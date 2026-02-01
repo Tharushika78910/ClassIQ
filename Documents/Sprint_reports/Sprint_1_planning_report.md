@@ -31,8 +31,8 @@
 
 
  - Project management tools 
-   - Created a github repository to store and share the project among group members and the lecturer. 
-   - Created a Trello workspace to plan, organize and track the project work clearly.
+  - Created a github repository to store and share the project among group members and the lecturer. 
+  - Created a Trello workspace to plan, organize and track the project work clearly.
 
 
  - Product vision
