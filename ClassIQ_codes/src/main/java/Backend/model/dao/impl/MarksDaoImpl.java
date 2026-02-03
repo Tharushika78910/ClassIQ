@@ -1,8 +1,8 @@
-package backend.model.dao.impl;
+package Backend.model.dao.impl;
 
-import backend.config.DatabaseConfig;
-import backend.model.dao.MarksDao;
-import backend.model.entity.StudentMarks;
+import Backend.config.DatabaseConfig;
+import Backend.model.dao.MarksDao;
+import Backend.model.entity.StudentMarks;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

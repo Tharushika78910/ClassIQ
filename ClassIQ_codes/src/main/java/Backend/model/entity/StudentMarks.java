@@ -1,4 +1,4 @@
-package backend.model.entity;
+package Backend.model.entity;
 
 public class StudentMarks {
 

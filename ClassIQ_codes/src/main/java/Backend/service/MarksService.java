@@ -1,6 +1,6 @@
-package backend.service;
+package Backend.service;
 
-import backend.model.entity.StudentMarks;
+import Backend.model.entity.StudentMarks;
 
 public class MarksService {
 

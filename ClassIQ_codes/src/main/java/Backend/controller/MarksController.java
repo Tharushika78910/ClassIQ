@@ -1,11 +1,11 @@
-package backend.controller;
+package Backend.controller;
 
-import backend.model.dao.MarksDao;
-import backend.model.dao.StudentDao;
-import backend.model.dao.impl.MarksDaoImpl;
-import backend.model.dao.impl.StudentDaoImpl;
-import backend.model.entity.StudentMarks;
-import backend.service.MarksService;
+import Backend.model.dao.MarksDao;
+import Backend.model.dao.StudentDao;
+import Backend.model.dao.impl.MarksDaoImpl;
+import Backend.model.dao.impl.StudentDaoImpl;
+import Backend.model.entity.StudentMarks;
+import Backend.service.MarksService;
 
 import java.sql.SQLException;
 

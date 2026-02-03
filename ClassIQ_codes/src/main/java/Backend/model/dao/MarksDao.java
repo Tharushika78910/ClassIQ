@@ -1,6 +1,6 @@
-package backend.model.dao;
+package Backend.model.dao;
 
-import backend.model.entity.StudentMarks;
+import Backend.model.entity.StudentMarks;
 
 import java.sql.SQLException;
 

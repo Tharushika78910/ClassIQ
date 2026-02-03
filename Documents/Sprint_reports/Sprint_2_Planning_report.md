@@ -8,7 +8,7 @@
 
 The goal of this sprint 2 is to initiate the technical foundation of ClassIQ project by implementing the database using MariaDB,
 starting the user interface 
-development with JavaFX , starting backend programmes  and integrating development tools such as unit testing and code coverage reporting.
+development with JavaFX , starting Backend programmes  and integrating development tools such as unit testing and code coverage reporting.
 
 
 ## Selected Product Backlog Items
@@ -17,7 +17,7 @@ development with JavaFX , starting backend programmes  and integrating developme
 
 - Design relational database schema
 - Start user interface 
-- Begin backend development
+- Begin Backend development
 - Database connectivity
 - Unit test framework
 - Code coverage reporting
@@ -40,7 +40,7 @@ development with JavaFX , starting backend programmes  and integrating developme
 
    
  - Begin Backend development   
-   We start the backend development by writing the core code in IntelliJ.First ,we 
+   We start the Backend development by writing the core code in IntelliJ.First ,we 
    create functions to enter and manage student details such as student name and student ID ,
     which will be used later to store and process student information in the system.
 

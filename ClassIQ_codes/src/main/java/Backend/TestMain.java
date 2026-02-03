@@ -1,7 +1,7 @@
-package backend;
+package Backend;
 
-import backend.controller.MarksController;
-import backend.model.entity.StudentMarks;
+import Backend.controller.MarksController;
+import Backend.model.entity.StudentMarks;
 
 public class TestMain {
 

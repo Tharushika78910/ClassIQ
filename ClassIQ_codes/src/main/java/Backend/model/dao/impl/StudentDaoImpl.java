@@ -1,8 +1,8 @@
-package backend.model.dao.impl;
+package Backend.model.dao.impl;
 
-import backend.config.DatabaseConfig;
-import backend.model.dao.StudentDao;
-import backend.model.entity.Student;
+import Backend.config.DatabaseConfig;
+import Backend.model.dao.StudentDao;
+import Backend.model.entity.Student;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
