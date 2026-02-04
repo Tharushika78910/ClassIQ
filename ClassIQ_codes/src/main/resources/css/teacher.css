@@ -1,0 +1,21 @@
+.teacher-root {
+    -fx-background-image: url("/bg_TeacherDashBoard.png");
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+
+.teacher-sidebar {
+    -fx-background-color: rgba(31, 42, 68, 0.95);
+    -fx-padding: 15;
+}
+
+.teacher-menu-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 12;
+}
+
+.teacher-menu-btn:hover { -fx-background-color: rgba(46, 59, 95, 0.95); }

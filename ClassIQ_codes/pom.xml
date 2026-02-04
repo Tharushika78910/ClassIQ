@@ -18,7 +18,6 @@
     </properties>
 
     <dependencies>
-        <!-- JavaFX Controls -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -31,14 +30,13 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!--JavaFX FXML-->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
-
         </dependency>
 
+        <!-- keep if your group uses DB -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
@@ -53,6 +51,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
+                    <!-- ✅ run the real application entry point -->
                     <mainClass>Frontend.Main</mainClass>
                 </configuration>
             </plugin>

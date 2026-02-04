@@ -1,0 +1,99 @@
+/* =====================================================
+   STUDENT DASHBOARD ROOT BACKGROUND
+   ===================================================== */
+.student-root {
+    -fx-background-image: url("/bg_Student.png");
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+
+
+/* =====================================================
+   SIDEBAR (LEFT)
+   ===================================================== */
+.student-sidebar {
+    -fx-background-color: rgba(38, 50, 56, 0.96);
+    -fx-padding: 15;
+}
+
+
+/* =====================================================
+   PROFILE BOX (IMAGE + NAME + EMAIL)
+   ===================================================== */
+.student-profile-box {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 14;
+    -fx-padding: 12;
+    -fx-alignment: center;
+}
+
+.profile-name {
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+}
+
+.profile-email {
+    -fx-text-fill: #cfd8dc;
+    -fx-font-size: 11px;
+}
+
+
+/* =====================================================
+   SIDEBAR MENU BUTTONS
+   ===================================================== */
+.student-menu-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 12;
+    -fx-background-radius: 10;
+}
+
+.student-menu-btn:hover {
+    -fx-background-color: rgba(55, 71, 79, 0.95);
+}
+
+/* Active menu item */
+.student-menu-active {
+    -fx-background-color: rgba(255, 255, 255, 0.22);
+}
+
+
+/* =====================================================
+   CENTER CONTENT CARD (THIS WAS HIDING YOUR BACKGROUND)
+   ===================================================== */
+.student-page-bg {
+    /* KEY FIX: semi-transparent so background shows */
+    -fx-background-color: rgba(255, 255, 255, 0.82);
+    -fx-background-radius: 18;
+    -fx-padding: 22;
+}
+
+
+/* =====================================================
+   MARKS TABLE (REPORT CARD)
+   ===================================================== */
+.marks-grid {
+    -fx-hgap: 0;
+    -fx-vgap: 0;
+    -fx-padding: 12;
+}
+
+.marks-cell {
+    -fx-border-color: #333;
+    -fx-border-width: 1;
+    -fx-padding: 8 12;
+    -fx-min-width: 160;
+    -fx-font-size: 14px;
+}
+
+
+/* =====================================================
+   OPTIONAL: HEADER BAR (KEEP SIMPLE)
+   ===================================================== */
+.header-bar {
+    -fx-background-color: transparent;
+}
