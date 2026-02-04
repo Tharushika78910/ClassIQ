@@ -182,8 +182,9 @@ public class StudentDashboard extends StackPane {
         addRow(grid, 1, "English", "9");
         addRow(grid, 2, "Science", "8");
         addRow(grid, 3, "Language", "8");
-        addRow(grid, 4, "Total\nMarks", "34");
-        addRow(grid, 5, "Average", "8.5");
+        addRow(grid, 4, "Geography","8");
+        addRow(grid, 5, "Total\nMarks", "42");
+        addRow(grid, 6, "Average", "8.4");
 
         left.getChildren().add(grid);
 

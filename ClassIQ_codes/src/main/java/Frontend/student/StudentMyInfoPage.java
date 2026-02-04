@@ -68,7 +68,8 @@ public class StudentMyInfoPage {
                 new SummaryRow("Mathematics", 90, "A"),
                 new SummaryRow("Science", 78, "B"),
                 new SummaryRow("English", 70, "B"),
-                new SummaryRow("History", 62, "C")
+                new SummaryRow("History", 62, "C"),
+                new SummaryRow("Geography",84,"A")
         ));
 
         tableCard.getChildren().add(table);
