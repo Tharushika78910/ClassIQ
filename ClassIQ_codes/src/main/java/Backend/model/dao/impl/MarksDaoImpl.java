@@ -1,6 +1,6 @@
 package Backend.model.dao.impl;
 
-import Backend.config.DatabaseConfig;
+import Backend.db.DBConnection;
 import Backend.model.dao.MarksDao;
 import Backend.model.entity.StudentMarks;
 
@@ -19,7 +19,7 @@ public class MarksDaoImpl implements MarksDao {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
-        try (Connection con = DatabaseConfig.getConnection();
+        try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, marks.getStudentId());

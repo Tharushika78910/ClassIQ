@@ -1,6 +1,6 @@
 package Backend.model.dao.impl;
 
-import Backend.config.DatabaseConfig;
+import Backend.db.DBConnection;
 import Backend.model.dao.WeightedMarksDao;
 
 import java.sql.Connection;
@@ -26,7 +26,7 @@ public class WeightedMarksDaoImpl implements WeightedMarksDao {
               grade = VALUES(grade)
             """;
 
-        try (Connection con = DatabaseConfig.getConnection();
+        try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, studentId);
