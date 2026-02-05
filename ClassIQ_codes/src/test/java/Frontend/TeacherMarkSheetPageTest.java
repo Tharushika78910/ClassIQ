@@ -1,4 +1,4 @@
-package FrontendTests;
+package Frontend;
 
 import Frontend.teacher.TeacherMarkSheetPage;
 import org.junit.jupiter.api.Test;
