@@ -14,7 +14,7 @@ public class TeacherDashboard extends BorderPane {
     private final StackPane contentArea = new StackPane();
 
     public TeacherDashboard(String name, String email, String profileImagePath) {
-        // Background image/theme from teacher.css (teacher-root)
+
         getStyleClass().add("teacher-root");
 
         setPadding(new Insets(10));
@@ -22,7 +22,7 @@ public class TeacherDashboard extends BorderPane {
         setLeft(buildSidebar());
         setCenter(contentArea);
 
-        // ✅ Default page = Home layout like your screenshot
+
         showPage(buildHomeView());
     }
 
@@ -78,7 +78,7 @@ public class TeacherDashboard extends BorderPane {
         btnRemedial.getStyleClass().add("teacher-menu-btn");
         btnLogout.getStyleClass().add("teacher-menu-btn");
 
-        // ✅ Actions
+
         btnHome.setOnAction(e -> showPage(buildHomeView()));
         btnMarkSheets.setOnAction(e -> showPage(new TeacherMarkSheetPage().getView()));
         btnGradingCriteria.setOnAction(e -> showPage(simplePlaceholder("Grading Criteria (placeholder)")));
@@ -103,7 +103,7 @@ public class TeacherDashboard extends BorderPane {
         return sidebar;
     }
 
-    // ✅ Home screen layout matching your screenshot
+    //  Home screen layout
     private Node buildHomeView() {
         VBox root = new VBox(20);
         root.setPadding(new Insets(30));

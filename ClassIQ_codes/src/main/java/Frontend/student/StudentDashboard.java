@@ -81,7 +81,7 @@ public class StudentDashboard extends StackPane {
         btnFeedback.getStyleClass().add("student-menu-btn");
         btnLogout.getStyleClass().add("student-menu-btn");
 
-        // ✅ Actions (NOW using separate page files)
+        //  Actions
         btnHome.setOnAction(e -> { setActive(btnHome); showPage(buildHomeView()); });
 
         btnMyInfo.setOnAction(e -> {
@@ -151,10 +151,7 @@ public class StudentDashboard extends StackPane {
         return wrapCard(card, 640, 260);
     }
 
-    /**
-     * Wrap content into a centered card-sized container
-     * so the background image stays visible.
-     */
+
     private Node wrapCard(Node card, double maxW, double maxH) {
         if (card instanceof Region r) {
             r.setMaxWidth(maxW);

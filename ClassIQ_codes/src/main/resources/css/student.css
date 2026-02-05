@@ -1,6 +1,8 @@
-/* =====================================================
-   STUDENT DASHBOARD ROOT BACKGROUND
-   ===================================================== */
+
+
+ /*student dashboard root background */
+
+
 .student-root {
     -fx-background-image: url("/bg_Student.png");
     -fx-background-size: cover;
@@ -9,18 +11,14 @@
 }
 
 
-/* =====================================================
-   SIDEBAR (LEFT)
-   ===================================================== */
+    /* Side bar (Left) */
 .student-sidebar {
     -fx-background-color: rgba(38, 50, 56, 0.96);
     -fx-padding: 15;
 }
 
 
-/* =====================================================
-   PROFILE BOX (IMAGE + NAME + EMAIL)
-   ===================================================== */
+/* profile box */
 .student-profile-box {
     -fx-background-color: rgba(255, 255, 255, 0.10);
     -fx-background-radius: 14;
@@ -40,9 +38,7 @@
 }
 
 
-/* =====================================================
-   SIDEBAR MENU BUTTONS
-   ===================================================== */
+/* side bar menu buttons*/
 .student-menu-btn {
     -fx-background-color: transparent;
     -fx-text-fill: white;
@@ -62,20 +58,16 @@
 }
 
 
-/* =====================================================
-   CENTER CONTENT CARD (THIS WAS HIDING YOUR BACKGROUND)
-   ===================================================== */
+/* center content card*/
 .student-page-bg {
-    /* KEY FIX: semi-transparent so background shows */
+
     -fx-background-color: rgba(255, 255, 255, 0.82);
     -fx-background-radius: 18;
     -fx-padding: 22;
 }
 
 
-/* =====================================================
-   MARKS TABLE (REPORT CARD)
-   ===================================================== */
+/*  Report Card-marks Table */
 .marks-grid {
     -fx-hgap: 0;
     -fx-vgap: 0;
@@ -91,9 +83,7 @@
 }
 
 
-/* =====================================================
-   OPTIONAL: HEADER BAR (KEEP SIMPLE)
-   ===================================================== */
+/* header  */
 .header-bar {
     -fx-background-color: transparent;
 }

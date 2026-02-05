@@ -93,10 +93,10 @@ public class TeacherMarkSheetPage {
 
         public String getGrade() {
             int t = getTotal();
-            if (t >= 85) return "A";
-            if (t >= 70) return "B";
+            if (t >= 75) return "A";
+            if (t >= 65) return "B";
             if (t >= 55) return "C";
-            if (t >= 40) return "D";
+            if (t >= 35) return "S";
             return "F";
         }
     }
