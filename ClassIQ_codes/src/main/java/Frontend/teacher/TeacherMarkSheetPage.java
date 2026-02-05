@@ -1,17 +1,20 @@
 package Frontend.teacher;
 
-import com.sun.source.tree.AssignmentTree;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.*;
+import javafx.util.StringConverter;
 
 public class TeacherMarkSheetPage {
+
+    private final TableView<MarkRow> table = new TableView<>();
+    private final Label status = new Label("");
 
     public Parent getView() {
         VBox root = new VBox(12);
@@ -21,84 +24,225 @@ public class TeacherMarkSheetPage {
         Label title = new Label("Mark Sheet");
         title.getStyleClass().add("title-xl");
 
-        Label subtitle = new Label("Class: 10A   |   Term: 1   |   Subject: Mathematics");
+        Label subtitle = new Label(
+                "Class: 10A   |   Term: 1   |   Subject: Mathematics\n" +
+                        "Assignment /20   Project /30   Final Exam /50"
+        );
         subtitle.getStyleClass().add("subtitle");
 
         VBox card = new VBox(12);
         card.getStyleClass().add("card");
 
-        TableView<MarkRow> table = new TableView<>();
-        table.getStyleClass().add("app-table");
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        buildTable();
 
-        TableColumn<MarkRow, String> colId = new TableColumn<>("Student ID");
-        colId.setCellValueFactory(new PropertyValueFactory<>("studentId"));
+        Button btnSave = new Button("Save");
+        btnSave.getStyleClass().add("primary-btn");
 
-        TableColumn<MarkRow, String> colName = new TableColumn<>("Student Name");
-        colName.setCellValueFactory(new PropertyValueFactory<>("studentName"));
+        Button btnClear = new Button("Clear");
+        btnClear.getStyleClass().add("secondary-btn");
 
-        TableColumn<MarkRow, Integer> colAssignment = new TableColumn<>("Assignment");
-        colAssignment.setCellValueFactory(new PropertyValueFactory<>("assignment"));
+        status.getStyleClass().add("muted-text");
 
-        TableColumn<MarkRow, Integer> colProject= new TableColumn<>("Project");
-        colProject.setCellValueFactory(new PropertyValueFactory<>("project"));
+        btnSave.setOnAction(e -> {
+            if (!allInputsValid()) {
+                status.setText("Please enter valid marks before saving.");
+                return;
+            }
 
-        TableColumn<MarkRow, Integer> colFinal = new TableColumn<>("FinalExam");
-        colFinal.setCellValueFactory(new PropertyValueFactory<>("finalExam"));
+            status.setText("Saved (demo only). Backend not connected.");
+            System.out.println("=== SAVE (DEMO) ===");
+            for (MarkRow r : table.getItems()) {
+                System.out.printf(
+                        "%s | %s | A:%d/20 P:%d/30 F:%d/50 | Total:%d | Grade:%s%n",
+                        r.getStudentId(), r.getStudentName(),
+                        r.getAssignment(), r.getProject(), r.getFinalExam(),
+                        r.getTotal(), r.getGrade()
+                );
+            }
+        });
 
-        TableColumn<MarkRow, Integer> colTotal = new TableColumn<>("Total");
-        colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
+        btnClear.setOnAction(e -> {
+            for (MarkRow r : table.getItems()) {
+                r.setAssignment(0);
+                r.setProject(0);
+                r.setFinalExam(0);
+            }
+            status.setText("All marks cleared.");
+        });
 
-        TableColumn<MarkRow, String> colGrade = new TableColumn<>("Grade");
-        colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
+        HBox actions = new HBox(10, btnSave, btnClear, status);
+        actions.setAlignment(Pos.CENTER_LEFT);
 
-        table.getColumns().addAll(colId, colName, colAssignment, colProject, colFinal, colTotal, colGrade);
-        table.setItems(sampleData());
-
-        card.getChildren().add(table);
+        card.getChildren().addAll(table, actions);
         root.getChildren().addAll(title, subtitle, card);
         return root;
     }
 
-    private ObservableList<MarkRow> sampleData() {
+    private void buildTable() {
+        table.setEditable(true);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<MarkRow, String> colId = new TableColumn<>("Student ID");
+        colId.setCellValueFactory(c -> c.getValue().studentIdProperty());
+
+        TableColumn<MarkRow, String> colName = new TableColumn<>("Student Name");
+        colName.setCellValueFactory(c -> c.getValue().studentNameProperty());
+
+        TableColumn<MarkRow, Integer> colAssignment =
+                editableMarkColumn("Assignment", 20, MarkRow::setAssignment);
+
+        TableColumn<MarkRow, Integer> colProject =
+                editableMarkColumn("Project", 30, MarkRow::setProject);
+
+        TableColumn<MarkRow, Integer> colFinal =
+                editableMarkColumn("Final Exam", 50, MarkRow::setFinalExam);
+
+        TableColumn<MarkRow, Integer> colTotal = new TableColumn<>("Total");
+        colTotal.setCellValueFactory(c -> c.getValue().totalProperty().asObject());
+
+        TableColumn<MarkRow, String> colGrade = new TableColumn<>("Grade");
+        colGrade.setCellValueFactory(c -> c.getValue().gradeProperty());
+
+        table.getColumns().setAll(
+                colId, colName,
+                colAssignment, colProject, colFinal,
+                colTotal, colGrade
+        );
+
+        table.setItems(fixedStudents());
+    }
+
+    private TableColumn<MarkRow, Integer> editableMarkColumn(
+            String title,
+            int max,
+            java.util.function.BiConsumer<MarkRow, Integer> setter
+    ) {
+        TableColumn<MarkRow, Integer> col = new TableColumn<>(title);
+        col.setCellValueFactory(c -> c.getValue().getPropertyFor(title).asObject());
+        col.setEditable(true);
+
+        col.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+        col.setOnEditCommit(ev -> {
+            Integer val = ev.getNewValue();
+            if (val == null) val = 0;
+
+            if (val < 0 || val > max) {
+                status.setText(title + " must be between 0 and " + max);
+                table.refresh();
+                return;
+            }
+
+            setter.accept(ev.getRowValue(), val);
+            status.setText("");
+        });
+
+        return col;
+    }
+
+    private boolean allInputsValid() {
+        for (MarkRow r : table.getItems()) {
+            if (r.getAssignment() < 0 || r.getAssignment() > 20) return false;
+            if (r.getProject() < 0 || r.getProject() > 30) return false;
+            if (r.getFinalExam() < 0 || r.getFinalExam() > 50) return false;
+        }
+        return true;
+    }
+
+    private ObservableList<MarkRow> fixedStudents() {
         return FXCollections.observableArrayList(
-                new MarkRow("S001", "Alex Johnson", 10, 25, 55),
-                new MarkRow("S002", "Mia Tran", 9, 28, 60),
-                new MarkRow("S003", "Noah Silva", 8, 20, 50),
-                new MarkRow("S004", "Emma Lee", 10, 30, 65)
+                new MarkRow("S001", "Poornima Jayamanna"),
+                new MarkRow("S002", "Hathadura Chathurika Silva"),
+                new MarkRow("S003", "Malmige Roshini"),
+                new MarkRow("S004", "Kumudu Nalleperuma"),
+                new MarkRow("S005", "Dilmi Rajapaksha"),
+                new MarkRow("S006", "Saumya Sompala"),
+                new MarkRow("S007", "Chani Anjalika")
         );
     }
 
-    public static class MarkRow {
-        private final String studentId;
-        private final String studentName;
-        private final int assignment;
-        private final int project;
-        private final int finalExam;
+    // inner model
 
-        public MarkRow(String studentId, String studentName, int assignment, int project, int finalExam) {
-            this.studentId = studentId;
-            this.studentName = studentName;
-            this.assignment = assignment;
-            this.project = project;
-            this.finalExam = finalExam;
+    public static class MarkRow {
+        private final StringProperty studentId = new SimpleStringProperty();
+        private final StringProperty studentName = new SimpleStringProperty();
+
+        private final IntegerProperty assignment = new SimpleIntegerProperty(0);
+        private final IntegerProperty project = new SimpleIntegerProperty(0);
+        private final IntegerProperty finalExam = new SimpleIntegerProperty(0);
+
+        private final IntegerProperty total = new SimpleIntegerProperty();
+        private final StringProperty grade = new SimpleStringProperty();
+
+        public MarkRow(String id, String name) {
+            studentId.set(id);
+            studentName.set(name);
+
+            assignment.addListener((o, a, b) -> recalc());
+            project.addListener((o, a, b) -> recalc());
+            finalExam.addListener((o, a, b) -> recalc());
+
+            recalc();
         }
 
-        public String getStudentId() { return studentId; }
-        public String getStudentName() { return studentName; }
-        public int getAssignment() { return assignment; }
-        public int getProject() { return project; }
-        public int getFinalExam() { return finalExam; }
+        private void recalc() {
+            int t = assignment.get() + project.get() + finalExam.get();
+            total.set(t);
 
-        public int getTotal() { return assignment + project + finalExam; }
+            if (t >= 75) grade.set("A");
+            else if (t >= 65) grade.set("B");
+            else if (t >= 55) grade.set("C");
+            else if (t >= 35) grade.set("S");
+            else grade.set("F");
+        }
 
-        public String getGrade() {
-            int t = getTotal();
-            if (t >= 75) return "A";
-            if (t >= 65) return "B";
-            if (t >= 55) return "C";
-            if (t >= 35) return "S";
-            return "F";
+        // getters / setters
+        public String getStudentId() { return studentId.get(); }
+        public String getStudentName() { return studentName.get(); }
+
+        public int getAssignment() { return assignment.get(); }
+        public int getProject() { return project.get(); }
+        public int getFinalExam() { return finalExam.get(); }
+
+        public void setAssignment(int v) { assignment.set(v); }
+        public void setProject(int v) { project.set(v); }
+        public void setFinalExam(int v) { finalExam.set(v); }
+
+        public int getTotal() { return total.get(); }
+        public String getGrade() { return grade.get(); }
+
+        public StringProperty studentIdProperty() { return studentId; }
+        public StringProperty studentNameProperty() { return studentName; }
+        public IntegerProperty totalProperty() { return total; }
+        public StringProperty gradeProperty() { return grade; }
+
+        public IntegerProperty getPropertyFor(String title) {
+            return switch (title) {
+                case "Assignment" -> assignment;
+                case "Project" -> project;
+                case "Final Exam" -> finalExam;
+                default -> new SimpleIntegerProperty(0);
+            };
+        }
+    }
+
+    // converter
+
+
+    public static class IntegerStringConverter extends StringConverter<Integer> {
+        @Override
+        public String toString(Integer value) {
+            return value == null ? "0" : value.toString();
+        }
+
+        @Override
+        public Integer fromString(String s) {
+            if (s == null || s.trim().isEmpty()) return 0;
+            try {
+                return Integer.parseInt(s.trim());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
     }
 }

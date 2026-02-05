@@ -69,8 +69,8 @@ public class LoginPage {
                 //  Teacher dashboard navigation (ONLY NEW LOGIC)
                 teacherLogin.setOnAction(e -> {
                         TeacherDashboard dashboard = new TeacherDashboard(
-                                "Mr. Silva",
-                                "teacher@school.com",
+                                "Mr. Matti Valovirta",
+                                "mattiv@metropolia.com",
                                 "/Teacher.png"
                         );
                         Scene teacherScene = new Scene(dashboard, 1100, 700);
