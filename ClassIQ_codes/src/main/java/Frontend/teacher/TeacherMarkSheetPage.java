@@ -1,5 +1,6 @@
 package Frontend.teacher;
 
+import com.sun.source.tree.AssignmentTree;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -36,13 +37,13 @@ public class TeacherMarkSheetPage {
         TableColumn<MarkRow, String> colName = new TableColumn<>("Student Name");
         colName.setCellValueFactory(new PropertyValueFactory<>("studentName"));
 
-        TableColumn<MarkRow, Integer> colAttendance = new TableColumn<>("Attendance");
-        colAttendance.setCellValueFactory(new PropertyValueFactory<>("attendance"));
+        TableColumn<MarkRow, Integer> colAssignment = new TableColumn<>("Assignment");
+        colAssignment.setCellValueFactory(new PropertyValueFactory<>("assignment"));
 
-        TableColumn<MarkRow, Integer> colMid = new TableColumn<>("Mid");
-        colMid.setCellValueFactory(new PropertyValueFactory<>("mid"));
+        TableColumn<MarkRow, Integer> colProject= new TableColumn<>("Project");
+        colProject.setCellValueFactory(new PropertyValueFactory<>("project"));
 
-        TableColumn<MarkRow, Integer> colFinal = new TableColumn<>("Final");
+        TableColumn<MarkRow, Integer> colFinal = new TableColumn<>("FinalExam");
         colFinal.setCellValueFactory(new PropertyValueFactory<>("finalExam"));
 
         TableColumn<MarkRow, Integer> colTotal = new TableColumn<>("Total");
@@ -51,7 +52,7 @@ public class TeacherMarkSheetPage {
         TableColumn<MarkRow, String> colGrade = new TableColumn<>("Grade");
         colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
 
-        table.getColumns().addAll(colId, colName, colAttendance, colMid, colFinal, colTotal, colGrade);
+        table.getColumns().addAll(colId, colName, colAssignment, colProject, colFinal, colTotal, colGrade);
         table.setItems(sampleData());
 
         card.getChildren().add(table);
@@ -71,25 +72,25 @@ public class TeacherMarkSheetPage {
     public static class MarkRow {
         private final String studentId;
         private final String studentName;
-        private final int attendance;
-        private final int mid;
+        private final int assignment;
+        private final int project;
         private final int finalExam;
 
-        public MarkRow(String studentId, String studentName, int attendance, int mid, int finalExam) {
+        public MarkRow(String studentId, String studentName, int assignment, int project, int finalExam) {
             this.studentId = studentId;
             this.studentName = studentName;
-            this.attendance = attendance;
-            this.mid = mid;
+            this.assignment = assignment;
+            this.project = project;
             this.finalExam = finalExam;
         }
 
         public String getStudentId() { return studentId; }
         public String getStudentName() { return studentName; }
-        public int getAttendance() { return attendance; }
-        public int getMid() { return mid; }
+        public int getAssignment() { return assignment; }
+        public int getProject() { return project; }
         public int getFinalExam() { return finalExam; }
 
-        public int getTotal() { return attendance + mid + finalExam; }
+        public int getTotal() { return assignment + project + finalExam; }
 
         public String getGrade() {
             int t = getTotal();
