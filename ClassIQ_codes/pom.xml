@@ -36,6 +36,11 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -49,7 +54,6 @@
             <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
