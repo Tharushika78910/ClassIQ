@@ -1,4 +1,4 @@
-package Frontend;
+package FrontendTests;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
