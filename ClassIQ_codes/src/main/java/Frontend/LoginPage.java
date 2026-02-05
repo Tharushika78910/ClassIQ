@@ -66,7 +66,7 @@ public class LoginPage {
                 teacherLogin.setStyle("-fx-background-color: #32CD32; -fx-text-fill: white; -fx-background-radius: 15;");
                 teacherLogin.setPrefWidth(120);
 
-                // ✅ Teacher dashboard navigation (ONLY NEW LOGIC)
+                //  Teacher dashboard navigation (ONLY NEW LOGIC)
                 teacherLogin.setOnAction(e -> {
                         TeacherDashboard dashboard = new TeacherDashboard(
                                 "Mr. Silva",
@@ -130,7 +130,7 @@ public class LoginPage {
                 studentLogin.setStyle("-fx-background-color: #32CD32; -fx-text-fill: white; -fx-background-radius: 15;");
                 studentLogin.setPrefWidth(120);
 
-                // ✅ Student dashboard navigation (ONLY NEW LOGIC)
+                //  Student dashboard navigation (ONLY NEW LOGIC)
                 studentLogin.setOnAction(e -> {
                         StudentDashboard dashboard = new StudentDashboard(
                                 "Bao Tran",
