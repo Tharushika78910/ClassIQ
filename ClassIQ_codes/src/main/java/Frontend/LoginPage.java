@@ -24,7 +24,7 @@ public class LoginPage {
                 ImageView bgImageView = new ImageView(bgImage);
                 bgImageView.setPreserveRatio(false);
 
-                /* ===================== TEACHER PANEL ===================== */
+                /*  teacher panel  */
 
                 VBox teacherPanel = new VBox(12);
                 teacherPanel.setAlignment(Pos.TOP_CENTER);
@@ -88,7 +88,7 @@ public class LoginPage {
                         teacherIconView, teacherLabel, usernameBox, passwordBox, teacherForgot, teacherLogin
                 );
 
-                /* ===================== STUDENT PANEL ===================== */
+                /* student panel*/
 
                 VBox studentPanel = new VBox(12);
                 studentPanel.setAlignment(Pos.TOP_CENTER);
@@ -130,7 +130,7 @@ public class LoginPage {
                 studentLogin.setStyle("-fx-background-color: #32CD32; -fx-text-fill: white; -fx-background-radius: 15;");
                 studentLogin.setPrefWidth(120);
 
-                //  Student dashboard navigation (ONLY NEW LOGIC)
+                // student dash board navigation
                 studentLogin.setOnAction(e -> {
                         StudentDashboard dashboard = new StudentDashboard(
                                 "Bao Tran",
@@ -153,7 +153,7 @@ public class LoginPage {
                         studentPasswordBox, studentForgot, studentLogin
                 );
 
-                /* ===================== CENTER CONTENT ===================== */
+                /* center content  */
 
                 Label titleLabel = new Label("Class iQ");
                 titleLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 32));
