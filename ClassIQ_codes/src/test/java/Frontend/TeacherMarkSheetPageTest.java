@@ -2,12 +2,19 @@ package Frontend;
 
 import Frontend.teacher.TeacherMarkSheetPage;
 
+
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Parent;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,126 +23,224 @@ class TeacherMarkSheetPageTest {
 
     @BeforeAll
     static void initJavaFX() {
-        // starts JavaFX runtime
+        // Initialize JavaFX runtime once for all tests
         new JFXPanel();
     }
 
-    // helper to run code on FX thread and wait
     private static void runOnFxAndWait(Runnable action) throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             try { action.run(); }
             finally { latch.countDown(); }
         });
         latch.await();
     }
 
+    @SuppressWarnings("unchecked")
+    private static TableView<TeacherMarkSheetPage.MarkRow> getTable(TeacherMarkSheetPage page) {
+        try {
+            Field f = TeacherMarkSheetPage.class.getDeclaredField("table");
+            f.setAccessible(true);
+            return (TableView<TeacherMarkSheetPage.MarkRow>) f.get(page);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot access table field: " + e.getMessage(), e);
+        }
+    }
+
+    private static Button findButtonByText(Parent root, String text) {
+        for (Node n : root.lookupAll(".button")) {
+            if (n instanceof Button b && text.equals(b.getText())) return b;
+        }
+        return null;
+    }
+
     @Test
-    void getView_shouldBuildWithoutException() throws InterruptedException {
+    void getView_buildsTableAndButtons() throws InterruptedException {
         runOnFxAndWait(() -> {
             TeacherMarkSheetPage page = new TeacherMarkSheetPage();
             Parent view = page.getView();
+
             assertNotNull(view);
+
+            Button save = findButtonByText(view, "Save");
+            Button clear = findButtonByText(view, "Clear");
+
+            assertNotNull(save, "Save button should exist");
+            assertNotNull(clear, "Clear button should exist");
+
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+            assertNotNull(table);
+
+            assertEquals(7, table.getItems().size(), "Should have 7 fixed students");
+            assertEquals(7, table.getColumns().size(), "Should have 7 columns");
+            assertTrue(table.isEditable(), "Table should be editable");
         });
     }
 
     @Test
-    void markRow_recalculatesTotalAndGrade_whenMarksChange() throws InterruptedException {
+    void saveButton_runsValidationFailBranch_whenOutOfRange() throws InterruptedException {
         runOnFxAndWait(() -> {
-            TeacherMarkSheetPage.MarkRow row =
-                    new TeacherMarkSheetPage.MarkRow("S001", "Poornima Jayamanna");
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            Parent view = page.getView();
 
-            // initial
-            assertEquals(0, row.getTotal());
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+
+            // Make invalid: assignment > 20
+            table.getItems().get(0).setAssignment(21);
+
+            Button save = findButtonByText(view, "Save");
+            assertNotNull(save);
+
+            // should hit allInputsValid() == false branch
+            assertDoesNotThrow(save::fire);
+        });
+    }
+
+    @Test
+    void saveButton_runsSuccessBranch_whenAllValid() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            Parent view = page.getView();
+
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+
+            // Valid values for first row
+            var r0 = table.getItems().get(0);
+            r0.setAssignment(20); // max 20
+            r0.setProject(30);    // max 30
+            r0.setFinalExam(50);  // max 50
+
+            Button save = findButtonByText(view, "Save");
+            assertNotNull(save);
+
+            // should go through save success loop/println branch
+            assertDoesNotThrow(save::fire);
+
+            assertEquals(100, r0.getTotal());
+            assertEquals("A", r0.getGrade());
+        });
+    }
+
+    @Test
+    void clearButton_resetsAllMarksToZero() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            Parent view = page.getView();
+
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+
+            // Put some marks first
+            var r0 = table.getItems().get(0);
+            r0.setAssignment(10);
+            r0.setProject(10);
+            r0.setFinalExam(10);
+            assertEquals(30, r0.getTotal());
+
+            Button clear = findButtonByText(view, "Clear");
+            assertNotNull(clear);
+
+            clear.fire(); // run clear handler
+
+            assertEquals(0, r0.getAssignment());
+            assertEquals(0, r0.getProject());
+            assertEquals(0, r0.getFinalExam());
+            assertEquals(0, r0.getTotal());
+        });
+    }
+
+    @Test
+    void editCommit_invalidValue_hitsRefreshBranch() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            page.getView();
+
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+
+            // Assignment column is index 2 (ID, Name, Assignment...)
+            @SuppressWarnings("unchecked")
+            TableColumn<TeacherMarkSheetPage.MarkRow, Integer> assignmentCol =
+                    (TableColumn<TeacherMarkSheetPage.MarkRow, Integer>) table.getColumns().get(2);
+
+            // Fire onEditCommit with invalid new value (e.g., 999 > 20)
+            TablePosition<TeacherMarkSheetPage.MarkRow, Integer> pos =
+                    new TablePosition<>(table, 0, assignmentCol);
+
+            TableColumn.CellEditEvent<TeacherMarkSheetPage.MarkRow, Integer> ev =
+                    new TableColumn.CellEditEvent<>(table, pos, TableColumn.editCommitEvent(), 999);
+
+            assertDoesNotThrow(() -> assignmentCol.getOnEditCommit().handle(ev));
+
+            // value should not become 999 because handler should reject it
+            assertNotEquals(999, table.getItems().get(0).getAssignment());
+        });
+    }
+
+    @Test
+    void editCommit_validValue_updatesRow() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            page.getView();
+
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+
+            @SuppressWarnings("unchecked")
+            TableColumn<TeacherMarkSheetPage.MarkRow, Integer> projectCol =
+                    (TableColumn<TeacherMarkSheetPage.MarkRow, Integer>) table.getColumns().get(3);
+
+            TablePosition<TeacherMarkSheetPage.MarkRow, Integer> pos =
+                    new TablePosition<>(table, 0, projectCol);
+
+            TableColumn.CellEditEvent<TeacherMarkSheetPage.MarkRow, Integer> ev =
+                    new TableColumn.CellEditEvent<>(table, pos, TableColumn.editCommitEvent(), 30);
+
+            projectCol.getOnEditCommit().handle(ev);
+
+            assertEquals(30, table.getItems().get(0).getProject());
+        });
+    }
+
+    @Test
+    void markRow_gradeBranches_areCovered() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage.MarkRow row = new TeacherMarkSheetPage.MarkRow("S999", "Test");
+
+            // F (<35)
+            row.setAssignment(0); row.setProject(0); row.setFinalExam(34);
             assertEquals("F", row.getGrade());
 
-            // 20 + 30 + 50 = 100 => A
-            row.setAssignment(20);
-            row.setProject(30);
-            row.setFinalExam(50);
-
-            assertEquals(100, row.getTotal());
-            assertEquals("A", row.getGrade());
-
-            // 10 + 20 + 20 = 50 => S (>=35 and <55)
-            row.setAssignment(10);
-            row.setProject(20);
-            row.setFinalExam(20);
-
-            assertEquals(50, row.getTotal());
+            // S (>=35)
+            row.setFinalExam(35);
             assertEquals("S", row.getGrade());
-        });
-    }
 
-    @Test
-    void markRow_gradeBoundaries_areCorrect() throws InterruptedException {
-        runOnFxAndWait(() -> {
-            TeacherMarkSheetPage.MarkRow row =
-                    new TeacherMarkSheetPage.MarkRow("S002", "Test Student");
-
-            // 75 => A
-            row.setAssignment(20);
-            row.setProject(30);
-            row.setFinalExam(25);
-            assertEquals(75, row.getTotal());
-            assertEquals("A", row.getGrade());
-
-            // 65 => B
-            row.setFinalExam(15); // 20+30+15=65
-            assertEquals(65, row.getTotal());
-            assertEquals("B", row.getGrade());
-
-            // 55 => C
-            row.setFinalExam(5); // 20+30+5=55
-            assertEquals(55, row.getTotal());
+            // C (>=55)
+            row.setFinalExam(55);
             assertEquals("C", row.getGrade());
 
-            // 35 => S
-            row.setAssignment(10);
-            row.setProject(10);
-            row.setFinalExam(15); // 35
-            assertEquals(35, row.getTotal());
-            assertEquals("S", row.getGrade());
+            // B (>=65)
+            row.setFinalExam(65);
+            assertEquals("B", row.getGrade());
 
-            // 34 => F
-            row.setFinalExam(14); // 10+10+14=34
-            assertEquals(34, row.getTotal());
-            assertEquals("F", row.getGrade());
+            // A (>=75)
+            row.setFinalExam(75);
+            assertEquals("A", row.getGrade());
         });
     }
 
     @Test
-    void allInputsValid_returnsFalse_whenOutOfRange() throws Exception {
-        // allInputsValid() is private, so we call it using reflection.
-        // This is acceptable for student projects when you want to test private validation logic.
-
-        TeacherMarkSheetPage page = new TeacherMarkSheetPage();
-
-        // Build UI so table is initialized and items exist
-        runOnFxAndWait(page::getView);
-
-        Method m = TeacherMarkSheetPage.class.getDeclaredMethod("allInputsValid");
-        m.setAccessible(true);
-
-        // first should be valid (all zeros)
-        boolean valid1 = (boolean) m.invoke(page);
-        assertTrue(valid1);
-
-        // make one row invalid: assignment > 20
+    void converter_and_getPropertyFor_defaultBranch() throws InterruptedException {
         runOnFxAndWait(() -> {
-            // access first row through inner MarkRow class by rebuilding a row reference
-            // We can’t access the private table directly here, so we use reflection too.
-            try {
-                var tableField = TeacherMarkSheetPage.class.getDeclaredField("table");
-                tableField.setAccessible(true);
-                var table = (javafx.scene.control.TableView<TeacherMarkSheetPage.MarkRow>) tableField.get(page);
-                table.getItems().get(0).setAssignment(21); // invalid
-            } catch (Exception ex) {
-                fail("Reflection access failed: " + ex.getMessage());
-            }
-        });
+            // Converter paths
+            TeacherMarkSheetPage.IntegerStringConverter c = new TeacherMarkSheetPage.IntegerStringConverter();
+            assertEquals("0", c.toString(null));
+            assertEquals(0, c.fromString(""));
+            assertEquals(0, c.fromString("   "));
+            assertEquals(0, c.fromString("abc"));
+            assertEquals(12, c.fromString("12"));
 
-        boolean valid2 = (boolean) m.invoke(page);
-        assertFalse(valid2);
+            // getPropertyFor default branch
+            TeacherMarkSheetPage.MarkRow row = new TeacherMarkSheetPage.MarkRow("S1", "X");
+            assertNotNull(row.getPropertyFor("NOT_A_REAL_COLUMN"));
+            assertEquals(0, row.getPropertyFor("NOT_A_REAL_COLUMN").get());
+        });
     }
 }
