@@ -10,7 +10,7 @@ public class TestMain {
         MarksController controller = new MarksController();
 
         StudentMarks m = new StudentMarks();
-        m.setStudentId(1); // must exist in students table
+        m.setStudentId(201); // must exist in students table
         m.setSubject1(80);
         m.setSubject2(75);
         m.setSubject3(90);
