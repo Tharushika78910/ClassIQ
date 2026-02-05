@@ -1,86 +1,141 @@
 package Frontend;
 
 import Frontend.teacher.TeacherMarkSheetPage;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Parent;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TeacherMarkSheetPageTest {
 
-    @Test
-    void total_isSumOfAssignmentProjectFinalExam() {
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S001", "Alex Johnson", 10, 25, 55);
+    @BeforeAll
+    static void initJavaFX() {
+        // starts JavaFX runtime
+        new JFXPanel();
+    }
 
-        assertEquals(90, row.getTotal());
+    // helper to run code on FX thread and wait
+    private static void runOnFxAndWait(Runnable action) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        javafx.application.Platform.runLater(() -> {
+            try { action.run(); }
+            finally { latch.countDown(); }
+        });
+        latch.await();
     }
 
     @Test
-    void getters_returnCorrectValues() {
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S010", "Mia Tran", 9, 28, 60);
-
-        assertEquals("S010", row.getStudentId());
-        assertEquals("Mia Tran", row.getStudentName());
-        assertEquals(9, row.getAssignment());
-        assertEquals(28, row.getProject());
-        assertEquals(60, row.getFinalExam());
+    void getView_shouldBuildWithoutException() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            Parent view = page.getView();
+            assertNotNull(view);
+        });
     }
 
     @Test
-    void grade_isA_whenTotalAtLeast75() {
-        // 25 + 25 + 25 = 75
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S100", "A Student", 25, 25, 25);
+    void markRow_recalculatesTotalAndGrade_whenMarksChange() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage.MarkRow row =
+                    new TeacherMarkSheetPage.MarkRow("S001", "Poornima Jayamanna");
 
-        assertEquals(75, row.getTotal());
-        assertEquals("A", row.getGrade());
+            // initial
+            assertEquals(0, row.getTotal());
+            assertEquals("F", row.getGrade());
+
+            // 20 + 30 + 50 = 100 => A
+            row.setAssignment(20);
+            row.setProject(30);
+            row.setFinalExam(50);
+
+            assertEquals(100, row.getTotal());
+            assertEquals("A", row.getGrade());
+
+            // 10 + 20 + 20 = 50 => S (>=35 and <55)
+            row.setAssignment(10);
+            row.setProject(20);
+            row.setFinalExam(20);
+
+            assertEquals(50, row.getTotal());
+            assertEquals("S", row.getGrade());
+        });
     }
 
     @Test
-    void grade_isB_whenTotalBetween65And74() {
-        // 20 + 20 + 25 = 65
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S101", "B Student", 20, 20, 25);
+    void markRow_gradeBoundaries_areCorrect() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage.MarkRow row =
+                    new TeacherMarkSheetPage.MarkRow("S002", "Test Student");
 
-        assertEquals(65, row.getTotal());
-        assertEquals("B", row.getGrade());
+            // 75 => A
+            row.setAssignment(20);
+            row.setProject(30);
+            row.setFinalExam(25);
+            assertEquals(75, row.getTotal());
+            assertEquals("A", row.getGrade());
 
-        // 24 + 20 + 20 = 64 -> should be C, just to show boundary
-        TeacherMarkSheetPage.MarkRow row2 =
-                new TeacherMarkSheetPage.MarkRow("S102", "Boundary Student", 24, 20, 20);
+            // 65 => B
+            row.setFinalExam(15); // 20+30+15=65
+            assertEquals(65, row.getTotal());
+            assertEquals("B", row.getGrade());
 
-        assertEquals(64, row2.getTotal());
-        assertEquals("C", row2.getGrade());
+            // 55 => C
+            row.setFinalExam(5); // 20+30+5=55
+            assertEquals(55, row.getTotal());
+            assertEquals("C", row.getGrade());
+
+            // 35 => S
+            row.setAssignment(10);
+            row.setProject(10);
+            row.setFinalExam(15); // 35
+            assertEquals(35, row.getTotal());
+            assertEquals("S", row.getGrade());
+
+            // 34 => F
+            row.setFinalExam(14); // 10+10+14=34
+            assertEquals(34, row.getTotal());
+            assertEquals("F", row.getGrade());
+        });
     }
 
     @Test
-    void grade_isC_whenTotalBetween55And64() {
-        // 15 + 20 + 20 = 55
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S103", "C Student", 15, 20, 20);
+    void allInputsValid_returnsFalse_whenOutOfRange() throws Exception {
+        // allInputsValid() is private, so we call it using reflection.
+        // This is acceptable for student projects when you want to test private validation logic.
 
-        assertEquals(55, row.getTotal());
-        assertEquals("C", row.getGrade());
-    }
+        TeacherMarkSheetPage page = new TeacherMarkSheetPage();
 
-    @Test
-    void grade_isS_whenTotalBetween35And54() {
-        // 10 + 10 + 15 = 35
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S104", "S Student", 10, 10, 15);
+        // Build UI so table is initialized and items exist
+        runOnFxAndWait(page::getView);
 
-        assertEquals(35, row.getTotal());
-        assertEquals("S", row.getGrade());
-    }
+        Method m = TeacherMarkSheetPage.class.getDeclaredMethod("allInputsValid");
+        m.setAccessible(true);
 
-    @Test
-    void grade_isF_whenTotalBelow35() {
-        // 10 + 10 + 14 = 34
-        TeacherMarkSheetPage.MarkRow row =
-                new TeacherMarkSheetPage.MarkRow("S105", "F Student", 10, 10, 14);
+        // first should be valid (all zeros)
+        boolean valid1 = (boolean) m.invoke(page);
+        assertTrue(valid1);
 
-        assertEquals(34, row.getTotal());
-        assertEquals("F", row.getGrade());
+        // make one row invalid: assignment > 20
+        runOnFxAndWait(() -> {
+            // access first row through inner MarkRow class by rebuilding a row reference
+            // We can’t access the private table directly here, so we use reflection too.
+            try {
+                var tableField = TeacherMarkSheetPage.class.getDeclaredField("table");
+                tableField.setAccessible(true);
+                var table = (javafx.scene.control.TableView<TeacherMarkSheetPage.MarkRow>) tableField.get(page);
+                table.getItems().get(0).setAssignment(21); // invalid
+            } catch (Exception ex) {
+                fail("Reflection access failed: " + ex.getMessage());
+            }
+        });
+
+        boolean valid2 = (boolean) m.invoke(page);
+        assertFalse(valid2);
     }
 }
