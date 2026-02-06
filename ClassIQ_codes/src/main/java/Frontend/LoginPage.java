@@ -24,7 +24,7 @@ public class LoginPage {
                 ImageView bgImageView = new ImageView(bgImage);
                 bgImageView.setPreserveRatio(false);
 
-                /*  teacher panel  */
+                // Teacher panel
 
                 VBox teacherPanel = new VBox(12);
                 teacherPanel.setAlignment(Pos.TOP_CENTER);
@@ -88,7 +88,7 @@ public class LoginPage {
                         teacherIconView, teacherLabel, usernameBox, passwordBox, teacherForgot, teacherLogin
                 );
 
-                /* student panel*/
+                // student panel
 
                 VBox studentPanel = new VBox(12);
                 studentPanel.setAlignment(Pos.TOP_CENTER);
@@ -153,7 +153,7 @@ public class LoginPage {
                         studentPasswordBox, studentForgot, studentLogin
                 );
 
-                /* center content  */
+                // center content
 
                 Label titleLabel = new Label("Class iQ");
                 titleLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 32));

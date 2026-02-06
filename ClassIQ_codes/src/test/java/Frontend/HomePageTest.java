@@ -14,7 +14,6 @@ public class HomePageTest {
 
     @BeforeAll
     static void initJavaFX() {
-        // Initializes JavaFX runtime once for all tests
         new JFXPanel();
     }
 

@@ -3,8 +3,10 @@ package Frontend;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,41 +17,63 @@ public class LoginPageTest {
 
     @BeforeAll
     static void initJavaFX() {
-        // Initializes JavaFX runtime so we can test JavaFX components
         new JFXPanel();
     }
 
     @Test
-    void getScene_shouldCreateLoginPageScene() {
+    void getScene_basicTestForLoginPage() {
         Platform.runLater(() -> {
-            // 1. Create a stage
+            // Create stage and page
             Stage stage = new Stage();
-
-            // 2. Create LoginPage instance
             LoginPage loginPage = new LoginPage();
 
-            // 3. Get scene from LoginPage
+            // Build scene
             Scene scene = loginPage.getScene(stage);
 
-            // 4. Assertions
-
-            // Scene should not be null
+            // Basic checks
             assertNotNull(scene, "Scene should not be null");
-
-            // Root should be StackPane
             assertTrue(scene.getRoot() instanceof StackPane, "Root should be a StackPane");
 
-            // Root should contain exactly 2 children: background image + HBox
             StackPane root = (StackPane) scene.getRoot();
+            // bg image + main content
             assertEquals(2, root.getChildren().size(), "Root should have 2 children");
 
-            // Second child should be HBox (panelsBox)
-            assertTrue(root.getChildren().get(1) instanceof HBox, "Second child should be HBox");
+            // Second child is mainContent VBox
+            assertTrue(root.getChildren().get(1) instanceof VBox, "Second child should be mainContent VBox");
+            VBox mainContent = (VBox) root.getChildren().get(1);
 
-            HBox panelsBox = (HBox) root.getChildren().get(1);
+            // mainContent- [titleLabel, panelsBox]
+            assertTrue(mainContent.getChildren().size() >= 2, "Main content should have title and panels");
+            assertTrue(mainContent.getChildren().get(1) instanceof HBox, "Panels container should be an HBox");
+            HBox panelsBox = (HBox) mainContent.getChildren().get(1);
 
-            // HBox should contain exactly 2 children: teacher panel + student panel
-            assertEquals(2, panelsBox.getChildren().size(), "HBox should have 2 children");
+            // panelsBox- [teacherPanel, studentPanel]
+            assertEquals(2, panelsBox.getChildren().size(), "Panels box should have 2 children");
+            assertTrue(panelsBox.getChildren().get(0) instanceof VBox, "Teacher panel should be a VBox");
+            assertTrue(panelsBox.getChildren().get(1) instanceof VBox, "Student panel should be a VBox");
+
+            VBox teacherPanel = (VBox) panelsBox.getChildren().get(0);
+            VBox studentPanel = (VBox) panelsBox.getChildren().get(1);
+
+            // Find "Log in" buttons in each panel
+            Button teacherLogin = findButtonByText(teacherPanel, "Log in");
+            Button studentLogin = findButtonByText(studentPanel, "Log in");
+
+            assertNotNull(teacherLogin, "Teacher panel should contain 'Log in' button");
+            assertNotNull(studentLogin, "Student panel should contain 'Log in' button");
+
+            // Click buttons to execute the handlers (navigation code)
+            teacherLogin.fire();
+            studentLogin.fire();
         });
+    }
+
+    private static Button findButtonByText(VBox panel, String text) {
+        for (var node : panel.getChildren()) {
+            if (node instanceof Button b && text.equals(b.getText())) {
+                return b;
+            }
+        }
+        return null;
     }
 }

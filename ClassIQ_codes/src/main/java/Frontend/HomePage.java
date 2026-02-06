@@ -24,7 +24,7 @@ public class HomePage {
         ImageView bgImageView = new ImageView(bgImage);
         bgImageView.setPreserveRatio(false);
 
-        // Top Section-Title and Login Button
+        // Top Section Title and Login Button
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(20));
         topBar.setAlignment(Pos.CENTER_LEFT);
