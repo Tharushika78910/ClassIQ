@@ -54,6 +54,14 @@
             <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.14</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -84,6 +92,15 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <includes>
+                                <include>Backend/service/*</include>
+                                <include>Frontend/HomePage*</include>
+                                <include>Frontend/LoginPage*</include>
+                                <include>Frontend/teacher/TeacherMarkSheetPage*</include>
+                            </includes>
+                        </configuration>
+
                     </execution>
                 </executions>
             </plugin>

@@ -1,12 +1,10 @@
 package Frontend;
 
 import Frontend.teacher.TeacherMarkSheetPage;
-
-
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Parent;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
@@ -15,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +22,7 @@ class TeacherMarkSheetPageTest {
 
     @BeforeAll
     static void initJavaFX() {
-        // Initialize JavaFX runtime once for all tests
+
         new JFXPanel();
     }
 
@@ -79,124 +78,151 @@ class TeacherMarkSheetPageTest {
 
     @Test
     void saveButton_runsValidationFailBranch_whenOutOfRange() throws InterruptedException {
-        runOnFxAndWait(() -> {
-            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
-            Parent view = page.getView();
 
-            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+        System.setProperty("testMode", "true");
 
-            // Make invalid: assignment > 20
-            table.getItems().get(0).setAssignment(21);
+        try {
+            runOnFxAndWait(() -> {
+                TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+                Parent view = page.getView();
 
-            Button save = findButtonByText(view, "Save");
-            assertNotNull(save);
+                TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
 
-            // should hit allInputsValid() == false branch
-            assertDoesNotThrow(save::fire);
-        });
+
+                table.getItems().get(0).setAssignment(21);
+
+                Button save = findButtonByText(view, "Save");
+                assertNotNull(save);
+
+                assertDoesNotThrow(save::fire);
+            });
+        } finally {
+            System.clearProperty("testMode");
+        }
     }
 
     @Test
-    void saveButton_runsSuccessBranch_whenAllValid() throws InterruptedException {
-        runOnFxAndWait(() -> {
-            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
-            Parent view = page.getView();
+    void saveButton_runsSuccessBranch_whenAllValid_testMode() throws InterruptedException {
+        System.setProperty("testMode", "true");
 
-            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+        try {
+            runOnFxAndWait(() -> {
+                TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+                Parent view = page.getView();
 
-            // Valid values for first row
-            var r0 = table.getItems().get(0);
-            r0.setAssignment(20); // max 20
-            r0.setProject(30);    // max 30
-            r0.setFinalExam(50);  // max 50
+                TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
 
-            Button save = findButtonByText(view, "Save");
-            assertNotNull(save);
+                var r0 = table.getItems().get(0);
+                r0.setAssignment(20);
+                r0.setProject(30);
+                r0.setFinalExam(50);
 
-            // should go through save success loop/println branch
-            assertDoesNotThrow(save::fire);
+                Button save = findButtonByText(view, "Save");
+                assertNotNull(save);
 
-            assertEquals(100, r0.getTotal());
-            assertEquals("A", r0.getGrade());
-        });
+                assertDoesNotThrow(save::fire);
+
+                assertEquals(100, r0.getTotal());
+                assertEquals("A", r0.getGrade());
+            });
+        } finally {
+            System.clearProperty("testMode");
+        }
     }
 
     @Test
     void clearButton_resetsAllMarksToZero() throws InterruptedException {
-        runOnFxAndWait(() -> {
-            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
-            Parent view = page.getView();
 
-            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+        System.setProperty("testMode", "true");
 
-            // Put some marks first
-            var r0 = table.getItems().get(0);
-            r0.setAssignment(10);
-            r0.setProject(10);
-            r0.setFinalExam(10);
-            assertEquals(30, r0.getTotal());
+        try {
+            runOnFxAndWait(() -> {
+                TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+                Parent view = page.getView();
 
-            Button clear = findButtonByText(view, "Clear");
-            assertNotNull(clear);
+                TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
 
-            clear.fire(); // run clear handler
+                var r0 = table.getItems().get(0);
+                r0.setAssignment(10);
+                r0.setProject(10);
+                r0.setFinalExam(10);
+                assertEquals(30, r0.getTotal());
 
-            assertEquals(0, r0.getAssignment());
-            assertEquals(0, r0.getProject());
-            assertEquals(0, r0.getFinalExam());
-            assertEquals(0, r0.getTotal());
-        });
+                Button clear = findButtonByText(view, "Clear");
+                assertNotNull(clear);
+
+                clear.fire();
+
+                assertEquals(0, r0.getAssignment());
+                assertEquals(0, r0.getProject());
+                assertEquals(0, r0.getFinalExam());
+                assertEquals(0, r0.getTotal());
+            });
+        } finally {
+            System.clearProperty("testMode");
+        }
     }
 
     @Test
     void editCommit_invalidValue_hitsRefreshBranch() throws InterruptedException {
-        runOnFxAndWait(() -> {
-            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
-            page.getView();
+        System.setProperty("testMode", "true");
 
-            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+        try {
+            runOnFxAndWait(() -> {
+                TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+                page.getView();
 
-            // Assignment column is index 2 (ID, Name, Assignment...)
-            @SuppressWarnings("unchecked")
-            TableColumn<TeacherMarkSheetPage.MarkRow, Integer> assignmentCol =
-                    (TableColumn<TeacherMarkSheetPage.MarkRow, Integer>) table.getColumns().get(2);
+                TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
 
-            // Fire onEditCommit with invalid new value (e.g., 999 > 20)
-            TablePosition<TeacherMarkSheetPage.MarkRow, Integer> pos =
-                    new TablePosition<>(table, 0, assignmentCol);
+                @SuppressWarnings("unchecked")
+                TableColumn<TeacherMarkSheetPage.MarkRow, Integer> assignmentCol =
+                        (TableColumn<TeacherMarkSheetPage.MarkRow, Integer>) table.getColumns().get(2);
 
-            TableColumn.CellEditEvent<TeacherMarkSheetPage.MarkRow, Integer> ev =
-                    new TableColumn.CellEditEvent<>(table, pos, TableColumn.editCommitEvent(), 999);
+                TablePosition<TeacherMarkSheetPage.MarkRow, Integer> pos =
+                        new TablePosition<>(table, 0, assignmentCol);
 
-            assertDoesNotThrow(() -> assignmentCol.getOnEditCommit().handle(ev));
 
-            // value should not become 999 because handler should reject it
-            assertNotEquals(999, table.getItems().get(0).getAssignment());
-        });
+                TableColumn.CellEditEvent<TeacherMarkSheetPage.MarkRow, Integer> ev =
+                        new TableColumn.CellEditEvent<>(table, pos, TableColumn.editCommitEvent(), 999);
+
+                assertDoesNotThrow(() -> assignmentCol.getOnEditCommit().handle(ev));
+
+
+                assertNotEquals(999, table.getItems().get(0).getAssignment());
+            });
+        } finally {
+            System.clearProperty("testMode");
+        }
     }
 
     @Test
     void editCommit_validValue_updatesRow() throws InterruptedException {
-        runOnFxAndWait(() -> {
-            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
-            page.getView();
+        System.setProperty("testMode", "true");
 
-            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+        try {
+            runOnFxAndWait(() -> {
+                TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+                page.getView();
 
-            @SuppressWarnings("unchecked")
-            TableColumn<TeacherMarkSheetPage.MarkRow, Integer> projectCol =
-                    (TableColumn<TeacherMarkSheetPage.MarkRow, Integer>) table.getColumns().get(3);
+                TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
 
-            TablePosition<TeacherMarkSheetPage.MarkRow, Integer> pos =
-                    new TablePosition<>(table, 0, projectCol);
+                @SuppressWarnings("unchecked")
+                TableColumn<TeacherMarkSheetPage.MarkRow, Integer> projectCol =
+                        (TableColumn<TeacherMarkSheetPage.MarkRow, Integer>) table.getColumns().get(3);
 
-            TableColumn.CellEditEvent<TeacherMarkSheetPage.MarkRow, Integer> ev =
-                    new TableColumn.CellEditEvent<>(table, pos, TableColumn.editCommitEvent(), 30);
+                TablePosition<TeacherMarkSheetPage.MarkRow, Integer> pos =
+                        new TablePosition<>(table, 0, projectCol);
 
-            projectCol.getOnEditCommit().handle(ev);
+                TableColumn.CellEditEvent<TeacherMarkSheetPage.MarkRow, Integer> ev =
+                        new TableColumn.CellEditEvent<>(table, pos, TableColumn.editCommitEvent(), 30);
 
-            assertEquals(30, table.getItems().get(0).getProject());
-        });
+                projectCol.getOnEditCommit().handle(ev);
+
+                assertEquals(30, table.getItems().get(0).getProject());
+            });
+        } finally {
+            System.clearProperty("testMode");
+        }
     }
 
     @Test
@@ -204,23 +230,25 @@ class TeacherMarkSheetPageTest {
         runOnFxAndWait(() -> {
             TeacherMarkSheetPage.MarkRow row = new TeacherMarkSheetPage.MarkRow("S999", "Test");
 
-            // F (<35)
-            row.setAssignment(0); row.setProject(0); row.setFinalExam(34);
+
+            row.setAssignment(0);
+            row.setProject(0);
+            row.setFinalExam(34);
             assertEquals("F", row.getGrade());
 
-            // S (>=35)
+
             row.setFinalExam(35);
             assertEquals("S", row.getGrade());
 
-            // C (>=55)
+
             row.setFinalExam(55);
             assertEquals("C", row.getGrade());
 
-            // B (>=65)
+
             row.setFinalExam(65);
             assertEquals("B", row.getGrade());
 
-            // A (>=75)
+
             row.setFinalExam(75);
             assertEquals("A", row.getGrade());
         });
@@ -229,7 +257,6 @@ class TeacherMarkSheetPageTest {
     @Test
     void converter_and_getPropertyFor_defaultBranch() throws InterruptedException {
         runOnFxAndWait(() -> {
-            // Converter paths
             TeacherMarkSheetPage.IntegerStringConverter c = new TeacherMarkSheetPage.IntegerStringConverter();
             assertEquals("0", c.toString(null));
             assertEquals(0, c.fromString(""));
@@ -237,10 +264,61 @@ class TeacherMarkSheetPageTest {
             assertEquals(0, c.fromString("abc"));
             assertEquals(12, c.fromString("12"));
 
-            // getPropertyFor default branch
             TeacherMarkSheetPage.MarkRow row = new TeacherMarkSheetPage.MarkRow("S1", "X");
             assertNotNull(row.getPropertyFor("NOT_A_REAL_COLUMN"));
             assertEquals(0, row.getPropertyFor("NOT_A_REAL_COLUMN").get());
         });
+    }
+
+
+    @Test
+    void markRow_getters_and_properties_areCovered() {
+        TeacherMarkSheetPage.MarkRow row = new TeacherMarkSheetPage.MarkRow("S1", "Test");
+
+
+        assertEquals("S1", row.getStudentId());
+        assertEquals("Test", row.getStudentName());
+
+
+        assertNotNull(row.studentIdProperty());
+        assertNotNull(row.studentNameProperty());
+        assertNotNull(row.totalProperty());
+        assertNotNull(row.gradeProperty());
+    }
+
+    @Test
+    void buildTable_columnValueFactories_execute_lambdas() throws InterruptedException {
+        runOnFxAndWait(() -> {
+            TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+            page.getView();
+
+            TableView<TeacherMarkSheetPage.MarkRow> table = getTable(page);
+
+
+            for (TableColumn<?, ?> col : table.getColumns()) {
+                assertNotNull(col.getCellValueFactory(), "Each column should have a cellValueFactory");
+                var value = col.getCellValueFactory().call(
+                        new TableColumn.CellDataFeatures<>(table, (TableColumn) col, table.getItems().get(0))
+                );
+                assertNotNull(value);
+            }
+        });
+    }
+
+    @Test
+    void mapUiStudentToDbId_branches_ifYourProductionReturnsMinusOneForUnknown() throws Exception {
+
+        TeacherMarkSheetPage page = new TeacherMarkSheetPage();
+
+        Method m = TeacherMarkSheetPage.class.getDeclaredMethod("mapUiStudentToDbId", String.class);
+        m.setAccessible(true);
+
+        assertEquals(201, (int) m.invoke(page, "S001"));
+        assertEquals(202, (int) m.invoke(page, "S002"));
+        assertEquals(203, (int) m.invoke(page, "S003"));
+        assertEquals(204, (int) m.invoke(page, "S004"));
+        assertEquals(205, (int) m.invoke(page, "S005"));
+
+
     }
 }

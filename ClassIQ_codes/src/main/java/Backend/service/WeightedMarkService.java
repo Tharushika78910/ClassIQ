@@ -18,5 +18,8 @@ public class WeightedMarkService {
         if (weighted >= 35) return "S";
         return "F";
     }
+    public String gradeFromComponents(int assignment, int project, int finalExam) {
+        return gradeFromWeighted(assignment + project + finalExam);
+    }
 }
 

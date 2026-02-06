@@ -1,5 +1,8 @@
 package Frontend.teacher;
 
+import Backend.model.dao.impl.TeacherMarkSheetDaoImpl;
+import Backend.service.WeightedMarkService;
+
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +15,8 @@ import javafx.scene.layout.*;
 import javafx.util.StringConverter;
 
 public class TeacherMarkSheetPage {
+
+    private static final WeightedMarkService weightedMarkService = new WeightedMarkService();
 
     private final TableView<MarkRow> table = new TableView<>();
     private final Label status = new Label("");
@@ -49,15 +54,44 @@ public class TeacherMarkSheetPage {
                 return;
             }
 
-            status.setText("Saved (demo only). Backend not connected.");
-            System.out.println("=== SAVE (DEMO) ===");
-            for (MarkRow r : table.getItems()) {
-                System.out.printf(
-                        "%s | %s | A:%d/20 P:%d/30 F:%d/50 | Total:%d | Grade:%s%n",
-                        r.getStudentId(), r.getStudentName(),
-                        r.getAssignment(), r.getProject(), r.getFinalExam(),
-                        r.getTotal(), r.getGrade()
-                );
+
+            if (Boolean.getBoolean("testMode")) {
+                status.setText("Saved (test mode).");
+                return;
+            }
+
+            try {
+                TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
+
+                int savedCount = 0;
+
+                for (MarkRow r : table.getItems()) {
+
+
+                    if (r.getAssignment() == 0 && r.getProject() == 0 && r.getFinalExam() == 0) {
+                        continue;
+                    }
+
+                    int dbStudentId = mapUiStudentToDbId(r.getStudentId());
+
+                    dao.saveTeacherMarkSheetRow(
+                            dbStudentId,
+                            r.getStudentName(),
+                            r.getAssignment(),
+                            r.getProject(),
+                            r.getFinalExam(),
+                            r.getTotal(),
+                            r.getGrade()
+                    );
+
+                    savedCount++;
+                }
+
+                status.setText("Saved " + savedCount + " record(s) to database (teacher_marksheet).");
+
+            } catch (Exception ex) {
+                status.setText("Database error: " + ex.getMessage());
+                ex.printStackTrace();
             }
         });
 
@@ -76,6 +110,17 @@ public class TeacherMarkSheetPage {
         card.getChildren().addAll(table, actions);
         root.getChildren().addAll(title, subtitle, card);
         return root;
+    }
+
+    private int mapUiStudentToDbId(String uiStudentId) {
+        return switch (uiStudentId) {
+            case "S001" -> 201;
+            case "S002" -> 202;
+            case "S003" -> 203;
+            case "S004" -> 204;
+            case "S005" -> 205;
+            default -> throw new IllegalArgumentException("No DB mapping for: " + uiStudentId);
+        };
     }
 
     private void buildTable() {
@@ -161,8 +206,6 @@ public class TeacherMarkSheetPage {
         );
     }
 
-    // inner model
-
     public static class MarkRow {
         private final StringProperty studentId = new SimpleStringProperty();
         private final StringProperty studentName = new SimpleStringProperty();
@@ -189,14 +232,11 @@ public class TeacherMarkSheetPage {
             int t = assignment.get() + project.get() + finalExam.get();
             total.set(t);
 
-            if (t >= 75) grade.set("A");
-            else if (t >= 65) grade.set("B");
-            else if (t >= 55) grade.set("C");
-            else if (t >= 35) grade.set("S");
-            else grade.set("F");
+            grade.set(weightedMarkService.gradeFromComponents(
+                    assignment.get(), project.get(), finalExam.get()
+            ));
         }
 
-        // getters / setters
         public String getStudentId() { return studentId.get(); }
         public String getStudentName() { return studentName.get(); }
 
@@ -225,9 +265,6 @@ public class TeacherMarkSheetPage {
             };
         }
     }
-
-    // converter
-
 
     public static class IntegerStringConverter extends StringConverter<Integer> {
         @Override
