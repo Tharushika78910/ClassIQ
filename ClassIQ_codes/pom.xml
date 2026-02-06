@@ -98,6 +98,7 @@
                                 <include>Frontend/HomePage*</include>
                                 <include>Frontend/LoginPage*</include>
                                 <include>Frontend/teacher/TeacherMarkSheetPage*</include>
+                                <include>Backend/model/dao/impl/TeacherMarkSheetDaoImpl*</include>
                             </includes>
                         </configuration>
 
