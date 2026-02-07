@@ -14,53 +14,143 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping structure for table airport_db.airports
-CREATE TABLE IF NOT EXISTS `airports` (
-  `AirportID` int(11) NOT NULL,
-  `AirportName` varchar(100) NOT NULL,
-  `CountryID` int(11) DEFAULT NULL,
-  `Latitude` decimal(9,6) DEFAULT NULL,
-  `Longitude` decimal(9,6) DEFAULT NULL,
-  PRIMARY KEY (`AirportID`),
-  KEY `CountryID` (`CountryID`),
-  CONSTRAINT `airports_ibfk_1` FOREIGN KEY (`CountryID`) REFERENCES `countries` (`CountryID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+-- Dumping structure for table classiq.app_user
+CREATE TABLE IF NOT EXISTS `app_user` (
+  `user_id` int(11) NOT NULL,
+  `user_name` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(20) NOT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `user_name` (`user_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
--- Dumping structure for table airport_db.countries
-CREATE TABLE IF NOT EXISTS `countries` (
-  `CountryID` int(11) NOT NULL,
-  `CountryName` varchar(100) NOT NULL,
-  PRIMARY KEY (`CountryID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+-- Dumping structure for table classiq.grade
+CREATE TABLE IF NOT EXISTS `grade` (
+  `grade_id` int(11) NOT NULL,
+  `graded_date` date NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `score` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  PRIMARY KEY (`grade_id`),
+  KEY `student_id` (`student_id`),
+  KEY `category_id` (`category_id`),
+  KEY `teacher_id` (`teacher_id`),
+  CONSTRAINT `grade_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`),
+  CONSTRAINT `grade_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `gradecategory` (`category_id`),
+  CONSTRAINT `grade_ibfk_3` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
--- Dumping structure for table airport_db.players
-CREATE TABLE IF NOT EXISTS `players` (
-  `PlayerID` int(11) NOT NULL,
-  `PlayerName` varchar(100) NOT NULL,
-  `CurrentLocationID` int(11) DEFAULT NULL,
-  `Concords` int(11) DEFAULT 0,
-  PRIMARY KEY (`PlayerID`),
-  KEY `CurrentLocationID` (`CurrentLocationID`),
-  CONSTRAINT `players_ibfk_1` FOREIGN KEY (`CurrentLocationID`) REFERENCES `airports` (`AirportID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+-- Dumping structure for table classiq.gradecategory
+CREATE TABLE IF NOT EXISTS `gradecategory` (
+  `category_id` int(11) NOT NULL,
+  `category_name` varchar(50) NOT NULL,
+  `weight` int(11) NOT NULL,
+  PRIMARY KEY (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
--- Dumping structure for table airport_db.quests
-CREATE TABLE IF NOT EXISTS `quests` (
-  `QuestID` int(11) NOT NULL,
-  `QuestName` varchar(100) NOT NULL,
-  `Description` text DEFAULT NULL,
-  `Reward` int(11) NOT NULL,
-  `LocationID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`QuestID`),
-  KEY `LocationID` (`LocationID`),
-  CONSTRAINT `quests_ibfk_1` FOREIGN KEY (`LocationID`) REFERENCES `airports` (`AirportID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+-- Dumping structure for table classiq.remark
+CREATE TABLE IF NOT EXISTS `remark` (
+  `remark_id` int(11) NOT NULL,
+  `comment_text` varchar(500) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `report_card_id` int(11) NOT NULL,
+  PRIMARY KEY (`remark_id`),
+  KEY `teacher_id` (`teacher_id`),
+  KEY `report_card_id` (`report_card_id`),
+  CONSTRAINT `remark_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`),
+  CONSTRAINT `remark_ibfk_2` FOREIGN KEY (`report_card_id`) REFERENCES `reportcard` (`report_card_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.reportcard
+CREATE TABLE IF NOT EXISTS `reportcard` (
+  `report_card_id` int(11) NOT NULL,
+  `generated_date` date NOT NULL,
+  `term` varchar(20) NOT NULL,
+  `final_average` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  PRIMARY KEY (`report_card_id`),
+  KEY `student_id` (`student_id`),
+  CONSTRAINT `reportcard_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.student
+CREATE TABLE IF NOT EXISTS `student` (
+  `student_id` int(11) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `student_number` varchar(20) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`student_id`),
+  UNIQUE KEY `student_number` (`student_number`),
+  UNIQUE KEY `email` (`email`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `student_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.student_marks
+CREATE TABLE IF NOT EXISTS `student_marks` (
+  `marks_id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `subject1` int(11) NOT NULL,
+  `subject2` int(11) NOT NULL,
+  `subject3` int(11) NOT NULL,
+  `subject4` int(11) NOT NULL,
+  `subject5` int(11) NOT NULL,
+  `total` int(11) NOT NULL,
+  `average` double NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`marks_id`),
+  KEY `fk_student_marks_student` (`student_id`),
+  CONSTRAINT `fk_student_marks_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.teacher
+CREATE TABLE IF NOT EXISTS `teacher` (
+  `teacher_id` int(11) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`teacher_id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `teacher_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.teacher_marksheet
+CREATE TABLE IF NOT EXISTS `teacher_marksheet` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `student_name` varchar(100) NOT NULL,
+  `assignment` int(11) NOT NULL,
+  `project` int(11) NOT NULL,
+  `final_exam` int(11) NOT NULL,
+  `total` int(11) NOT NULL,
+  `grade` varchar(2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `fk_teacher_marksheet_student` (`student_id`),
+  CONSTRAINT `fk_teacher_marksheet_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
