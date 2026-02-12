@@ -1,15 +1,15 @@
 package Frontend;
 
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.effect.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -19,118 +19,216 @@ public class HomePage {
 
     public Scene getScene(Stage stage) {
 
-        // Background Image
-        Image bgImage = new Image(getClass().getResourceAsStream("/Homepage.jpg"));
-        ImageView bgImageView = new ImageView(bgImage);
-        bgImageView.setPreserveRatio(false);
+        // ================= ROOT LAYOUT =================
+        StackPane root = new StackPane();
+        BorderPane mainLayout = new BorderPane();
 
-        // Top Section Title and Login Button
-        HBox topBar = new HBox();
+        // Background
+        root.getChildren().add(createBackground());
+        root.getChildren().add(mainLayout);
+
+        // Top Section
+        mainLayout.setTop(createTopBar(stage));
+
+        // Center Section
+        mainLayout.setCenter(createCenterPanel());
+
+        // Bottom Section
+        mainLayout.setBottom(createBottomSection(stage));
+
+        return new Scene(root, 900, 600);
+    }
+
+    // ================= BACKGROUND =================
+    private Region createBackground() {
+        Region background = new Region();
+
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, 1,
+                true,
+                CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.rgb(200, 220, 200)),
+                new Stop(0.5, Color.rgb(180, 200, 180)),
+                new Stop(1.0, Color.rgb(240, 250, 240))
+        );
+
+        background.setBackground(
+                new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY))
+        );
+
+        return background;
+    }
+
+    // ================= TOP BAR =================
+    private HBox createTopBar(Stage stage) {
+        HBox topBar = new HBox(15);
         topBar.setPadding(new Insets(20));
         topBar.setAlignment(Pos.CENTER_LEFT);
 
-        // "Class iQ" title in top left
-        Label appTitle = new Label("Class iQ");
-        appTitle.setFont(Font.font("KyivType Sans", FontWeight.BOLD, FontPosture.ITALIC, 36));
-        appTitle.setTextFill(Color.BLACK);
+        LinearGradient topGradient = new LinearGradient(
+                0, 0, 1, 0,
+                false,
+                CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.rgb(162, 184, 172)),
+                new Stop(1.0, Color.rgb(180, 200, 180))
+        );
+        topBar.setBackground(new Background(new BackgroundFill(topGradient, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        // Spacer to push button to right
+        // ================= "FHS" LABEL =================
+        Label fhsLabel = new Label("FHS");
+        fhsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        fhsLabel.setTextFill(Color.BLACK);
+
+        // Spacer for Login button alignment
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // "Log in" button in top right
-        Button loginButton = new Button("Log in");
-        loginButton.setStyle("-fx-background-color: #A2B8AC; -fx-text-fill: black; -fx-background-radius: 10; -fx-border-color: white; -fx-border-width: 1; -fx-border-radius: 12;");
-        loginButton.setPadding(new Insets(8, 20, 8, 20));
-        loginButton.setOnAction(e -> {
+        // ================= LOGIN BUTTON =================
+        Button loginBtn = new Button("Login");
+        loginBtn.setStyle(
+                "-fx-background-color: #D3D3D3;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 8;"
+        );
+        loginBtn.setPadding(new Insets(8, 25, 8, 25));
+        loginBtn.setOnAction(e -> {
             LoginPage loginPage = new LoginPage();
             stage.setScene(loginPage.getScene(stage));
         });
 
-        topBar.getChildren().addAll(appTitle, spacer, loginButton);
+        // Add FHS label and Login button to top bar
+        topBar.getChildren().addAll(fhsLabel, spacer, loginBtn);
 
-        // Central Overlay Panel (BorderPane center)
-        // Semi-transparent dark olive green background, rounded corners
-        VBox overlayPanel = new VBox(5);
-        overlayPanel.setAlignment(Pos.CENTER);
-        overlayPanel.setPadding(new Insets(15, 40, 15, 40));
-        overlayPanel.setMaxWidth(650);  // Set maximum width to reduce panel size
-        overlayPanel.setPrefWidth(200); // Set preferred width
-        overlayPanel.setBackground(new Background(
-                new BackgroundFill(Color.rgb(85, 107, 47, 0.85), new CornerRadii(10), Insets.EMPTY)
-        ));
+        return topBar;
+    }
 
-        // "CLASSIQ — Academic Performance Platform"
-        Label platformLabel = new Label("CLASSIQ — Academic Performance Platform");
-        platformLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 20));
-        platformLabel.setTextFill(Color.BLACK);
+    // ================= CENTER PANEL =================
+    private VBox createCenterPanel() {
+        VBox centerPanel = new VBox(10);
+        centerPanel.setAlignment(Pos.CENTER);
+        centerPanel.setPadding(new Insets(20));
 
-        // "Where Academic Data Becomes Insight"
-        Label sloganLabel = new Label("\"Where Academic Data Becomes Insight.\"");
-        sloganLabel.setFont(Font.font("KyivType Sans", FontPosture.ITALIC, 18));
-        sloganLabel.setTextFill(Color.rgb(162, 184, 172));
+        VBox overlay = new VBox(8);
+        overlay.setAlignment(Pos.CENTER);
+        overlay.setPadding(new Insets(20, 40, 20, 40));
+        overlay.setMaxWidth(650);
 
-        overlayPanel.getChildren().addAll(platformLabel, sloganLabel);
+        overlay.setBackground(
+                new Background(new BackgroundFill(
+                        Color.rgb(85, 107, 47, 0.85),
+                        new CornerRadii(12),
+                        Insets.EMPTY))
+        );
 
-        // Footer Navigation Bar (BorderPane bottom)
-        // Light gray background
-        HBox navBar = new HBox(30);
+        Label platform = new Label("Ferguson High School");
+        platform.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        platform.setTextFill(Color.BLACK);
+
+        Label slogan = new Label("\"Academic Performance Platform.\"");
+        slogan.setFont(Font.font("Arial", FontPosture.ITALIC, 15));
+        slogan.setTextFill(Color.rgb(162, 184, 172));
+
+        overlay.getChildren().addAll(platform, slogan);
+        centerPanel.getChildren().add(overlay);
+
+        return centerPanel;
+    }
+
+    // ================= BOTTOM SECTION =================
+    private VBox createBottomSection(Stage stage) {
+        VBox bottomContainer = new VBox();
+
+        // Feature Cards
+        HBox navBar = new HBox(20);
         navBar.setAlignment(Pos.CENTER);
-        navBar.setPadding(new Insets(15));
-        navBar.setBackground(new Background(
-                new BackgroundFill(Color.rgb(220, 220, 220, 0.9), null, Insets.EMPTY)
-        ));
+        navBar.setPadding(new Insets(20));
 
-        // Checkmarks: ✓ Gradebook, ✓ Insights, ✓ Reports, ✓ Records
-        Label gradebook = new Label("✓ Gradebook");
-        Label insights = new Label("✓ Insights");
-        Label reports = new Label("✓ Reports");
-        Label records = new Label("✓ Records");
-
-        gradebook.setFont(Font.font("KyivType Sans", 14));
-        insights.setFont(Font.font("KyivType Sans", 14));
-        reports.setFont(Font.font("KyivType Sans", 14));
-        records.setFont(Font.font("KyivType Sans", 14));
+        VBox gradebook = createFeatureCard("📊", "Gradebook", "Track progress in real-time");
+        VBox insights = createFeatureCard("📈", "Insights", "AI-powered analytics");
+        VBox reports = createFeatureCard("📋", "Reports", "Comprehensive dashboards");
+        VBox records = createFeatureCard("🔒", "Records", "Secure data management");
 
         navBar.getChildren().addAll(gradebook, insights, reports, records);
 
-        //  Copyright Bar (below navigation)
-        // Light gray background
-        HBox copyrightBar = new HBox(10);
-        copyrightBar.setAlignment(Pos.CENTER);
-        copyrightBar.setPadding(new Insets(10));
-        copyrightBar.setBackground(new Background(
-                new BackgroundFill(Color.rgb(220, 220, 220, 0.9), null, Insets.EMPTY)
-        ));
+        // Footer
+        HBox footer = new HBox(15);
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(10));
+        footer.setBackground(
+                new Background(new BackgroundFill(
+                        Color.rgb(220, 220, 220, 0.9),
+                        CornerRadii.EMPTY,
+                        Insets.EMPTY))
+        );
 
-        // "© ClassIQ Systems 2025 | Version 1.0 | Privacy | Help"
-        Label copyright = new Label("© ClassIQ Systems 2025 | Version 1.0");
-        copyright.setFont(Font.font("KyivType Sans", 12));
+        Label copyright =
+                new Label("© 2026 | Version 1.0");
 
         Hyperlink privacy = new Hyperlink("Privacy");
-        privacy.setFont(Font.font("KyivType Sans", 12));
-        privacy.setTextFill(Color.BLACK);
-
         Hyperlink help = new Hyperlink("Help");
-        help.setFont(Font.font("KyivType Sans", 12));
-        help.setTextFill(Color.BLACK);
 
-        copyrightBar.getChildren().addAll(copyright, privacy, help);
+        privacy.setOnAction(e -> {
+            PrivacyPage privacyPage = new PrivacyPage();
+            stage.setScene(privacyPage.getScene(stage));
+        });
 
-        // Main Layout Structure using BorderPane
-        BorderPane mainLayout = new BorderPane();
-        mainLayout.setTop(topBar);           // Top bar with title and login button
-        mainLayout.setCenter(overlayPanel);  // Central overlay panel
-        mainLayout.setBottom(new VBox(0, navBar, copyrightBar));  // Footer with nav and copyright
+        help.setOnAction(e -> {
+            HelpPage helpPage = new HelpPage();
+            stage.setScene(helpPage.getScene(stage));
+        });
 
-        // Root StackPane
-        StackPane root = new StackPane();
-        root.getChildren().addAll(bgImageView, mainLayout);
+        footer.getChildren().addAll(copyright, privacy, help);
+        bottomContainer.getChildren().addAll(navBar, footer);
 
-        // Bind background image to root size
-        bgImageView.fitWidthProperty().bind(root.widthProperty());
-        bgImageView.fitHeightProperty().bind(root.heightProperty());
+        return bottomContainer;
+    }
 
-        return new Scene(root, 800, 600);
+    // ================= FEATURE CARD =================
+    private VBox createFeatureCard(String emoji, String title, String description) {
+        VBox card = new VBox(6);
+        card.setAlignment(Pos.CENTER);
+        card.setPadding(new Insets(12));
+        card.setPrefWidth(150);
+        card.setPrefHeight(100);
+
+        card.setBackground(
+                new Background(new BackgroundFill(
+                        Color.WHITE,
+                        new CornerRadii(10),
+                        Insets.EMPTY))
+        );
+
+        card.setBorder(new Border(new BorderStroke(
+                Color.rgb(162, 184, 172),
+                BorderStrokeStyle.SOLID,
+                new CornerRadii(10),
+                new BorderWidths(1))));
+
+        Label emojiLabel = new Label(emoji);
+        emojiLabel.setFont(Font.font(22));
+
+        Label titleLabel = new Label(title);
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        titleLabel.setTextFill(Color.rgb(85, 107, 47));
+
+        Label descLabel = new Label(description);
+        descLabel.setFont(Font.font(11));
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(130);
+        descLabel.setAlignment(Pos.CENTER);
+
+        card.getChildren().addAll(emojiLabel, titleLabel, descLabel);
+
+        return card;
+    }
+
+    // ================= DIALOG =================
+    private void showDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

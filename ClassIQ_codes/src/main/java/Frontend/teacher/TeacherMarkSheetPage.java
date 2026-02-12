@@ -198,7 +198,7 @@ public class TeacherMarkSheetPage {
         return FXCollections.observableArrayList(
                 new MarkRow("S001", "Poornima Jayamanna"),
                 new MarkRow("S002", "Hathadura Chathurika Silva"),
-                new MarkRow("S003", "Malmige Roshini"),
+                new MarkRow("S003", "Roshini Fernando"),
                 new MarkRow("S004", "Kumudu Nalleperuma"),
                 new MarkRow("S005", "Dilmi Rajapaksha"),
                 new MarkRow("S006", "Saumya Sompala"),
