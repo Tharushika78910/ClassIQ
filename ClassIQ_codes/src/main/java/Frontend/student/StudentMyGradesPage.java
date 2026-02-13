@@ -20,7 +20,7 @@ public class StudentMyGradesPage {
         content.setAlignment(Pos.TOP_LEFT);
 
         // ===== Title =====
-        Label title = new Label("My Grades");
+        Label title = new Label("Grades");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
         // ===== Grading Criteria Title =====

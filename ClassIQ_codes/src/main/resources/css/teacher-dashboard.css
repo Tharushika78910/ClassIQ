@@ -1,0 +1,97 @@
+/* ================================
+   ROOT BACKGROUND
+================================ */
+.figma-root {
+    -fx-background-color: transparent;
+}
+
+
+/* ================================
+   TOP RIGHT TEACHER INFO CARD
+================================ */
+.teacher-info {
+    -fx-padding: 10 16 10 16;
+    -fx-background-color: rgba(255,255,255,0.75);
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+
+    -fx-effect: dropshadow(gaussian,
+    rgba(0,0,0,0.15),
+    8, 0.2, 0, 3);
+}
+
+.teacher-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222;
+}
+
+.teacher-email {
+    -fx-font-size: 12px;
+    -fx-text-fill: #555;
+}
+
+
+/* ================================
+   3 MAIN TOPIC BUTTONS
+================================ */
+.topic-btn {
+    -fx-pref-width: 220px;
+    -fx-pref-height: 44px;
+
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 10;
+
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222;
+
+    -fx-cursor: hand;
+}
+
+.topic-btn:hover {
+    -fx-background-color: #ffffff;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+
+/* ================================
+   CIRCLE IMAGE HOLDER
+================================ */
+.circle-holder {
+    -fx-min-width: 180px;
+    -fx-min-height: 180px;
+    -fx-max-width: 180px;
+    -fx-max-height: 180px;
+
+    -fx-background-radius: 1000;
+    -fx-background-color: rgba(255,255,255,0.5);
+
+    -fx-effect: dropshadow(gaussian,
+    rgba(0,0,0,0.2),
+    12, 0.3, 0, 4);
+}
+
+
+/* ================================
+   LOGOUT BUTTON (BOTTOM LEFT)
+================================ */
+.logout-btn {
+    -fx-pref-width: 120px;
+    -fx-pref-height: 38px;
+
+    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-radius: 10;
+
+    -fx-font-weight: bold;
+    -fx-text-fill: #b00020;
+
+    -fx-cursor: hand;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #ffffff;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
