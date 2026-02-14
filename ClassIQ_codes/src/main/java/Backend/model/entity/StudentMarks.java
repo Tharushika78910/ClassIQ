@@ -2,11 +2,22 @@ package Backend.model.entity;
 
 public class StudentMarks {
 
-    private int studentId; // link to students table
+    private int marksId;
+    private int studentId;
 
-    private int subject1, subject2, subject3, subject4, subject5;
+    private int subject1;
+    private int subject2;
+    private int subject3;
+    private int subject4;
+    private int subject5;
+
     private int total;
     private double average;
+
+    private String feedback; // maps to DB column feed_back
+
+    public int getMarksId() { return marksId; }
+    public void setMarksId(int marksId) { this.marksId = marksId; }
 
     public int getStudentId() { return studentId; }
     public void setStudentId(int studentId) { this.studentId = studentId; }
@@ -31,4 +42,7 @@ public class StudentMarks {
 
     public double getAverage() { return average; }
     public void setAverage(double average) { this.average = average; }
+
+    public String getFeedback() { return feedback; }
+    public void setFeedback(String feedback) { this.feedback = feedback; }
 }

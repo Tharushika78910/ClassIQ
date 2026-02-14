@@ -99,10 +99,6 @@ public class StudentDashboard extends StackPane {
             showPage(wrapCard(new StudentReportCardPage().getView(), 860, 520));
         });
 
-        btnFeedback.setOnAction(e -> {
-            setActive(btnFeedback);
-            showPage(wrapCard(new StudentFeedbackPage().getView(), 720, 320));
-        });
 
         btnLogout.setOnAction(e -> {
             setActive(btnLogout);

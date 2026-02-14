@@ -1,5 +1,6 @@
 package Frontend.teacher;
 
+import Frontend.student.StudentMyGradesPage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,14 +11,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import Frontend.student.StudentMyGradesPage;
-
 
 import java.util.Objects;
 
 public class TeacherDashboard extends BorderPane {
 
     private final StackPane contentArea = new StackPane();
+
+    // Store teacher info for showHome()
+    private final String teacherName;
+    private final String teacherEmail;
+    private final String teacherProfileImagePath;
 
     // Update image paths if needed
     private static final String BG_IMAGE = "/Login.png";
@@ -26,6 +30,11 @@ public class TeacherDashboard extends BorderPane {
     private static final String STUDENT_IMAGE = "/images/studentinfo.png";
 
     public TeacherDashboard(String name, String email, String profileImagePath) {
+
+        // Save values so we can return to home anytime
+        this.teacherName = name;
+        this.teacherEmail = email;
+        this.teacherProfileImagePath = profileImagePath;
 
         getStyleClass().add("teacher-root");
 
@@ -37,7 +46,12 @@ public class TeacherDashboard extends BorderPane {
         setCenter(contentArea);
 
         // Show dashboard home (like before)
-        showPage(buildHomeView(name, email, profileImagePath));
+        showHome();
+    }
+
+    // used by "Dashboard" button in StudentDetailsPage
+    public void showHome() {
+        showPage(buildHomeView(teacherName, teacherEmail, teacherProfileImagePath));
     }
 
     private Node buildHomeView(String name, String email, String profileImagePath) {
@@ -86,14 +100,14 @@ public class TeacherDashboard extends BorderPane {
         AnchorPane.setRightAnchor(logoutBtn, 20.0);
         AnchorPane.setBottomAnchor(logoutBtn, 20.0);
 
-        // ===== Button Actions (Same as Before) =====
+        // ===== Button Actions =====
         Button markBtn = (Button) markBlock.getChildren().get(0);
         Button gradingBtn = (Button) gradingBlock.getChildren().get(0);
         Button studentBtn = (Button) studentBlock.getChildren().get(0);
 
         markBtn.setOnAction(e -> showPage(new TeacherMarkSheetPage().getView()));
         gradingBtn.setOnAction(e -> showPage(new StudentMyGradesPage().getView()));
-        studentBtn.setOnAction(e -> showPage(simplePlaceholder("Students Info (placeholder)")));
+        studentBtn.setOnAction(e -> showPage(new TeacherStudentsInfoPage(this).getView()));
 
         logoutBtn.setOnAction(e -> showPage(simplePlaceholder("Logged out (placeholder)")));
 
@@ -182,7 +196,8 @@ public class TeacherDashboard extends BorderPane {
         return box;
     }
 
-    private void showPage(Node node) {
+    // keep this public (needed for navigation)
+    public void showPage(Node node) {
         contentArea.getChildren().setAll(node);
     }
 }
