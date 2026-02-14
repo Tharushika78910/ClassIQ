@@ -15,6 +15,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <javafx.version>21.0.1</javafx.version>
+        <javafx.modules>javafx.controls,javafx.graphics,javafx.fxml,javafx.swing,javafx.web</javafx.modules>
     </properties>
 
     <dependencies>
@@ -115,6 +116,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version>
+                <configuration>
+                    <argLine>@{argLine} --add-modules ${javafx.modules} -Djava.awt.headless=true</argLine>
+                </configuration>
             </plugin>
 
         </plugins>

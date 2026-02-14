@@ -14,6 +14,8 @@ import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
+import java.net.URL;
+
 public class HomePage {
 
     private static final String SAGE_BUTTON = "#9AC4B7";
@@ -26,17 +28,17 @@ public class HomePage {
         StackPane root = new StackPane();
 
         // Background image
-        ImageView background = new ImageView(
-                new Image(getClass().getResource("/Homepage.png").toExternalForm())
-        );
-        background.setPreserveRatio(false);
-        background.setSmooth(true);
-        background.fitWidthProperty().bind(stage.widthProperty());
-        background.fitHeightProperty().bind(stage.heightProperty());
+        ImageView background = loadImageView("/Homepage.png");
+        if (background != null) {
+            background.setPreserveRatio(false);
+            background.setSmooth(true);
+            background.fitWidthProperty().bind(stage.widthProperty());
+            background.fitHeightProperty().bind(stage.heightProperty());
+            root.getChildren().add(background);
+        }
 
         Pane content = createCenterContent(stage);
-
-        root.getChildren().addAll(background, content);
+        root.getChildren().add(content);
 
         return new Scene(root, 1000, 650);
     }
@@ -46,7 +48,7 @@ public class HomePage {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(40));
 
-        //vglassmorphism panel
+        // Glassmorphism panel
         VBox glassPanel = new VBox(20);
         glassPanel.setAlignment(Pos.CENTER);
         glassPanel.setPadding(new Insets(40));
@@ -61,16 +63,16 @@ public class HomePage {
                 new BorderWidths(1.5)
         )));
 
-        // logo
-        try {
-            ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/logo.png")));
+        // Logo
+        ImageView logo = loadImageView("/logo.png");
+        if (logo != null) {
             logo.setPreserveRatio(true);
             logo.setSmooth(true);
             logo.fitWidthProperty().bind(stage.widthProperty().multiply(0.35));
             glassPanel.getChildren().add(logo);
-        } catch (Exception ignored) {}
+        }
 
-        //login button
+        // Login button
         Button loginBtn = new Button("Login");
         loginBtn.setStyle(buttonStyle(SAGE_BUTTON));
         loginBtn.setOnMouseEntered(e -> loginBtn.setStyle(buttonStyle(SAGE_BUTTON_HOVER)));
@@ -81,20 +83,20 @@ public class HomePage {
         });
         glassPanel.getChildren().add(loginBtn);
 
-        // stars
+        // Stars
         HBox stars = new HBox(5);
         stars.setAlignment(Pos.CENTER);
         for (int i = 0; i < 5; i++) {
             Label star = new Label("★");
             star.setFont(Font.font(26));
             star.setTextFill(Color.web(GOLD_STAR));
-            star.setOnMouseEntered(e -> star.setTextFill(Color.web(GOLD_STAR_HOVER)));
-            star.setOnMouseExited(e -> star.setTextFill(Color.web(GOLD_STAR)));
+            star.setOnMouseEntered(ev -> star.setTextFill(Color.web(GOLD_STAR_HOVER)));
+            star.setOnMouseExited(ev -> star.setTextFill(Color.web(GOLD_STAR)));
             stars.getChildren().add(star);
         }
         glassPanel.getChildren().add(stars);
 
-        // footer with copyright and links
+        // Footer
         HBox footer = new HBox(8);
         footer.setAlignment(Pos.CENTER);
 
@@ -108,7 +110,6 @@ public class HomePage {
         help.setStyle("-fx-text-fill: green; -fx-underline: false;");
 
         privacy.setOnAction(e -> openWebPage(stage, "/privacy.html"));
-
         help.setOnAction(e -> openWebPage(stage, "/help.html"));
 
         footer.getChildren().addAll(copyright, privacy, help);
@@ -119,16 +120,19 @@ public class HomePage {
         return layout;
     }
 
-    // webview page loader with the login panel style and a back button
     private void openWebPage(Stage stage, String resourcePath) {
 
-        WebView webView = new WebView();
-        webView.getEngine().load(getClass().getResource(resourcePath).toExternalForm());
-        webView.setStyle("-fx-background-color: transparent;");
-        webView.setPrefHeight(400);
-        webView.setPrefWidth(600);
+        URL url = getClass().getResource(resourcePath);
+        if (url == null) {
+            System.err.println("Resource not found: " + resourcePath);
+            return;
+        }
 
-        // glassmorphism panel like loign page but with webview inside
+        WebView webView = new WebView();
+        webView.getEngine().load(url.toExternalForm());
+        webView.prefWidthProperty().bind(stage.widthProperty().multiply(0.65));
+        webView.prefHeightProperty().bind(stage.heightProperty().multiply(0.65));
+
         VBox glassPanel = new VBox(webView);
         glassPanel.setPadding(new Insets(30));
         glassPanel.setAlignment(Pos.CENTER);
@@ -144,10 +148,9 @@ public class HomePage {
                 new BorderWidths(1.5)
         )));
 
-        // button back
         Button backBtn = new Button("Back");
         backBtn.setOnAction(ev -> stage.setScene(getScene(stage)));
-        backBtn.setStyle("-fx-background-color: #9AC4B7; -fx-text-fill: white; -fx-font-weight: bold;");
+        backBtn.setStyle(buttonStyle(SAGE_BUTTON));
         backBtn.setPadding(new Insets(10));
 
         HBox topBar = new HBox(backBtn);
@@ -158,22 +161,34 @@ public class HomePage {
         webLayout.setTop(topBar);
         webLayout.setCenter(glassPanel);
 
-        // background image
-        ImageView background = new ImageView(
-                new Image(getClass().getResource("/Homepage.png").toExternalForm())
-        );
-        background.setPreserveRatio(false);
-        background.fitWidthProperty().bind(stage.widthProperty());
-        background.fitHeightProperty().bind(stage.heightProperty());
-        background.setSmooth(true);
+        ImageView background = loadImageView("/Homepage.png");
+        if (background != null) {
+            background.setPreserveRatio(false);
+            background.fitWidthProperty().bind(stage.widthProperty());
+            background.fitHeightProperty().bind(stage.heightProperty());
+            background.setSmooth(true);
+        }
 
-        StackPane root = new StackPane(background, webLayout);
+        StackPane root = (background != null) ? new StackPane(background, webLayout) : new StackPane(webLayout);
 
         Scene webScene = new Scene(root, stage.getWidth(), stage.getHeight());
         stage.setScene(webScene);
     }
 
-    // button style generator to avoid code repetition for the login button and the back button
+    private ImageView loadImageView(String resourcePath) {
+        try {
+            URL url = getClass().getResource(resourcePath);
+            if (url != null) {
+                return new ImageView(new Image(url.toExternalForm()));
+            } else {
+                System.err.println("Resource not found: " + resourcePath);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private String buttonStyle(String color) {
         return "-fx-background-color: " + color + ";" +
                 "-fx-text-fill: white;" +
