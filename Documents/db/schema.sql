@@ -16,33 +16,13 @@
 
 -- Dumping structure for table classiq.app_user
 CREATE TABLE IF NOT EXISTS `app_user` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` varchar(20) NOT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_name` (`user_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table classiq.grade
-CREATE TABLE IF NOT EXISTS `grade` (
-  `grade_id` int(11) NOT NULL,
-  `graded_date` date NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `score` int(11) NOT NULL,
-  `student_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL,
-  `teacher_id` int(11) NOT NULL,
-  PRIMARY KEY (`grade_id`),
-  KEY `student_id` (`student_id`),
-  KEY `category_id` (`category_id`),
-  KEY `teacher_id` (`teacher_id`),
-  CONSTRAINT `grade_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`),
-  CONSTRAINT `grade_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `gradecategory` (`category_id`),
-  CONSTRAINT `grade_ibfk_3` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
@@ -56,32 +36,14 @@ CREATE TABLE IF NOT EXISTS `gradecategory` (
 
 -- Data exporting was unselected.
 
--- Dumping structure for table classiq.remark
-CREATE TABLE IF NOT EXISTS `remark` (
-  `remark_id` int(11) NOT NULL,
-  `comment_text` varchar(500) NOT NULL,
-  `teacher_id` int(11) NOT NULL,
-  `report_card_id` int(11) NOT NULL,
-  PRIMARY KEY (`remark_id`),
-  KEY `teacher_id` (`teacher_id`),
-  KEY `report_card_id` (`report_card_id`),
-  CONSTRAINT `remark_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`),
-  CONSTRAINT `remark_ibfk_2` FOREIGN KEY (`report_card_id`) REFERENCES `reportcard` (`report_card_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-
--- Data exporting was unselected.
-
--- Dumping structure for table classiq.reportcard
-CREATE TABLE IF NOT EXISTS `reportcard` (
-  `report_card_id` int(11) NOT NULL,
-  `generated_date` date NOT NULL,
-  `term` varchar(20) NOT NULL,
-  `final_average` int(11) NOT NULL,
-  `student_id` int(11) NOT NULL,
-  PRIMARY KEY (`report_card_id`),
-  KEY `student_id` (`student_id`),
-  CONSTRAINT `reportcard_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+-- Dumping structure for table classiq.grade_scale
+CREATE TABLE IF NOT EXISTS `grade_scale` (
+  `scale_id` int(11) NOT NULL AUTO_INCREMENT,
+  `min_mark` int(11) NOT NULL,
+  `max_mark` int(11) NOT NULL,
+  `grade_letter` varchar(2) NOT NULL,
+  PRIMARY KEY (`scale_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
@@ -106,18 +68,19 @@ CREATE TABLE IF NOT EXISTS `student` (
 CREATE TABLE IF NOT EXISTS `student_marks` (
   `marks_id` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` int(11) NOT NULL,
-  `subject1` int(11) NOT NULL,
-  `subject2` int(11) NOT NULL,
-  `subject3` int(11) NOT NULL,
-  `subject4` int(11) NOT NULL,
-  `subject5` int(11) NOT NULL,
+  `mathematics` int(11) DEFAULT NULL,
+  `english` int(11) DEFAULT NULL,
+  `science` int(11) DEFAULT NULL,
+  `craft` int(11) DEFAULT NULL,
+  `languages` int(11) DEFAULT NULL,
   `total` int(11) NOT NULL,
   `average` double NOT NULL,
+  `feed_back` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`marks_id`),
-  KEY `fk_student_marks_student` (`student_id`),
+  UNIQUE KEY `uq_student_marks` (`student_id`),
   CONSTRAINT `fk_student_marks_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
@@ -128,6 +91,7 @@ CREATE TABLE IF NOT EXISTS `teacher` (
   `last_name` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `subject` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`teacher_id`),
   UNIQUE KEY `email` (`email`),
   KEY `user_id` (`user_id`),
@@ -150,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `teacher_marksheet` (
   PRIMARY KEY (`id`),
   KEY `fk_teacher_marksheet_student` (`student_id`),
   CONSTRAINT `fk_teacher_marksheet_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
 
