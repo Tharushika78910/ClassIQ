@@ -111,9 +111,13 @@ CREATE TABLE IF NOT EXISTS `teacher_marksheet` (
   `total` int(11) NOT NULL,
   `grade` varchar(2) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `teacher_id` int(11) NOT NULL,
+  `subject` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_teacher_marksheet_student` (`student_id`),
-  CONSTRAINT `fk_teacher_marksheet_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
+  KEY `fk_tms_teacher` (`teacher_id`),
+  CONSTRAINT `fk_teacher_marksheet_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`),
+  CONSTRAINT `fk_tms_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- Data exporting was unselected.
