@@ -42,6 +42,13 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- ADD THIS: JavaFX WebView module -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>21.0.1</version>
+        </dependency>
+
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
@@ -60,9 +67,8 @@
             <artifactId>logback-classic</artifactId>
             <version>1.4.14</version>
         </dependency>
-
-
     </dependencies>
+
 
     <build>
         <plugins>
