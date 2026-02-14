@@ -20,6 +20,9 @@ public class TeacherStudentDetailsPage {
 
     private final StudentDetailsController controller = new StudentDetailsController();
 
+    // keep latest loaded feedback for edit mode
+    private String lastSavedFeedback = "";
+
     public TeacherStudentDetailsPage(TeacherDashboard dashboard, String studentNumber) {
         this.dashboard = dashboard;
         this.studentNumber = studentNumber;
@@ -42,7 +45,6 @@ public class TeacherStudentDetailsPage {
                 Insets.EMPTY
         )));
 
-        // Header
         Label title = new Label("Student Details");
         title.setFont(Font.font(24));
 
@@ -100,10 +102,11 @@ public class TeacherStudentDetailsPage {
         feedbackArea.setPrefRowCount(3);
         feedbackArea.setWrapText(true);
 
-        // IMPORTANT: Teacher can type immediately
+        // Required behavior:
+        // - first teacher should type => we let edit mode be ON by default if feedback empty
+        // - after saving => clear and lock
         feedbackArea.setEditable(true);
 
-        // Buttons
         Button btnSave = new Button("Save");
         Button btnEdit = new Button("Edit");
         Button btnBack = new Button("Back");
@@ -115,10 +118,9 @@ public class TeacherStudentDetailsPage {
         HBox buttons = new HBox(10, btnSave, btnEdit, btnBack, btnDashboard);
         buttons.setAlignment(Pos.CENTER_LEFT);
 
-        // Load data from DB
+        // ===== Load data from DB =====
         try {
             StudentDetailsDTO dto = controller.getDetails(studentNumber);
-
             Student s = dto.getStudent();
             StudentMarks mk = dto.getMarks();
 
@@ -134,37 +136,70 @@ public class TeacherStudentDetailsPage {
             totalVal.setText(String.valueOf(mk.getTotal()));
             avgVal.setText(String.format("%.2f", mk.getAverage()));
 
-            feedbackArea.setText(mk.getFeedback() == null ? "" : mk.getFeedback());
+            lastSavedFeedback = mk.getFeedback() == null ? "" : mk.getFeedback();
+
+
+            // If feedback already exists -> show empty box and lock (teacher must press Edit)
+            // If feedback empty -> allow typing immediately
+            if (lastSavedFeedback.isBlank()) {
+                feedbackArea.clear();
+                feedbackArea.setEditable(true);
+                status.setText("");
+            } else {
+                feedbackArea.clear();          // do NOT show old feedback in box
+                feedbackArea.setEditable(false); // teacher must press Edit
+                status.setText("Press Edit to update existing feedback.");
+            }
 
         } catch (Exception ex) {
             status.setText("Load error: " + ex.getMessage());
             ex.printStackTrace();
         }
 
-        //  Edit button is optional now: just focus the textbox
+        //  load existing feedback and unlock
         btnEdit.setOnAction(e -> {
-            feedbackArea.requestFocus();
-            feedbackArea.positionCaret(feedbackArea.getText().length());
-            status.setText("");
+            try {
+                StudentDetailsDTO dto = controller.getDetails(studentNumber);
+                String fb = dto.getMarks().getFeedback();
+                lastSavedFeedback = (fb == null ? "" : fb);
+
+                feedbackArea.setText(lastSavedFeedback);
+                feedbackArea.setEditable(true);
+                feedbackArea.requestFocus();
+                feedbackArea.positionCaret(feedbackArea.getText().length());
+
+                status.setText("Editing enabled.");
+            } catch (Exception ex) {
+                status.setText("Edit load error: " + ex.getMessage());
+                ex.printStackTrace();
+            }
         });
 
-        //  Save feedback (insert/update handled by DAO)
+        //save to DB, then clear textbox and lock it
         btnSave.setOnAction(e -> {
             try {
-                controller.saveFeedback(studentNumber, feedbackArea.getText());
-                status.setText("Feedback saved.");
+                String newFb = feedbackArea.getText();
+
+                controller.saveFeedback(studentNumber, newFb);
+
+                // update last saved value
+                lastSavedFeedback = newFb == null ? "" : newFb;
+
+                // clear and lock after save
+                feedbackArea.clear();
+                feedbackArea.setEditable(false);
+
+                status.setText("Feedback saved. Press Edit to change.");
             } catch (Exception ex) {
                 status.setText("Save error: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
 
-        // Back -> Student Info page
         btnBack.setOnAction(e ->
                 dashboard.showPage(new TeacherStudentsInfoPage(dashboard).getView())
         );
 
-        // Dashboard -> Teacher Dashboard home
         btnDashboard.setOnAction(e -> dashboard.showHome());
 
         card.getChildren().addAll(
