@@ -10,49 +10,65 @@
    TOP RIGHT TEACHER INFO CARD
 ================================ */
 .teacher-info {
-    -fx-padding: 10 16 10 16;
-    -fx-background-color: rgba(255,255,255,0.75);
+    -fx-padding: 12 18 12 18;
+    -fx-background-color: rgba(255,255,255,0.85);
     -fx-background-radius: 16;
     -fx-border-radius: 16;
 
     -fx-effect: dropshadow(gaussian,
-    rgba(0,0,0,0.15),
-    8, 0.2, 0, 3);
+    rgba(0,0,0,0.18),
+    10, 0.25, 0, 4);
 }
 
 .teacher-name {
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #222;
+    -fx-text-fill: #1f1f1f;
 }
 
 .teacher-email {
     -fx-font-size: 12px;
-    -fx-text-fill: #555;
+    -fx-text-fill: #555555;
 }
 
 
 /* ================================
-   3 MAIN TOPIC BUTTONS
+   3 MAIN TOPIC BUTTONS (MOSS GREEN EMBOSS)
 ================================ */
 .topic-btn {
     -fx-pref-width: 220px;
     -fx-pref-height: 44px;
 
-    -fx-background-color: rgba(255,255,255,0.9);
-    -fx-background-radius: 10;
+    /* Light moss green */
+    -fx-background-color: linear-gradient(to bottom, #9FBE6A, #8FAF5A);
+    -fx-text-fill: white;
 
-    -fx-font-size: 13px;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #222;
+
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+
+    -fx-border-color: #6E8E3C;
+    -fx-border-width: 2px;
+
+    /* Emboss / raised look */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0.4, 2, 3);
 
     -fx-cursor: hand;
 }
 
+/* Hover Effect */
 .topic-btn:hover {
-    -fx-background-color: #ffffff;
-    -fx-scale-x: 1.03;
-    -fx-scale-y: 1.03;
+    -fx-background-color: linear-gradient(to bottom, #A8C874, #97B964);
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+}
+
+/* Pressed (Inner Emboss Effect) */
+.topic-btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #7A984C, #6E8E3C);
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.6), 10, 0.5, 2, 2);
 }
 
 
@@ -66,26 +82,31 @@
     -fx-max-height: 180px;
 
     -fx-background-radius: 1000;
-    -fx-background-color: rgba(255,255,255,0.5);
+    -fx-background-color: rgba(255,255,255,0.55);
 
     -fx-effect: dropshadow(gaussian,
-    rgba(0,0,0,0.2),
-    12, 0.3, 0, 4);
+    rgba(0,0,0,0.25),
+    14, 0.3, 0, 5);
 }
 
 
 /* ================================
-   LOGOUT BUTTON (BOTTOM LEFT)
+   LOGOUT BUTTON
 ================================ */
 .logout-btn {
     -fx-pref-width: 120px;
     -fx-pref-height: 38px;
 
-    -fx-background-color: rgba(255,255,255,0.9);
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f2f2f2);
     -fx-background-radius: 10;
 
     -fx-font-weight: bold;
     -fx-text-fill: #b00020;
+
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 10;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0.3, 1, 2);
 
     -fx-cursor: hand;
 }

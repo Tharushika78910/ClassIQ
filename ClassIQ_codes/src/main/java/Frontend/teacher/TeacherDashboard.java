@@ -105,7 +105,10 @@ public class TeacherDashboard extends BorderPane {
         Button gradingBtn = (Button) gradingBlock.getChildren().get(0);
         Button studentBtn = (Button) studentBlock.getChildren().get(0);
 
-        markBtn.setOnAction(e -> showPage(new TeacherMarkSheetPage().getView()));
+        markBtn.setOnAction(e ->
+                showPage(new TeacherMarkSheetPage(this).getView())
+        );
+
         gradingBtn.setOnAction(e -> showPage(new StudentMyGradesPage().getView()));
         studentBtn.setOnAction(e -> showPage(new TeacherStudentsInfoPage(this).getView()));
 

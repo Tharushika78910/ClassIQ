@@ -21,24 +21,32 @@ public class TeacherMarkSheetPage {
     private final TableView<MarkRow> table = new TableView<>();
     private final Label status = new Label("");
 
+    private final TeacherDashboard dashboard;
+
+    public TeacherMarkSheetPage(TeacherDashboard dashboard) {
+        this.dashboard = dashboard;
+    }
+
     public Parent getView() {
-        VBox root = new VBox(12);
+
+        BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
         root.getStyleClass().add("page-bg");
 
-        Label title = new Label("Mark Sheet");
-        title.getStyleClass().add("title-xl");
+        /* ===========================
+           CENTER CONTENT
+        ============================ */
+        VBox centerBox = new VBox(15);
+        centerBox.setPadding(new Insets(10));
 
-        Label subtitle = new Label(
-                "Class: 10A   |   Term: 1   |   Subject: Mathematics\n" +
-                        "Assignment /20   Project /30   Final Exam /50"
-        );
-        subtitle.getStyleClass().add("subtitle");
+        // SUBJECT TITLE (Big & Bold)
+        Label subjectTitle = new Label("Mathematics");
+        subjectTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        buildTable();
 
         VBox card = new VBox(12);
         card.getStyleClass().add("card");
-
-        buildTable();
 
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
@@ -54,21 +62,15 @@ public class TeacherMarkSheetPage {
                 return;
             }
 
-
-            if (Boolean.getBoolean("testMode")) {
-                status.setText("Saved (test mode).");
-                return;
-            }
-
             try {
                 TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
-
                 int savedCount = 0;
 
                 for (MarkRow r : table.getItems()) {
 
-
-                    if (r.getAssignment() == 0 && r.getProject() == 0 && r.getFinalExam() == 0) {
+                    if (r.getAssignment() == 0 &&
+                            r.getProject() == 0 &&
+                            r.getFinalExam() == 0) {
                         continue;
                     }
 
@@ -87,7 +89,7 @@ public class TeacherMarkSheetPage {
                     savedCount++;
                 }
 
-                status.setText("Saved " + savedCount + " record(s) to database (teacher_marksheet).");
+                status.setText("Saved " + savedCount + " record(s) to database.");
 
             } catch (Exception ex) {
                 status.setText("Database error: " + ex.getMessage());
@@ -108,7 +110,38 @@ public class TeacherMarkSheetPage {
         actions.setAlignment(Pos.CENTER_LEFT);
 
         card.getChildren().addAll(table, actions);
-        root.getChildren().addAll(title, subtitle, card);
+
+        centerBox.getChildren().addAll(subjectTitle, card);
+        root.setCenter(centerBox);
+
+        /* ===========================
+           BOTTOM BUTTON BAR
+        ============================ */
+        Button btnBack = new Button("Back");
+        btnBack.getStyleClass().add("secondary-btn");
+
+        Button btnLogout = new Button("Logout");
+        btnLogout.getStyleClass().add("logout-btn");
+
+        btnBack.setOnAction(e -> dashboard.showHome());
+
+        btnLogout.setOnAction(e ->
+                dashboard.showPage(new Label("Logged out (placeholder)"))
+        );
+
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
+
+        AnchorPane.setLeftAnchor(btnBack, 20.0);
+        AnchorPane.setBottomAnchor(btnBack, 10.0);
+
+        AnchorPane.setRightAnchor(btnLogout, 20.0);
+        AnchorPane.setBottomAnchor(btnLogout, 10.0);
+
+        bottomBar.getChildren().addAll(btnBack, btnLogout);
+
+        root.setBottom(bottomBar);
+
         return root;
     }
 
@@ -164,8 +197,6 @@ public class TeacherMarkSheetPage {
     ) {
         TableColumn<MarkRow, Integer> col = new TableColumn<>(title);
         col.setCellValueFactory(c -> c.getValue().getPropertyFor(title).asObject());
-        col.setEditable(true);
-
         col.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
 
         col.setOnEditCommit(ev -> {
@@ -200,20 +231,20 @@ public class TeacherMarkSheetPage {
                 new MarkRow("S002", "Hathadura Chathurika Silva"),
                 new MarkRow("S003", "Roshini Fernando"),
                 new MarkRow("S004", "Kumudu Nalleperuma"),
-                new MarkRow("S005", "Dilmi Rajapaksha"),
-                new MarkRow("S006", "Saumya Sompala"),
-                new MarkRow("S007", "Chani Anjalika")
+                new MarkRow("S005", "Dilmi Rajapaksha")
         );
     }
+
+    /* ===========================
+       INNER CLASSES
+    ============================ */
 
     public static class MarkRow {
         private final StringProperty studentId = new SimpleStringProperty();
         private final StringProperty studentName = new SimpleStringProperty();
-
         private final IntegerProperty assignment = new SimpleIntegerProperty(0);
         private final IntegerProperty project = new SimpleIntegerProperty(0);
         private final IntegerProperty finalExam = new SimpleIntegerProperty(0);
-
         private final IntegerProperty total = new SimpleIntegerProperty();
         private final StringProperty grade = new SimpleStringProperty();
 
@@ -221,9 +252,9 @@ public class TeacherMarkSheetPage {
             studentId.set(id);
             studentName.set(name);
 
-            assignment.addListener((o, a, b) -> recalc());
-            project.addListener((o, a, b) -> recalc());
-            finalExam.addListener((o, a, b) -> recalc());
+            assignment.addListener((o,a,b)->recalc());
+            project.addListener((o,a,b)->recalc());
+            finalExam.addListener((o,a,b)->recalc());
 
             recalc();
         }
@@ -231,33 +262,31 @@ public class TeacherMarkSheetPage {
         private void recalc() {
             int t = assignment.get() + project.get() + finalExam.get();
             total.set(t);
-
             grade.set(weightedMarkService.gradeFromComponents(
                     assignment.get(), project.get(), finalExam.get()
             ));
         }
 
-        public String getStudentId() { return studentId.get(); }
-        public String getStudentName() { return studentName.get(); }
+        public StringProperty studentIdProperty(){ return studentId; }
+        public StringProperty studentNameProperty(){ return studentName; }
+        public IntegerProperty totalProperty(){ return total; }
+        public StringProperty gradeProperty(){ return grade; }
 
-        public int getAssignment() { return assignment.get(); }
-        public int getProject() { return project.get(); }
-        public int getFinalExam() { return finalExam.get(); }
+        public int getAssignment(){ return assignment.get(); }
+        public int getProject(){ return project.get(); }
+        public int getFinalExam(){ return finalExam.get(); }
 
-        public void setAssignment(int v) { assignment.set(v); }
-        public void setProject(int v) { project.set(v); }
-        public void setFinalExam(int v) { finalExam.set(v); }
+        public void setAssignment(int v){ assignment.set(v); }
+        public void setProject(int v){ project.set(v); }
+        public void setFinalExam(int v){ finalExam.set(v); }
 
-        public int getTotal() { return total.get(); }
-        public String getGrade() { return grade.get(); }
+        public String getStudentId(){ return studentId.get(); }
+        public String getStudentName(){ return studentName.get(); }
+        public int getTotal(){ return total.get(); }
+        public String getGrade(){ return grade.get(); }
 
-        public StringProperty studentIdProperty() { return studentId; }
-        public StringProperty studentNameProperty() { return studentName; }
-        public IntegerProperty totalProperty() { return total; }
-        public StringProperty gradeProperty() { return grade; }
-
-        public IntegerProperty getPropertyFor(String title) {
-            return switch (title) {
+        public IntegerProperty getPropertyFor(String title){
+            return switch(title){
                 case "Assignment" -> assignment;
                 case "Project" -> project;
                 case "Final Exam" -> finalExam;
@@ -268,16 +297,14 @@ public class TeacherMarkSheetPage {
 
     public static class IntegerStringConverter extends StringConverter<Integer> {
         @Override
-        public String toString(Integer value) {
-            return value == null ? "0" : value.toString();
+        public String toString(Integer v){
+            return v==null?"0":v.toString();
         }
-
         @Override
-        public Integer fromString(String s) {
-            if (s == null || s.trim().isEmpty()) return 0;
-            try {
+        public Integer fromString(String s){
+            try{
                 return Integer.parseInt(s.trim());
-            } catch (NumberFormatException e) {
+            } catch(Exception e){
                 return 0;
             }
         }
