@@ -94,7 +94,7 @@ public class TeacherDashboard extends BorderPane {
         AnchorPane.setTopAnchor(studentBlock, 330.0);
         AnchorPane.setLeftAnchor(studentBlock, 330.0);
 
-        // ===== Logout (Bottom Left) =====
+        // ===== Logout (Bottom Right) =====
         Button logoutBtn = new Button("Logout");
         logoutBtn.getStyleClass().add("logout-btn");
         AnchorPane.setRightAnchor(logoutBtn, 20.0);
@@ -109,9 +109,21 @@ public class TeacherDashboard extends BorderPane {
                 showPage(new TeacherMarkSheetPage(this).getView())
         );
 
-        gradingBtn.setOnAction(e -> showPage(new StudentMyGradesPage().getView()));
-        studentBtn.setOnAction(e -> showPage(new TeacherStudentsInfoPage(this).getView()));
+        // ✅ FIXED: open grading page with Back button that returns to teacher dashboard
+        gradingBtn.setOnAction(e -> {
+            StudentMyGradesPage page = new StudentMyGradesPage(
+                    this::showHome, // Back -> Teacher dashboard home
+                    () -> showPage(simplePlaceholder("Logged out (placeholder)")), // keep placeholder
+                    "/Frontend/images/Login.png"
+            );
+            showPage(page.getView());
+        });
 
+        studentBtn.setOnAction(e ->
+                showPage(new TeacherStudentsInfoPage(this).getView())
+        );
+
+        // keep existing placeholder logout (no login navigation)
         logoutBtn.setOnAction(e -> showPage(simplePlaceholder("Logged out (placeholder)")));
 
         layer.getChildren().addAll(

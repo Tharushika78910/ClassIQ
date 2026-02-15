@@ -81,7 +81,7 @@ public class StudentDashboard extends StackPane {
         btnFeedback.getStyleClass().add("student-menu-btn");
         btnLogout.getStyleClass().add("student-menu-btn");
 
-        //  Actions
+        // Actions
         btnHome.setOnAction(e -> { setActive(btnHome); showPage(buildHomeView()); });
 
         btnMyInfo.setOnAction(e -> {
@@ -89,9 +89,17 @@ public class StudentDashboard extends StackPane {
             showPage(wrapCard(new StudentMyInfoPage().getView(), 820, 520));
         });
 
+        // ✅ Grades page with Back + Logout + background
         btnMyGrades.setOnAction(e -> {
             setActive(btnMyGrades);
-            showPage(wrapCard(new StudentMyGradesPage().getView(), 720, 380));
+
+            StudentMyGradesPage page = new StudentMyGradesPage(
+                    () -> { setActive(btnHome); showPage(buildHomeView()); }, // Back
+                    () -> { setActive(btnLogout); showPage(buildPlaceholderView("Logged out (placeholder)")); }, // Logout
+                    "/Frontend/images/Login.png" // Background
+            );
+
+            showPage(page.getView()); // DO NOT wrapCard
         });
 
         btnReportCard.setOnAction(e -> {
@@ -99,6 +107,11 @@ public class StudentDashboard extends StackPane {
             showPage(wrapCard(new StudentReportCardPage().getView(), 860, 520));
         });
 
+        // ✅ (optional) Feedback button action so it does something
+        btnFeedback.setOnAction(e -> {
+            setActive(btnFeedback);
+            showPage(buildPlaceholderView("Feedback (placeholder)"));
+        });
 
         btnLogout.setOnAction(e -> {
             setActive(btnLogout);
@@ -146,7 +159,6 @@ public class StudentDashboard extends StackPane {
         card.getChildren().add(t);
         return wrapCard(card, 640, 260);
     }
-
 
     private Node wrapCard(Node card, double maxW, double maxH) {
         if (card instanceof Region r) {

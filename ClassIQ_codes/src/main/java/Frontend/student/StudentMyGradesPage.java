@@ -1,38 +1,58 @@
+// ===============================
+// StudentMyGradesPage.java
+// ===============================
 package Frontend.student;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import java.io.InputStream;
+
 public class StudentMyGradesPage {
 
+    private final Runnable onBack;
+    private final Runnable onLogout;
+    private final String backgroundResourcePath;
+
+    // keeps old calls working: new StudentMyGradesPage().getView()
+    public StudentMyGradesPage() {
+        this(null, null, null);
+    }
+
+    // use this to show Back + Logout + background
+    public StudentMyGradesPage(Runnable onBack, Runnable onLogout, String backgroundResourcePath) {
+        this.onBack = onBack;
+        this.onLogout = onLogout;
+        this.backgroundResourcePath = backgroundResourcePath;
+    }
+
     public Node getView() {
-        VBox content = new VBox(25);
-        content.setPadding(new Insets(30));
+
+        VBox content = new VBox(18);
+        content.setPadding(new Insets(18));
         content.setAlignment(Pos.TOP_LEFT);
 
-        // ===== Title =====
         Label title = new Label("Grades");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // ===== Grading Criteria Title =====
         Label criteriaTitle = new Label("Grading Criteria");
         criteriaTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // ===== Paragraph with Bold Words =====
         TextFlow criteriaText = new TextFlow();
         criteriaText.setLineSpacing(5);
-        criteriaText.setMaxWidth(750);
+        criteriaText.setMaxWidth(620);
 
-        // First paragraph
         Text t1 = new Text("The ");
         Text t2 = new Text("Total mark ");
         t2.setFont(Font.font("System", FontWeight.BOLD, 14));
@@ -41,7 +61,6 @@ public class StudentMyGradesPage {
         t4.setFont(Font.font("System", FontWeight.BOLD, 14));
         Text t5 = new Text("and it is calculated based on three assessment components.\n\n");
 
-        // Second paragraph
         Text t7 = new Text("Assignments ");
         t7.setFont(Font.font("System", FontWeight.BOLD, 14));
         Text t8 = new Text("contribute ");
@@ -61,7 +80,6 @@ public class StudentMyGradesPage {
         t17.setFont(Font.font("System", FontWeight.BOLD, 14));
         Text t18 = new Text("and measures the overall knowledge gained throughout the course.\n\n");
 
-        // Third paragraph
         Text t19 = new Text("The final result is calculated by combining the marks obtained from all three components.");
 
         criteriaText.getChildren().addAll(
@@ -72,40 +90,75 @@ public class StudentMyGradesPage {
                 t19
         );
 
-        // ===== Grade Scale Title =====
         Label gradeScaleTitle = new Label("Grade Scale");
         gradeScaleTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // ===== Grade Table =====
         GridPane gradeTable = new GridPane();
         gradeTable.setVgap(10);
         gradeTable.setHgap(60);
         gradeTable.setPadding(new Insets(10, 0, 0, 0));
 
-        // Adding grades properly
         gradeTable.add(new Label("0 - 34"), 0, 0);
         gradeTable.add(new Label("F"), 1, 0);
-
         gradeTable.add(new Label("35 - 54"), 0, 1);
         gradeTable.add(new Label("S"), 1, 1);
-
         gradeTable.add(new Label("55 - 64"), 0, 2);
         gradeTable.add(new Label("C"), 1, 2);
-
         gradeTable.add(new Label("65 - 74"), 0, 3);
         gradeTable.add(new Label("B"), 1, 3);
-
         gradeTable.add(new Label("75 - 100"), 0, 4);
         gradeTable.add(new Label("A"), 1, 4);
 
-        // Add all to VBox
         content.getChildren().addAll(title, criteriaTitle, criteriaText, gradeScaleTitle, gradeTable);
 
-        // ===== Scroll support =====
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
         scrollPane.setPadding(new Insets(10));
 
-        return scrollPane;
+        // old usage: no buttons
+        if (onBack == null && onLogout == null && backgroundResourcePath == null) {
+            return scrollPane;
+        }
+
+        BorderPane page = new BorderPane();
+        page.setCenter(scrollPane);
+
+        BorderPane bottomBar = new BorderPane();
+        bottomBar.setPadding(new Insets(15, 20, 15, 20));
+
+        Button backBtn = new Button("Back");
+        backBtn.setStyle("""
+            -fx-background-color: #e6e6e6;
+            -fx-font-weight: bold;
+            -fx-background-radius: 10;
+            -fx-padding: 8 18;
+        """);
+        backBtn.setOnAction(e -> { if (onBack != null) onBack.run(); });
+
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.setStyle("""
+            -fx-background-color: #b7f7b7;
+            -fx-font-weight: bold;
+            -fx-background-radius: 10;
+            -fx-padding: 8 18;
+        """);
+        logoutBtn.setOnAction(e -> { if (onLogout != null) onLogout.run(); });
+
+        bottomBar.setLeft(backBtn);
+        bottomBar.setRight(logoutBtn);
+        page.setBottom(bottomBar);
+
+        if (backgroundResourcePath != null) {
+            InputStream is = getClass().getResourceAsStream(backgroundResourcePath);
+            if (is != null) {
+                ImageView bg = new ImageView(new Image(is));
+                bg.setPreserveRatio(false);
+                bg.fitWidthProperty().bind(page.widthProperty());
+                bg.fitHeightProperty().bind(page.heightProperty());
+                return new StackPane(bg, page);
+            }
+        }
+
+        return page;
     }
 }
