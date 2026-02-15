@@ -40,7 +40,8 @@ public class HomePage {
         Pane content = createCenterContent(stage);
         root.getChildren().add(content);
 
-        return new Scene(root, 1000, 650);
+        // always same size
+        return new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT);
     }
 
     private Pane createCenterContent(Stage stage) {
@@ -171,7 +172,8 @@ public class HomePage {
 
         StackPane root = (background != null) ? new StackPane(background, webLayout) : new StackPane(webLayout);
 
-        Scene webScene = new Scene(root, stage.getWidth(), stage.getHeight());
+        //  always same size
+        Scene webScene = new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT);
         stage.setScene(webScene);
     }
 

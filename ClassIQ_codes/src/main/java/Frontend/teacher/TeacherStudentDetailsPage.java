@@ -79,8 +79,8 @@ public class TeacherStudentDetailsPage {
         addRow(grid, 1, "Mathematics", m1);
         addRow(grid, 2, "English",     m2);
         addRow(grid, 3, "Science",     m3);
-        addRow(grid, 4, "Language",    m4);
-        addRow(grid, 5, "Craft",       m5);
+        addRow(grid, 4, "Craft",       m4);
+        addRow(grid, 5, "Language",    m5);
 
         // Total + Average
         Label totalVal = new Label("0");

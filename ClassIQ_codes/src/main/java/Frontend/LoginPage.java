@@ -34,8 +34,8 @@ public class LoginPage {
         Label teacherLabel = new Label("I am a Teacher");
         teacherLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 18));
 
-        HBox teacherUsernameBox = createInputBox("Username", 180); // increased width
-        HBox teacherPasswordBox = createInputBox("Password", 180, true); // increased width
+        HBox teacherUsernameBox = createInputBox("Username", 180);
+        HBox teacherPasswordBox = createInputBox("Password", 180, true);
 
         Hyperlink teacherForgot = new Hyperlink("forgot password?");
         teacherForgot.setTextFill(Color.web("#1976D2"));
@@ -47,14 +47,21 @@ public class LoginPage {
                     "mattiv@metropolia.com",
                     "/Teacher.png"
             );
-            Scene teacherScene = new Scene(dashboard, 1100, 700);
+
+            //  always same size
+            Scene teacherScene = new Scene(dashboard, Main.APP_WIDTH, Main.APP_HEIGHT);
             teacherScene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
             teacherScene.getStylesheets().add(getClass().getResource("/css/teacher.css").toExternalForm());
+
             stage.setTitle("Teacher Dashboard");
             stage.setScene(teacherScene);
         });
 
-        teacherPanel.getChildren().addAll(teacherIconView, teacherLabel, teacherUsernameBox, teacherPasswordBox, teacherForgot, teacherLogin);
+        teacherPanel.getChildren().addAll(
+                teacherIconView, teacherLabel,
+                teacherUsernameBox, teacherPasswordBox,
+                teacherForgot, teacherLogin
+        );
 
         // student panel
         VBox studentPanel = createLoginPanel();
@@ -62,8 +69,8 @@ public class LoginPage {
         Label studentLabel = new Label("I am a Student");
         studentLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 18));
 
-        HBox studentUsernameBox = createInputBox("Username", 180); // increased width
-        HBox studentPasswordBox = createInputBox("Password", 180, true); // increased width
+        HBox studentUsernameBox = createInputBox("Username", 180);
+        HBox studentPasswordBox = createInputBox("Password", 180, true);
 
         Hyperlink studentForgot = new Hyperlink("forgot password?");
         studentForgot.setTextFill(Color.web("#1976D2"));
@@ -75,14 +82,21 @@ public class LoginPage {
                     "bao@student.com",
                     "/Student.png"
             );
-            Scene studentScene = new Scene(dashboard, 1100, 700);
+
+            // always same size
+            Scene studentScene = new Scene(dashboard, Main.APP_WIDTH, Main.APP_HEIGHT);
             studentScene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
             studentScene.getStylesheets().add(getClass().getResource("/css/student.css").toExternalForm());
+
             stage.setTitle("Student Dashboard");
             stage.setScene(studentScene);
         });
 
-        studentPanel.getChildren().addAll(studentIconView, studentLabel, studentUsernameBox, studentPasswordBox, studentForgot, studentLogin);
+        studentPanel.getChildren().addAll(
+                studentIconView, studentLabel,
+                studentUsernameBox, studentPasswordBox,
+                studentForgot, studentLogin
+        );
 
         // center content
         HBox panelsBox = new HBox(50, teacherPanel, studentPanel);
@@ -91,7 +105,7 @@ public class LoginPage {
         VBox mainContent = new VBox(40, panelsBox);
         mainContent.setAlignment(Pos.CENTER);
         mainContent.setPadding(new Insets(40, 20, 20, 20));
-        mainContent.setTranslateX(80); // shift panels slightly to the right
+        mainContent.setTranslateX(80);
 
         // root stack pane
         StackPane root = new StackPane(bgImageView, mainContent);
@@ -121,10 +135,10 @@ public class LoginPage {
         bgImageView.fitWidthProperty().bind(root.widthProperty());
         bgImageView.fitHeightProperty().bind(root.heightProperty());
 
-        return new Scene(root, 850, 600); // slightly wider to accommodate larger fields
+        // always same size
+        return new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT);
     }
 
-    // panel creation with gradient background and rounded corners
     private VBox createLoginPanel() {
         VBox panel = new VBox(20);
         panel.setAlignment(Pos.TOP_CENTER);
@@ -142,7 +156,6 @@ public class LoginPage {
         return panel;
     }
 
-    // create input box with label and text field, with focus effects
     private HBox createInputBox(String labelText, double fieldWidth) {
         return createInputBox(labelText, fieldWidth, false);
     }
@@ -161,8 +174,8 @@ public class LoginPage {
                 "-fx-background-radius: 10; " +
                         "-fx-border-radius: 10; " +
                         "-fx-border-color: #A2B8AC; " +
-                        "-fx-padding: 8; " + // slightly bigger padding
-                        "-fx-font-size: 14px;" // bigger font
+                        "-fx-padding: 8; " +
+                        "-fx-font-size: 14px;"
         );
 
         input.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -189,7 +202,6 @@ public class LoginPage {
         return box;
     }
 
-    // fancy button with gradient, rounded corners, and shadow
     private Button createFancyButton(String text) {
         Button btn = new Button(text);
         btn.setPrefWidth(180);
@@ -203,7 +215,6 @@ public class LoginPage {
         return btn;
     }
 
-    // icon cropping to remove transparent padding
     private ImageView createCroppedIcon(String path, double width, double height) {
         Image img = new Image(getClass().getResourceAsStream(path));
         Rectangle2D viewport = getVisibleBounds(img);
