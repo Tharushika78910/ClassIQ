@@ -1,6 +1,3 @@
-// ===============================
-// StudentMyGradesPage.java
-// ===============================
 package Frontend.student;
 
 import javafx.geometry.Insets;
@@ -10,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -25,12 +21,10 @@ public class StudentMyGradesPage {
     private final Runnable onLogout;
     private final String backgroundResourcePath;
 
-    // keeps old calls working: new StudentMyGradesPage().getView()
     public StudentMyGradesPage() {
         this(null, null, null);
     }
 
-    // use this to show Back + Logout + background
     public StudentMyGradesPage(Runnable onBack, Runnable onLogout, String backgroundResourcePath) {
         this.onBack = onBack;
         this.onLogout = onLogout;
@@ -39,8 +33,11 @@ public class StudentMyGradesPage {
 
     public Node getView() {
 
+        // =========================
+        // Content (your text)
+        // =========================
         VBox content = new VBox(18);
-        content.setPadding(new Insets(18));
+        content.setPadding(new Insets(22));
         content.setAlignment(Pos.TOP_LEFT);
 
         Label title = new Label("Grades");
@@ -51,7 +48,7 @@ public class StudentMyGradesPage {
 
         TextFlow criteriaText = new TextFlow();
         criteriaText.setLineSpacing(5);
-        criteriaText.setMaxWidth(620);
+        criteriaText.setMaxWidth(720);
 
         Text t1 = new Text("The ");
         Text t2 = new Text("Total mark ");
@@ -96,7 +93,7 @@ public class StudentMyGradesPage {
         GridPane gradeTable = new GridPane();
         gradeTable.setVgap(10);
         gradeTable.setHgap(60);
-        gradeTable.setPadding(new Insets(10, 0, 0, 0));
+        gradeTable.setPadding(new Insets(8, 0, 0, 0));
 
         gradeTable.add(new Label("0 - 34"), 0, 0);
         gradeTable.add(new Label("F"), 1, 0);
@@ -111,54 +108,94 @@ public class StudentMyGradesPage {
 
         content.getChildren().addAll(title, criteriaTitle, criteriaText, gradeScaleTitle, gradeTable);
 
-        ScrollPane scrollPane = new ScrollPane(content);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPadding(new Insets(10));
+        // =========================
+        // Scroll inside the card
+        // =========================
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setStyle("-fx-background-color: transparent;");
+        scroll.setBackground(Background.EMPTY);
 
-        // old usage: no buttons
-        if (onBack == null && onLogout == null && backgroundResourcePath == null) {
-            return scrollPane;
-        }
+        // =========================
+        // Center card (dull green + border + rounded corners)
+        // =========================
+        StackPane card = new StackPane(scroll);
+        card.setAlignment(Pos.TOP_LEFT);
+        card.setPadding(new Insets(6));
+        card.setMaxWidth(860);
+        card.setPrefWidth(860);
 
-        BorderPane page = new BorderPane();
-        page.setCenter(scrollPane);
+        // Dull green with frame + rounded corners (NOT huge radius)
+        card.setStyle("""
+            -fx-background-color: rgba(200, 230, 200, 0.70);
+            -fx-background-radius: 18;
+            -fx-border-color: rgba(60, 90, 60, 0.55);
+            -fx-border-width: 2;
+            -fx-border-radius: 18;
+        """);
 
+        // Wrap card so it stays in the middle (removes that marked empty area)
+        StackPane centeredCard = new StackPane(card);
+        centeredCard.setAlignment(Pos.TOP_CENTER);
+        centeredCard.setPadding(new Insets(28, 28, 18, 28));
+
+        // =========================
+        // Bottom buttons bar
+        // =========================
         BorderPane bottomBar = new BorderPane();
-        bottomBar.setPadding(new Insets(15, 20, 15, 20));
+        bottomBar.setPadding(new Insets(10, 20, 18, 20));
 
         Button backBtn = new Button("Back");
-        backBtn.setStyle("""
-            -fx-background-color: #e6e6e6;
-            -fx-font-weight: bold;
-            -fx-background-radius: 10;
-            -fx-padding: 8 18;
-        """);
+        backBtn.getStyleClass().add("secondary-btn");
+
         backBtn.setOnAction(e -> { if (onBack != null) onBack.run(); });
 
         Button logoutBtn = new Button("Logout");
-        logoutBtn.setStyle("""
-            -fx-background-color: #b7f7b7;
-            -fx-font-weight: bold;
-            -fx-background-radius: 10;
-            -fx-padding: 8 18;
-        """);
+        logoutBtn.getStyleClass().add("logout-btn");
+
         logoutBtn.setOnAction(e -> { if (onLogout != null) onLogout.run(); });
 
         bottomBar.setLeft(backBtn);
         bottomBar.setRight(logoutBtn);
+
+        BorderPane page = new BorderPane();
+        page.setCenter(centeredCard);
         page.setBottom(bottomBar);
 
-        if (backgroundResourcePath != null) {
-            InputStream is = getClass().getResourceAsStream(backgroundResourcePath);
-            if (is != null) {
-                ImageView bg = new ImageView(new Image(is));
-                bg.setPreserveRatio(false);
-                bg.fitWidthProperty().bind(page.widthProperty());
-                bg.fitHeightProperty().bind(page.heightProperty());
-                return new StackPane(bg, page);
-            }
+        // =========================
+        // Background image on ROOT
+        // =========================
+        StackPane root = new StackPane(page);
+        root.setPadding(new Insets(10));
+
+        Image bg = tryLoad(backgroundResourcePath);
+        if (bg != null) {
+            BackgroundImage bgi = new BackgroundImage(
+                    bg,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(100, 100, true, true, true, true)
+            );
+            root.setBackground(new Background(bgi));
         }
 
-        return page;
+        // Old usage (no args) still works: it will show the same layout but Back/Logout won't do anything.
+        return root;
+    }
+
+    private Image tryLoad(String path) {
+        if (path == null) return null;
+
+        InputStream is = getClass().getResourceAsStream(path);
+        if (is == null && !path.startsWith("/")) {
+            is = getClass().getResourceAsStream("/" + path);
+        }
+        // fallback if your image is directly in resources
+        if (is == null) {
+            is = getClass().getResourceAsStream("/Login.png");
+        }
+        return is != null ? new Image(is) : null;
     }
 }

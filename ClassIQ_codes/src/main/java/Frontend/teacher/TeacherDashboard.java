@@ -18,38 +18,33 @@ public class TeacherDashboard extends BorderPane {
 
     private final StackPane contentArea = new StackPane();
 
-    // Store teacher info for showHome()
     private final String teacherName;
     private final String teacherEmail;
     private final String teacherProfileImagePath;
 
-    // Update image paths if needed
-    private static final String BG_IMAGE = "/Login.png";
-    private static final String MARK_IMAGE = "/images/Mark sheet.png";
-    private static final String GRADING_IMAGE = "/images/Grading.png";
-    private static final String STUDENT_IMAGE = "/images/studentinfo.png";
+    // Images
+    private static final String BG_IMAGE = "/Homepage.png";
+    private static final String MARK_IMAGE = "/images/MarkSheet.png";
+    private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
+    private static final String STUDENT_IMAGE = "/images/studentInfo.png";
 
     public TeacherDashboard(String name, String email, String profileImagePath) {
 
-        // Save values so we can return to home anytime
         this.teacherName = name;
         this.teacherEmail = email;
         this.teacherProfileImagePath = profileImagePath;
 
         getStyleClass().add("teacher-root");
 
-        // Load dashboard CSS
         getStylesheets().add(
                 getClass().getResource("/css/teacher-dashboard.css").toExternalForm()
         );
 
         setCenter(contentArea);
 
-        // Show dashboard home (like before)
         showHome();
     }
 
-    // used by "Dashboard" button in StudentDetailsPage
     public void showHome() {
         showPage(buildHomeView(teacherName, teacherEmail, teacherProfileImagePath));
     }
@@ -74,46 +69,46 @@ public class TeacherDashboard extends BorderPane {
         AnchorPane layer = new AnchorPane();
         layer.setPadding(new Insets(30));
 
-        // ===== Teacher Info (Top Right) =====
+        // Teacher info (Top Right)
         HBox teacherBox = buildTeacherInfo(name, email, profileImagePath);
         AnchorPane.setTopAnchor(teacherBox, 20.0);
         AnchorPane.setRightAnchor(teacherBox, 20.0);
 
-        // ===== Mark Sheet =====
+        // Mark Sheet
         VBox markBlock = buildTopicBlock("Mark sheet", MARK_IMAGE);
-        AnchorPane.setTopAnchor(markBlock, 100.0);
-        AnchorPane.setLeftAnchor(markBlock, 140.0);
+        AnchorPane.setTopAnchor(markBlock, 120.0);
+        AnchorPane.setLeftAnchor(markBlock, 150.0);
 
-        // ===== Grading Criteria =====
+        // Grading Criteria
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
-        AnchorPane.setTopAnchor(gradingBlock, 100.0);
-        AnchorPane.setLeftAnchor(gradingBlock, 520.0);
+        AnchorPane.setTopAnchor(gradingBlock, 120.0);
+        AnchorPane.setLeftAnchor(gradingBlock, 600.0);
 
-        // ===== Student Info =====
+        // Student Info
         VBox studentBlock = buildTopicBlock("Student Info", STUDENT_IMAGE);
-        AnchorPane.setTopAnchor(studentBlock, 330.0);
-        AnchorPane.setLeftAnchor(studentBlock, 330.0);
+        AnchorPane.setTopAnchor(studentBlock, 380.0);
+        AnchorPane.setLeftAnchor(studentBlock, 380.0);
 
-        // ===== Logout (Bottom Right) =====
+        // Logout (Bottom Right)
         Button logoutBtn = new Button("Logout");
         logoutBtn.getStyleClass().add("logout-btn");
         AnchorPane.setRightAnchor(logoutBtn, 20.0);
         AnchorPane.setBottomAnchor(logoutBtn, 20.0);
 
         // ===== Button Actions =====
-        Button markBtn = (Button) markBlock.getChildren().get(0);
-        Button gradingBtn = (Button) gradingBlock.getChildren().get(0);
-        Button studentBtn = (Button) studentBlock.getChildren().get(0);
+        // (IMPORTANT: button is index 1 because image is index 0)
+        Button markBtn = (Button) markBlock.getChildren().get(1);
+        Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
+        Button studentBtn = (Button) studentBlock.getChildren().get(1);
 
         markBtn.setOnAction(e ->
                 showPage(new TeacherMarkSheetPage(this).getView())
         );
 
-        // ✅ FIXED: open grading page with Back button that returns to teacher dashboard
         gradingBtn.setOnAction(e -> {
             StudentMyGradesPage page = new StudentMyGradesPage(
-                    this::showHome, // Back -> Teacher dashboard home
-                    () -> showPage(simplePlaceholder("Logged out (placeholder)")), // keep placeholder
+                    this::showHome,
+                    () -> showPage(simplePlaceholder("Logged out (placeholder)")),
                     "/Frontend/images/Login.png"
             );
             showPage(page.getView());
@@ -123,8 +118,9 @@ public class TeacherDashboard extends BorderPane {
                 showPage(new TeacherStudentsInfoPage(this).getView())
         );
 
-        // keep existing placeholder logout (no login navigation)
-        logoutBtn.setOnAction(e -> showPage(simplePlaceholder("Logged out (placeholder)")));
+        logoutBtn.setOnAction(e ->
+                showPage(simplePlaceholder("Logged out (placeholder)"))
+        );
 
         layer.getChildren().addAll(
                 teacherBox,
@@ -138,33 +134,40 @@ public class TeacherDashboard extends BorderPane {
         return root;
     }
 
+    // ✅ SMALLER CIRCLES + SPACE SO THEY DON'T TOUCH BUTTONS
     private VBox buildTopicBlock(String title, String imagePath) {
 
-        VBox box = new VBox(15);
+        VBox box = new VBox(16);          // ✅ more spacing between circle and button
         box.setAlignment(Pos.TOP_CENTER);
 
-        Button btn = new Button(title);
-        btn.getStyleClass().add("topic-btn");
-
-        btn.setMinSize(220, 44);
-        btn.setMaxSize(220, 44);
-
+        // ----- Image -----
         ImageView iv = new ImageView();
         try {
             iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
         } catch (Exception ignored) {}
 
-        iv.setFitWidth(180);
-        iv.setFitHeight(180);
+        // ✅ Smaller circle size
+        iv.setFitWidth(140);
+        iv.setFitHeight(140);
         iv.setPreserveRatio(false);
 
-        Circle clip = new Circle(90, 90, 90);
+        Circle clip = new Circle(70, 70, 70);
         iv.setClip(clip);
 
         StackPane circleHolder = new StackPane(iv);
+        circleHolder.setMinSize(140, 140);
+        circleHolder.setMaxSize(140, 140);
         circleHolder.getStyleClass().add("circle-holder");
 
-        box.getChildren().addAll(btn, circleHolder);
+        // ----- Button -----
+        Button btn = new Button(title);
+        btn.getStyleClass().add("topic-btn");
+
+        // ✅ Smaller button
+        btn.setPrefSize(160, 32);
+
+        // ✅ Image first, button under
+        box.getChildren().addAll(circleHolder, btn);
         return box;
     }
 
@@ -197,8 +200,8 @@ public class TeacherDashboard extends BorderPane {
         emailLbl.getStyleClass().add("teacher-email");
 
         info.getChildren().addAll(nameLbl, emailLbl);
-
         wrap.getChildren().addAll(avatar, info);
+
         return wrap;
     }
 
@@ -211,7 +214,6 @@ public class TeacherDashboard extends BorderPane {
         return box;
     }
 
-    // keep this public (needed for navigation)
     public void showPage(Node node) {
         contentArea.getChildren().setAll(node);
     }
