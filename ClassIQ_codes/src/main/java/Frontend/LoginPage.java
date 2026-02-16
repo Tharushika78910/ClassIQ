@@ -21,6 +21,7 @@ public class LoginPage {
 
     private static final String BG_IMAGE = "/Homepage.png";
     private static final String LOGO = "/logo.png";
+
     private static final String STUDENT_AVATAR = "/Student.png";
     private static final String TEACHER_AVATAR = "/Teacher.png";
 
@@ -38,43 +39,33 @@ public class LoginPage {
 
         StackPane root = new StackPane();
 
-        // ===== Background =====
-        ImageView bg = new ImageView();
-        try {
-            bg.setImage(new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream(BG_IMAGE))));
-        } catch (Exception ignored) {}
-
-        bg.setPreserveRatio(false);
-        bg.fitWidthProperty().bind(root.widthProperty());
-        bg.fitHeightProperty().bind(root.heightProperty());
-
+        // Background (Login page)
+        ImageView bg = createBackgroundView();
         root.getChildren().add(bg);
 
-        // ===== Main Content =====
+        // Main Content
         VBox mainBox = new VBox(35);
         mainBox.setAlignment(Pos.CENTER);
 
-        // IMPORTANT: prevent VBox from blocking Back button
         mainBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        mainBox.setBackground(Background.EMPTY); // ensure no default background
+        mainBox.setStyle("-fx-background-color: transparent;");
 
-        // ===== Logo (NO WHITE PANEL) =====
+        // Logo (
         ImageView logo = new ImageView();
         try {
-            logo.setImage(new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream(LOGO))));
+            logo.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(LOGO))));
         } catch (Exception ignored) {}
-
         logo.setPreserveRatio(true);
         logo.setSmooth(true);
         logo.setFitWidth(320);
-        logo.setStyle(
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 20, 0.3, 0, 4);"
-        );
+        logo.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 20, 0.3, 0, 4);");
 
-        // ===== Login Cards =====
+        // Two Cards
         HBox cards = new HBox(70);
         cards.setAlignment(Pos.CENTER);
+        cards.setBackground(Background.EMPTY);
+        cards.setStyle("-fx-background-color: transparent;");
 
         VBox teacherCard = buildLoginCard("I am a Teacher", TEACHER_AVATAR, "TEACHER");
         VBox studentCard = buildLoginCard("I am a Student", STUDENT_AVATAR, "STUDENT");
@@ -82,10 +73,9 @@ public class LoginPage {
         cards.getChildren().addAll(teacherCard, studentCard);
 
         mainBox.getChildren().addAll(logo, cards);
-
         root.getChildren().add(mainBox);
 
-        // ===== Back Button (TOP RIGHT) =====
+        // Back Button
         Button backBtn = new Button("← Back");
 
         String backNormal =
@@ -114,10 +104,9 @@ public class LoginPage {
 
         backBtn.setOnAction(e -> {
             HomePage home = new HomePage();
-            stage.setScene(home.getScene(stage));
+            stage.setScene(home.getScene(stage)); // HomePage unchanged
         });
 
-        // ADD LAST so it stays on top
         root.getChildren().add(backBtn);
 
         return root;
@@ -137,20 +126,14 @@ public class LoginPage {
 
         ImageView avatar = new ImageView();
         try {
-            avatar.setImage(new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream(avatarPath))));
+            avatar.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(avatarPath))));
         } catch (Exception ignored) {}
-
         avatar.setFitWidth(90);
         avatar.setFitHeight(90);
         avatar.setPreserveRatio(true);
 
         Label title = new Label(titleText);
-        title.setStyle(
-                "-fx-font-size: 22px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #1f1f1f;"
-        );
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f1f1f;");
 
         TextField tfUser = new TextField();
         tfUser.setPromptText("Username");
@@ -162,10 +145,8 @@ public class LoginPage {
 
         Hyperlink forgot = new Hyperlink("forgot password?");
         forgot.setStyle("-fx-text-fill: #2F6DAA; -fx-font-size: 13px;");
-        forgot.setOnAction(e ->
-                new Alert(Alert.AlertType.INFORMATION,
-                        "Forgot password feature not implemented yet.")
-                        .showAndWait());
+        forgot.setOnAction(e -> new Alert(Alert.AlertType.INFORMATION,
+                "Forgot password feature not implemented yet.").showAndWait());
 
         Label error = new Label();
         error.setTextFill(Color.DARKRED);
@@ -183,7 +164,6 @@ public class LoginPage {
         );
 
         loginBtn.setOnAction(e -> {
-
             error.setText("");
 
             String username = tfUser.getText() == null ? "" : tfUser.getText().trim();
@@ -210,37 +190,52 @@ public class LoginPage {
             UserProfileDaoImpl profileDao = new UserProfileDaoImpl();
 
             if ("STUDENT".equalsIgnoreCase(result.role)) {
-
                 var sp = profileDao.findStudentByUserId(result.userId);
                 if (sp == null) {
                     error.setText("Student profile not found.");
                     return;
                 }
 
-                StudentDashboard dash =
-                        new StudentDashboard(sp.name, sp.email, STUDENT_AVATAR);
+                StudentDashboard dash = new StudentDashboard(sp.name, sp.email, STUDENT_AVATAR);
 
-                stage.getScene().setRoot(dash);
+                stage.getScene().setRoot(wrapWithBackground(dash));
 
             } else if ("TEACHER".equalsIgnoreCase(result.role)) {
-
                 var tp = profileDao.findTeacherByUserId(result.userId);
                 if (tp == null) {
                     error.setText("Teacher profile not found.");
                     return;
                 }
 
-                TeacherDashboard dash =
-                        new TeacherDashboard(tp.name, tp.email, TEACHER_AVATAR);
+                TeacherDashboard dash = new TeacherDashboard(tp.name, tp.email, TEACHER_AVATAR);
 
-                stage.getScene().setRoot(dash);
+
+                stage.getScene().setRoot(wrapWithBackground(dash));
             }
         });
 
-        card.getChildren().addAll(
-                avatar, title, tfUser, tfPass, forgot, error, loginBtn
-        );
-
+        card.getChildren().addAll(avatar, title, tfUser, tfPass, forgot, error, loginBtn);
         return card;
+    }
+
+    // Background helpers
+
+    private ImageView createBackgroundView() {
+        ImageView bg = new ImageView();
+        try {
+            bg.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(BG_IMAGE))));
+        } catch (Exception ignored) {}
+
+        bg.setPreserveRatio(false);
+        bg.fitWidthProperty().bind(stage.widthProperty());
+        bg.fitHeightProperty().bind(stage.heightProperty());
+        bg.setSmooth(true);
+        return bg;
+    }
+
+    private Parent wrapWithBackground(Parent pageContent) {
+        ImageView bg = createBackgroundView();
+        StackPane wrapper = new StackPane(bg, pageContent);
+        return wrapper;
     }
 }

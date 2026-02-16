@@ -23,10 +23,19 @@ public class Main extends Application {
 
         stage.setTitle("Class iQ");
 
+        // Start with HomePage
         HomePage homePage = new HomePage();
         Scene scene = homePage.getScene(stage);
-        stage.setScene(scene);
 
+        // Apply background to the WHOLE SCENE using CSS (cannot be removed by setRoot)
+        scene.getRoot().setStyle(
+                "-fx-background-image: url('/Homepage.png');" +
+                        "-fx-background-size: cover;" +
+                        "-fx-background-position: center center;" +
+                        "-fx-background-repeat: no-repeat;"
+        );
+
+        stage.setScene(scene);
         stage.show();
     }
 

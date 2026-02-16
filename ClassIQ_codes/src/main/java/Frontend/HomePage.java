@@ -40,7 +40,6 @@ public class HomePage {
         Pane content = createCenterContent(stage);
         root.getChildren().add(content);
 
-        // always same size
         return new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT);
     }
 
@@ -49,14 +48,18 @@ public class HomePage {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(40));
 
-        // Glassmorphism panel
+        // Glass panel
         VBox glassPanel = new VBox(20);
         glassPanel.setAlignment(Pos.CENTER);
         glassPanel.setPadding(new Insets(40));
         glassPanel.setMaxWidth(450);
+
         glassPanel.setBackground(new Background(
-                new BackgroundFill(Color.rgb(255, 255, 255, 0.18), new CornerRadii(20), Insets.EMPTY)
+                new BackgroundFill(Color.rgb(255, 255, 255, 0.18),
+                        new CornerRadii(20),
+                        Insets.EMPTY)
         ));
+
         glassPanel.setBorder(new Border(new BorderStroke(
                 Color.rgb(255, 255, 255, 0.35),
                 BorderStrokeStyle.SOLID,
@@ -78,21 +81,27 @@ public class HomePage {
         loginBtn.setStyle(buttonStyle(SAGE_BUTTON));
         loginBtn.setOnMouseEntered(e -> loginBtn.setStyle(buttonStyle(SAGE_BUTTON_HOVER)));
         loginBtn.setOnMouseExited(e -> loginBtn.setStyle(buttonStyle(SAGE_BUTTON)));
+
+
         loginBtn.setOnAction(e -> {
             LoginPage loginPage = new LoginPage(stage);
             stage.setScene(loginPage.getScene());
         });
+
         glassPanel.getChildren().add(loginBtn);
 
         // Stars
         HBox stars = new HBox(5);
         stars.setAlignment(Pos.CENTER);
+
         for (int i = 0; i < 5; i++) {
             Label star = new Label("★");
             star.setFont(Font.font(26));
             star.setTextFill(Color.web(GOLD_STAR));
+
             star.setOnMouseEntered(ev -> star.setTextFill(Color.web(GOLD_STAR_HOVER)));
             star.setOnMouseExited(ev -> star.setTextFill(Color.web(GOLD_STAR)));
+
             stars.getChildren().add(star);
         }
         glassPanel.getChildren().add(stars);
@@ -110,6 +119,7 @@ public class HomePage {
         privacy.setStyle("-fx-text-fill: green; -fx-underline: false;");
         help.setStyle("-fx-text-fill: green; -fx-underline: false;");
 
+        // open web pages inside app
         privacy.setOnAction(e -> openWebPage(stage, "/privacy.html"));
         help.setOnAction(e -> openWebPage(stage, "/help.html"));
 
@@ -129,19 +139,22 @@ public class HomePage {
             return;
         }
 
+        // WebView
         WebView webView = new WebView();
         webView.getEngine().load(url.toExternalForm());
-        webView.prefWidthProperty().bind(stage.widthProperty().multiply(0.65));
-        webView.prefHeightProperty().bind(stage.heightProperty().multiply(0.65));
 
         VBox glassPanel = new VBox(webView);
         glassPanel.setPadding(new Insets(30));
         glassPanel.setAlignment(Pos.CENTER);
-        glassPanel.setMaxWidth(650);
-        glassPanel.setMaxHeight(500);
+        glassPanel.setMaxWidth(750);
+        glassPanel.setMaxHeight(540);
+
         glassPanel.setBackground(new Background(
-                new BackgroundFill(Color.rgb(255, 255, 255, 0.18), new CornerRadii(20), Insets.EMPTY)
+                new BackgroundFill(Color.rgb(255, 255, 255, 0.18),
+                        new CornerRadii(20),
+                        Insets.EMPTY)
         ));
+
         glassPanel.setBorder(new Border(new BorderStroke(
                 Color.rgb(255, 255, 255, 0.35),
                 BorderStrokeStyle.SOLID,
@@ -149,32 +162,34 @@ public class HomePage {
                 new BorderWidths(1.5)
         )));
 
-        Button backBtn = new Button("Back");
-        backBtn.setOnAction(ev -> stage.setScene(getScene(stage)));
+        // Back button
+        Button backBtn = new Button("← Back");
         backBtn.setStyle(buttonStyle(SAGE_BUTTON));
-        backBtn.setPadding(new Insets(10));
+        backBtn.setPadding(new Insets(10, 18, 10, 18));
+        backBtn.setOnAction(ev -> stage.setScene(getScene(stage)));
 
         HBox topBar = new HBox(backBtn);
-        topBar.setPadding(new Insets(10));
-        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(12));
+        topBar.setAlignment(Pos.TOP_LEFT);
 
         BorderPane webLayout = new BorderPane();
         webLayout.setTop(topBar);
         webLayout.setCenter(glassPanel);
 
+        // Background image
         ImageView background = loadImageView("/Homepage.png");
         if (background != null) {
             background.setPreserveRatio(false);
+            background.setSmooth(true);
             background.fitWidthProperty().bind(stage.widthProperty());
             background.fitHeightProperty().bind(stage.heightProperty());
-            background.setSmooth(true);
         }
 
-        StackPane root = (background != null) ? new StackPane(background, webLayout) : new StackPane(webLayout);
+        StackPane root = (background != null)
+                ? new StackPane(background, webLayout)
+                : new StackPane(webLayout);
 
-        //  always same size
-        Scene webScene = new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT);
-        stage.setScene(webScene);
+        stage.setScene(new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT));
     }
 
     private ImageView loadImageView(String resourcePath) {
