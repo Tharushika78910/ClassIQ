@@ -8,181 +8,203 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 
-public class StudentDashboard extends StackPane {
+import java.util.Objects;
 
-    private final BorderPane layout = new BorderPane();
+public class StudentDashboard extends BorderPane {
+
     private final StackPane contentArea = new StackPane();
 
-    private Button btnHome, btnMyInfo, btnMyGrades, btnReportCard, btnFeedback, btnLogout;
+    private final String studentName;
+    private final String studentEmail;
+    private final String studentProfileImagePath;
+
+    // ✅ Images (CHANGE PATHS if yours are different)
+    private static final String BG_IMAGE      = "/Homepage.png";
+    private static final String INFO_IMAGE    = "/images/studentInfo.png";
+    private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
+    private static final String REPORT_IMAGE  = "/images/Report Card.png"; // change to your real file
 
     public StudentDashboard(String name, String email, String profileImagePath) {
-        getStyleClass().add("student-root");
 
-        getChildren().add(layout);
+        this.studentName = name;
+        this.studentEmail = email;
+        this.studentProfileImagePath = profileImagePath;
 
-        layout.setPadding(new Insets(10));
-        layout.setTop(buildHeader());
-        layout.setLeft(buildSidebar(name, email, profileImagePath));
-        layout.setCenter(contentArea);
+        // ✅ Use same CSS as teacher (so circle-holder, topic-btn, logout-btn, teacher-info styles work)
+        getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
+        );
 
-        BorderPane.setMargin(contentArea, new Insets(20));
-
-        setActive(btnHome);
-        showPage(buildHomeView());
+        setCenter(contentArea);
+        showHome();
     }
 
-    private Node buildHeader() {
-        HBox header = new HBox();
-        header.getStyleClass().add("header-bar");
-        header.setPadding(new Insets(10));
-        return header;
+    public void showHome() {
+        showPage(buildHomeView(studentName, studentEmail, studentProfileImagePath));
     }
 
-    private Node buildSidebar(String name, String email, String profileImagePath) {
-        VBox sidebar = new VBox(14);
-        sidebar.setPrefWidth(240);
-        sidebar.getStyleClass().add("student-sidebar");
-        sidebar.setPadding(new Insets(15));
+    private Node buildHomeView(String name, String email, String profileImagePath) {
 
-        VBox profileBox = new VBox(6);
-        profileBox.setAlignment(Pos.CENTER);
-        profileBox.getStyleClass().add("student-profile-box");
-        profileBox.setPadding(new Insets(12));
+        StackPane root = new StackPane();
+        root.getStyleClass().add("figma-root");
+
+
+        try {
+            BackgroundImage bg = new BackgroundImage(
+                    new Image(Objects.requireNonNull(getClass().getResourceAsStream(BG_IMAGE))),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(
+                            BackgroundSize.AUTO, BackgroundSize.AUTO,
+                            false, false,
+                            true,  // contain
+                            true   // cover  ✅ important
+                    )
+            );
+            root.setBackground(new Background(bg));
+        } catch (Exception ignored) {}
+
+        AnchorPane layer = new AnchorPane();
+        layer.setPadding(new Insets(30));
+
+        //  Top-right student info
+        HBox studentBox = buildStudentInfo(name, email, profileImagePath);
+        AnchorPane.setTopAnchor(studentBox, 20.0);
+        AnchorPane.setRightAnchor(studentBox, 20.0);
+
+        //  My Info block
+        VBox infoBlock = buildTopicBlock("My Info", INFO_IMAGE);
+        AnchorPane.setTopAnchor(infoBlock, 120.0);
+        AnchorPane.setLeftAnchor(infoBlock, 280.0);
+
+        //  Grading Criteria block (opens StudentMyGradesPage)
+        VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
+        AnchorPane.setTopAnchor(gradingBlock, 120.0);
+        AnchorPane.setLeftAnchor(gradingBlock, 700.0);
+
+        // Report Card block
+        VBox reportBlock = buildTopicBlock("Report Card", REPORT_IMAGE);
+        AnchorPane.setTopAnchor(reportBlock, 380.0);
+        AnchorPane.setLeftAnchor(reportBlock, 480.0);
+
+        // Bottom-right logout
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.getStyleClass().add("logout-btn");
+        AnchorPane.setRightAnchor(logoutBtn, 20.0);
+        AnchorPane.setBottomAnchor(logoutBtn, 20.0);
+
+        // ===== Actions =====
+        Button infoBtn = (Button) infoBlock.getChildren().get(1);
+        Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
+        Button reportBtn = (Button) reportBlock.getChildren().get(1);
+
+        infoBtn.setOnAction(e -> showPage(new StudentMyInfoPage().getView()));
+
+        gradingBtn.setOnAction(e -> {
+            StudentMyGradesPage page = new StudentMyGradesPage(
+                    this::showHome, // Back goes to Home
+                    () -> showPage(simplePlaceholder("Logged out (placeholder)")),
+                    "/Frontend/images/Login.png"
+            );
+            showPage(page.getView());
+        });
+
+        reportBtn.setOnAction(e -> showPage(new StudentReportCardPage().getView()));
+
+        logoutBtn.setOnAction(e -> showPage(simplePlaceholder("Logged out (placeholder)")));
+
+        layer.getChildren().addAll(
+                studentBox,
+                infoBlock,
+                gradingBlock,
+                reportBlock,
+                logoutBtn
+        );
+
+        root.getChildren().add(layer);
+        return root;
+    }
+
+    //  same circle + button as teacher
+    private VBox buildTopicBlock(String title, String imagePath) {
+
+        VBox box = new VBox(16);
+        box.setAlignment(Pos.TOP_CENTER);
+
+        ImageView iv = new ImageView();
+        try {
+            iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+        } catch (Exception ignored) {}
+
+        iv.setFitWidth(140);
+        iv.setFitHeight(140);
+        iv.setPreserveRatio(false);
+
+        Circle clip = new Circle(70, 70, 70);
+        iv.setClip(clip);
+
+        StackPane circleHolder = new StackPane(iv);
+        circleHolder.setMinSize(140, 140);
+        circleHolder.setMaxSize(140, 140);
+        circleHolder.getStyleClass().add("circle-holder");
+
+        Button btn = new Button(title);
+        btn.getStyleClass().add("topic-btn");
+        btn.setPrefSize(160, 32);
+
+        box.getChildren().addAll(circleHolder, btn);
+        return box;
+    }
+
+    //  top-right info box (reuse teacher-info css)
+    private HBox buildStudentInfo(String name, String email, String profileImagePath) {
+
+        HBox wrap = new HBox(12);
+        wrap.setAlignment(Pos.CENTER_RIGHT);
+        wrap.getStyleClass().add("teacher-info");
 
         ImageView avatar = new ImageView();
         try {
-            avatar.setImage(new Image(getClass().getResourceAsStream(profileImagePath)));
+            avatar.setImage(new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream(profileImagePath))
+            ));
         } catch (Exception ignored) {}
-        avatar.setFitWidth(42);
-        avatar.setFitHeight(42);
-        avatar.setPreserveRatio(true);
+
+        avatar.setFitWidth(52);
+        avatar.setFitHeight(52);
+        avatar.setPreserveRatio(false);
+
+        Circle clip = new Circle(26, 26, 26);
+        avatar.setClip(clip);
+
+        VBox info = new VBox(2);
 
         Label nameLbl = new Label(name);
-        nameLbl.getStyleClass().add("profile-name");
+        nameLbl.getStyleClass().add("teacher-name");
 
         Label emailLbl = new Label(email);
-        emailLbl.getStyleClass().add("profile-email");
+        emailLbl.getStyleClass().add("teacher-email");
 
-        profileBox.getChildren().addAll(avatar, nameLbl, emailLbl);
+        info.getChildren().addAll(nameLbl, emailLbl);
+        wrap.getChildren().addAll(avatar, info);
 
-        // buttons
-        btnHome = new Button("Home");
-        btnMyInfo = new Button("My Info");
-        btnMyGrades = new Button("My Grades");
-        btnReportCard = new Button("Report Card");
-        btnFeedback = new Button("Feedback");
-        btnLogout = new Button("Log out");
-
-        btnHome.getStyleClass().add("student-menu-btn");
-        btnMyInfo.getStyleClass().add("student-menu-btn");
-        btnMyGrades.getStyleClass().add("student-menu-btn");
-        btnReportCard.getStyleClass().add("student-menu-btn");
-        btnFeedback.getStyleClass().add("student-menu-btn");
-        btnLogout.getStyleClass().add("student-menu-btn");
-
-        // Actions
-        btnHome.setOnAction(e -> { setActive(btnHome); showPage(buildHomeView()); });
-
-        btnMyInfo.setOnAction(e -> {
-            setActive(btnMyInfo);
-            showPage(wrapCard(new StudentMyInfoPage().getView(), 820, 520));
-        });
-
-        // ✅ Grades page with Back + Logout + background
-        btnMyGrades.setOnAction(e -> {
-            setActive(btnMyGrades);
-
-            StudentMyGradesPage page = new StudentMyGradesPage(
-                    () -> { setActive(btnHome); showPage(buildHomeView()); }, // Back
-                    () -> { setActive(btnLogout); showPage(buildPlaceholderView("Logged out (placeholder)")); }, // Logout
-                    "/Frontend/images/Login.png" // Background
-            );
-
-            showPage(page.getView()); // DO NOT wrapCard
-        });
-
-        btnReportCard.setOnAction(e -> {
-            setActive(btnReportCard);
-            showPage(wrapCard(new StudentReportCardPage().getView(), 860, 520));
-        });
-
-        // ✅ (optional) Feedback button action so it does something
-        btnFeedback.setOnAction(e -> {
-            setActive(btnFeedback);
-            showPage(buildPlaceholderView("Feedback (placeholder)"));
-        });
-
-        btnLogout.setOnAction(e -> {
-            setActive(btnLogout);
-            showPage(buildPlaceholderView("Logged out (placeholder)"));
-        });
-
-        Region grow = new Region();
-        VBox.setVgrow(grow, Priority.ALWAYS);
-
-        sidebar.getChildren().addAll(
-                profileBox,
-                btnHome,
-                btnMyInfo,
-                btnMyGrades,
-                btnReportCard,
-                btnFeedback,
-                grow,
-                btnLogout
-        );
-
-        return sidebar;
+        return wrap;
     }
 
-    private Node buildHomeView() {
-        VBox card = new VBox(10);
-        card.getStyleClass().add("student-page-bg");
-        card.setPadding(new Insets(20));
-
-        Label t = new Label("Student Home");
-        t.getStyleClass().add("title-xl");
-
-        Label s = new Label("Welcome! Use the menu to navigate.");
-
-        card.getChildren().addAll(t, s);
-
-        return wrapCard(card, 560, 260);
+    private Node simplePlaceholder(String text) {
+        VBox box = new VBox(20);
+        box.setPadding(new Insets(40));
+        Label lbl = new Label(text);
+        lbl.setFont(Font.font(18));
+        box.getChildren().add(lbl);
+        return box;
     }
 
-    private Node buildPlaceholderView(String text) {
-        VBox card = new VBox(10);
-        card.getStyleClass().add("student-page-bg");
-        card.setPadding(new Insets(20));
-        Label t = new Label(text);
-        t.getStyleClass().add("title-xl");
-        card.getChildren().add(t);
-        return wrapCard(card, 640, 260);
-    }
-
-    private Node wrapCard(Node card, double maxW, double maxH) {
-        if (card instanceof Region r) {
-            r.setMaxWidth(maxW);
-            r.setMaxHeight(maxH);
-        }
-
-        StackPane wrapper = new StackPane(card);
-        wrapper.setAlignment(Pos.TOP_LEFT);
-        wrapper.setPadding(new Insets(40));
-        return wrapper;
-    }
-
-    private void setActive(Button active) {
-        btnHome.getStyleClass().remove("student-menu-active");
-        btnMyInfo.getStyleClass().remove("student-menu-active");
-        btnMyGrades.getStyleClass().remove("student-menu-active");
-        btnReportCard.getStyleClass().remove("student-menu-active");
-        btnFeedback.getStyleClass().remove("student-menu-active");
-        btnLogout.getStyleClass().remove("student-menu-active");
-        active.getStyleClass().add("student-menu-active");
-    }
-
-    private void showPage(Node node) {
+    public void showPage(Node node) {
         contentArea.getChildren().setAll(node);
     }
 }

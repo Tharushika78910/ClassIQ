@@ -77,17 +77,17 @@ public class TeacherDashboard extends BorderPane {
         // Mark Sheet
         VBox markBlock = buildTopicBlock("Mark sheet", MARK_IMAGE);
         AnchorPane.setTopAnchor(markBlock, 120.0);
-        AnchorPane.setLeftAnchor(markBlock, 150.0);
+        AnchorPane.setLeftAnchor(markBlock, 270.0);
 
         // Grading Criteria
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
         AnchorPane.setTopAnchor(gradingBlock, 120.0);
-        AnchorPane.setLeftAnchor(gradingBlock, 600.0);
+        AnchorPane.setLeftAnchor(gradingBlock, 720.0);
 
         // Student Info
         VBox studentBlock = buildTopicBlock("Student Info", STUDENT_IMAGE);
         AnchorPane.setTopAnchor(studentBlock, 380.0);
-        AnchorPane.setLeftAnchor(studentBlock, 380.0);
+        AnchorPane.setLeftAnchor(studentBlock, 500.0);
 
         // Logout (Bottom Right)
         Button logoutBtn = new Button("Logout");
