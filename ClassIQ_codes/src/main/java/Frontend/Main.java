@@ -14,8 +14,8 @@ import java.util.Objects;
 
 public class Main extends Application {
 
-    public static final double APP_WIDTH = 1300;
-    public static final double APP_HEIGHT = 800;
+    public static final double APP_WIDTH = 1100;
+    public static final double APP_HEIGHT = 700;
 
 
     private static final String LOGO_PATH = "/logo_badge.png";
