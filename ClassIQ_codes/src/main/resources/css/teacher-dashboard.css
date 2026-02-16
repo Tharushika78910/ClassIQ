@@ -30,6 +30,22 @@
     -fx-font-size: 12px;
     -fx-text-fill: #555555;
 }
+/* === Table grid lines === */
+.table-view {
+    -fx-border-color: rgba(40,40,40,0.35);
+    -fx-border-width: 1;
+    -fx-table-cell-border-color: rgba(40,40,40,0.35);
+}
+
+.table-view .column-header-background {
+    -fx-border-color: rgba(40,40,40,0.35);
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .table-cell {
+    -fx-border-color: rgba(40,40,40,0.35);
+    -fx-border-width: 0 1 1 0; /* right + bottom lines */
+}
 
 
 /* ================================
@@ -94,6 +110,55 @@
 
     -fx-font-weight: bold;
     -fx-text-fill:  #b00020;
+/* ================================
+   MARKSHEET GRID TABLE
+================================ */
+
+/* Whole table border */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: rgba(40,40,40,0.55);
+    -fx-border-width: 1.2;
+    -fx-table-cell-border-color: rgba(40,40,40,0.55); /* grid color */
+}
+
+/* Remove default zebra striping effect */
+.table-row-cell {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Make every row white (no stripes) */
+.table-row-cell:filled,
+.table-row-cell:odd:filled,
+.table-row-cell:even:filled {
+    -fx-background-color: white;
+}
+
+/* Header background + border */
+.table-view .column-header-background {
+    -fx-background-color: #f2f2f2;
+    -fx-border-color: rgba(40,40,40,0.55);
+    -fx-border-width: 0 0 1.2 0; /* bottom border */
+}
+
+/* Header cells border (vertical lines) */
+.table-view .column-header {
+    -fx-border-color: rgba(40,40,40,0.55);
+    -fx-border-width: 0 1.2 0 0;
+}
+
+/* Grid cell borders (RIGHT + BOTTOM) */
+.table-view .table-cell {
+    -fx-alignment: CENTER;
+    -fx-padding: 4 6 4 6;
+
+    -fx-border-color: rgba(40,40,40,0.55);
+    -fx-border-width: 0 1.2 1.2 0; /* right + bottom */
+}
+
+/* Add LEFT border for the first visible column */
+.tab
 
     -fx-border-color: #8edc8e;
     -fx-border-radius: 10;

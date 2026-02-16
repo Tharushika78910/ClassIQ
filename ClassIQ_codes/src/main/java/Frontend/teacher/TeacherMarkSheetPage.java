@@ -4,7 +4,6 @@ import Backend.model.dao.impl.TeacherMarkSheetDaoImpl;
 import Backend.service.WeightedMarkService;
 
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,19 +33,29 @@ public class TeacherMarkSheetPage {
         root.getStyleClass().add("page-bg");
 
         /* ===========================
-           CENTER CONTENT
+           CENTER CONTENT (CENTERED)
         ============================ */
         VBox centerBox = new VBox(15);
         centerBox.setPadding(new Insets(10));
+        centerBox.setAlignment(Pos.TOP_CENTER); // ✅ Center everything
 
-        // SUBJECT TITLE (Big & Bold)
         Label subjectTitle = new Label("Mathematics");
         subjectTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
         buildTable();
 
+        // ✅ Reduce table width
+        table.setMaxWidth(780);
+        table.setPrefWidth(780);
+
+        // ✅ Show 15 visible rows (grid)
+        table.setFixedCellSize(28);
+        table.setPrefHeight((28 * 15) + 30); // 15 rows + header
+
         VBox card = new VBox(12);
         card.getStyleClass().add("card");
+        card.setMaxWidth(800); // ✅ container width smaller
+        card.setPadding(new Insets(12));
 
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
@@ -111,7 +120,11 @@ public class TeacherMarkSheetPage {
 
         card.getChildren().addAll(table, actions);
 
-        centerBox.getChildren().addAll(subjectTitle, card);
+        // ✅ keep card centered
+        StackPane centeredCard = new StackPane(card);
+        centeredCard.setAlignment(Pos.TOP_CENTER);
+
+        centerBox.getChildren().addAll(subjectTitle, centeredCard);
         root.setCenter(centerBox);
 
         /* ===========================
@@ -139,7 +152,6 @@ public class TeacherMarkSheetPage {
         AnchorPane.setBottomAnchor(btnLogout, 10.0);
 
         bottomBar.getChildren().addAll(btnBack, btnLogout);
-
         root.setBottom(bottomBar);
 
         return root;
@@ -187,7 +199,10 @@ public class TeacherMarkSheetPage {
                 colTotal, colGrade
         );
 
-        table.setItems(fixedStudents());
+        // ✅ No hardcoded list here.
+        // Keep your existing DB-loading code elsewhere in your project
+        // that sets table items.
+        // (If your project loads DB rows after getView(), it will still work.)
     }
 
     private TableColumn<MarkRow, Integer> editableMarkColumn(
@@ -225,16 +240,6 @@ public class TeacherMarkSheetPage {
         return true;
     }
 
-    private ObservableList<MarkRow> fixedStudents() {
-        return FXCollections.observableArrayList(
-                new MarkRow("S001", "Poornima Jayamanna"),
-                new MarkRow("S002", "Hathadura Chathurika Silva"),
-                new MarkRow("S003", "Roshini Fernando"),
-                new MarkRow("S004", "Kumudu Nalleperuma"),
-                new MarkRow("S005", "Dilmi Rajapaksha")
-        );
-    }
-
     /* ===========================
        INNER CLASSES
     ============================ */
@@ -252,9 +257,9 @@ public class TeacherMarkSheetPage {
             studentId.set(id);
             studentName.set(name);
 
-            assignment.addListener((o,a,b)->recalc());
-            project.addListener((o,a,b)->recalc());
-            finalExam.addListener((o,a,b)->recalc());
+            assignment.addListener((o, a, b) -> recalc());
+            project.addListener((o, a, b) -> recalc());
+            finalExam.addListener((o, a, b) -> recalc());
 
             recalc();
         }
@@ -267,26 +272,26 @@ public class TeacherMarkSheetPage {
             ));
         }
 
-        public StringProperty studentIdProperty(){ return studentId; }
-        public StringProperty studentNameProperty(){ return studentName; }
-        public IntegerProperty totalProperty(){ return total; }
-        public StringProperty gradeProperty(){ return grade; }
+        public StringProperty studentIdProperty() { return studentId; }
+        public StringProperty studentNameProperty() { return studentName; }
+        public IntegerProperty totalProperty() { return total; }
+        public StringProperty gradeProperty() { return grade; }
 
-        public int getAssignment(){ return assignment.get(); }
-        public int getProject(){ return project.get(); }
-        public int getFinalExam(){ return finalExam.get(); }
+        public int getAssignment() { return assignment.get(); }
+        public int getProject() { return project.get(); }
+        public int getFinalExam() { return finalExam.get(); }
 
-        public void setAssignment(int v){ assignment.set(v); }
-        public void setProject(int v){ project.set(v); }
-        public void setFinalExam(int v){ finalExam.set(v); }
+        public void setAssignment(int v) { assignment.set(v); }
+        public void setProject(int v) { project.set(v); }
+        public void setFinalExam(int v) { finalExam.set(v); }
 
-        public String getStudentId(){ return studentId.get(); }
-        public String getStudentName(){ return studentName.get(); }
-        public int getTotal(){ return total.get(); }
-        public String getGrade(){ return grade.get(); }
+        public String getStudentId() { return studentId.get(); }
+        public String getStudentName() { return studentName.get(); }
+        public int getTotal() { return total.get(); }
+        public String getGrade() { return grade.get(); }
 
-        public IntegerProperty getPropertyFor(String title){
-            return switch(title){
+        public IntegerProperty getPropertyFor(String title) {
+            return switch (title) {
                 case "Assignment" -> assignment;
                 case "Project" -> project;
                 case "Final Exam" -> finalExam;
@@ -297,14 +302,15 @@ public class TeacherMarkSheetPage {
 
     public static class IntegerStringConverter extends StringConverter<Integer> {
         @Override
-        public String toString(Integer v){
-            return v==null?"0":v.toString();
+        public String toString(Integer v) {
+            return v == null ? "0" : v.toString();
         }
+
         @Override
-        public Integer fromString(String s){
-            try{
+        public Integer fromString(String s) {
+            try {
                 return Integer.parseInt(s.trim());
-            } catch(Exception e){
+            } catch (Exception e) {
                 return 0;
             }
         }
