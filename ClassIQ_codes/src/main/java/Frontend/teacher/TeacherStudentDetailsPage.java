@@ -174,7 +174,7 @@ public class TeacherStudentDetailsPage {
 
                 controller.saveFeedback(studentNumber, newFb);
 
-                //  clear after save
+                // clear after save
                 feedbackArea.clear();
                 status.setText("Feedback saved successfully.");
 
@@ -205,7 +205,29 @@ public class TeacherStudentDetailsPage {
                 status
         );
 
-        root.getChildren().add(card);
+        //Green outer frame (like Image 1)
+        StackPane greenFrame = new StackPane(card);
+
+
+        greenFrame.setAlignment(Pos.CENTER);
+
+
+        greenFrame.setPadding(new Insets(20));  // increase if you want more top/bottom space
+
+
+        greenFrame.setMaxWidth(720);
+        greenFrame.setPrefWidth(720);  // force width
+
+
+        greenFrame.setStyle("""
+            -fx-background-color: rgba(200, 230, 200, 0.70);
+            -fx-background-radius: 18;
+            -fx-border-color: rgba(60, 90, 60, 0.55);
+            -fx-border-width: 2;
+            -fx-border-radius: 18;
+        """);
+
+        root.getChildren().add(greenFrame);
         return root;
     }
 
