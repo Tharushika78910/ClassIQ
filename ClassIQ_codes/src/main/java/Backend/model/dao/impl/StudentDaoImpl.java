@@ -32,7 +32,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  FIND BY ID
+    // FIND BY ID  FIXED
     @Override
     public Student findById(int studentId) throws SQLException {
 
@@ -54,7 +54,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  FIND ALL
+    // FIND ALL
     @Override
     public List<Student> findAll() throws SQLException {
 
@@ -76,7 +76,7 @@ public class StudentDaoImpl implements StudentDao {
         return list;
     }
 
-    //  UPDATE
+    // UPDATE
     @Override
     public void update(Student s) throws SQLException {
 
@@ -100,7 +100,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  DELETE
+    // DELETE
     @Override
     public void delete(int studentId) throws SQLException {
 
@@ -114,7 +114,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  EXISTS
+    // EXISTS
     @Override
     public boolean existsById(int studentId) throws SQLException {
 
@@ -131,7 +131,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  FIND BY STUDENT NUMBER
+    // FIND BY STUDENT NUMBER
     @Override
     public Student findByStudentNumber(String studentNumber) throws SQLException {
 
@@ -153,7 +153,27 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  FIND FIRST STUDENT
+    // REQUIRED by StudentDetailsController
+    @Override
+    public int findStudentIdByStudentNumber(String studentNumber) throws SQLException {
+
+        String sql = "SELECT student_id FROM student WHERE student_number = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, studentNumber);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new IllegalArgumentException("Student not found: " + studentNumber);
+                }
+                return rs.getInt("student_id");
+            }
+        }
+    }
+
+    // FIND FIRST STUDENT
     @Override
     public Student findFirstStudent() throws SQLException {
 
@@ -173,7 +193,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    //  FIND ALL BASIC (for table reference)
+    // FIND ALL BASIC
     @Override
     public List<Student> findAllBasic() throws SQLException {
 
@@ -202,7 +222,7 @@ public class StudentDaoImpl implements StudentDao {
         return list;
     }
 
-    // HELPER METHOD
+    // HELPER
     private Student mapRow(ResultSet rs) throws SQLException {
         Student s = new Student();
         s.setStudentId(rs.getInt("student_id"));

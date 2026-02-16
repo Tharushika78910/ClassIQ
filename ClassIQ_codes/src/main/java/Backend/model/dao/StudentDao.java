@@ -23,10 +23,12 @@ public interface StudentDao {
     // Search by student_number
     Student findByStudentNumber(String studentNumber) throws SQLException;
 
+    //  Needed by StudentDetailsController
+    int findStudentIdByStudentNumber(String studentNumber) throws SQLException;
+
     // For initial display when page opens
     Student findFirstStudent() throws SQLException;
 
     // For the reference table (Student Number + Full Name)
-
     List<Student> findAllBasic() throws SQLException;
 }

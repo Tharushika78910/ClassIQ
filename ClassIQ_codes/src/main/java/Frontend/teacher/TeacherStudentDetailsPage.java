@@ -20,9 +20,6 @@ public class TeacherStudentDetailsPage {
 
     private final StudentDetailsController controller = new StudentDetailsController();
 
-    // keep latest loaded feedback for edit mode
-    private String lastSavedFeedback = "";
-
     public TeacherStudentDetailsPage(TeacherDashboard dashboard, String studentNumber) {
         this.dashboard = dashboard;
         this.studentNumber = studentNumber;
@@ -102,9 +99,8 @@ public class TeacherStudentDetailsPage {
         feedbackArea.setPrefRowCount(3);
         feedbackArea.setWrapText(true);
 
-        // Required behavior:
-        // - first teacher should type => we let edit mode be ON by default if feedback empty
-        // - after saving => clear and lock
+        // FORCE ENABLE + EDITABLE (teacher must be able to type)
+        feedbackArea.setDisable(false);
         feedbackArea.setEditable(true);
 
         Button btnSave = new Button("Save");
@@ -136,60 +132,52 @@ public class TeacherStudentDetailsPage {
             totalVal.setText(String.valueOf(mk.getTotal()));
             avgVal.setText(String.format("%.2f", mk.getAverage()));
 
-            lastSavedFeedback = mk.getFeedback() == null ? "" : mk.getFeedback();
-
-
-            // If feedback already exists -> show empty box and lock (teacher must press Edit)
-            // If feedback empty -> allow typing immediately
-            if (lastSavedFeedback.isBlank()) {
-                feedbackArea.clear();
-                feedbackArea.setEditable(true);
-                status.setText("");
-            } else {
-                feedbackArea.clear();          // do NOT show old feedback in box
-                feedbackArea.setEditable(false); // teacher must press Edit
-                status.setText("Press Edit to update existing feedback.");
-            }
+            // On open: EMPTY textbox so teacher can type NEW feedback immediately
+            feedbackArea.clear();
+            status.setText("");
 
         } catch (Exception ex) {
             status.setText("Load error: " + ex.getMessage());
             ex.printStackTrace();
         }
 
-        //  load existing feedback and unlock
+        // Edit: load existing feedback into box, then teacher types new and saves
         btnEdit.setOnAction(e -> {
             try {
-                StudentDetailsDTO dto = controller.getDetails(studentNumber);
-                String fb = dto.getMarks().getFeedback();
-                lastSavedFeedback = (fb == null ? "" : fb);
-
-                feedbackArea.setText(lastSavedFeedback);
+                String fb = controller.loadFeedback(studentNumber);
+                feedbackArea.setDisable(false);
                 feedbackArea.setEditable(true);
+                feedbackArea.setText(fb == null ? "" : fb);
                 feedbackArea.requestFocus();
                 feedbackArea.positionCaret(feedbackArea.getText().length());
-
-                status.setText("Editing enabled.");
+                status.setText("Edit the feedback and press Save.");
             } catch (Exception ex) {
                 status.setText("Edit load error: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
 
-        //save to DB, then clear textbox and lock it
+        // Save: save into student_marks.feed_back, then CLEAR textbox
         btnSave.setOnAction(e -> {
             try {
-                String newFb = feedbackArea.getText();
+                String newFb = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();
+
+                if (newFb.isEmpty()) {
+                    status.setText("Please type feedback before saving.");
+                    return;
+                }
+
+                if (newFb.length() > 255) {
+                    status.setText("Feedback is too long (max 255 characters).");
+                    return;
+                }
 
                 controller.saveFeedback(studentNumber, newFb);
 
-                // update last saved value
-                lastSavedFeedback = newFb == null ? "" : newFb;
-
-                // clear and lock after save
+                //  clear after save
                 feedbackArea.clear();
-                feedbackArea.setEditable(false);
+                status.setText("Feedback saved successfully.");
 
-                status.setText("Feedback saved. Press Edit to change.");
             } catch (Exception ex) {
                 status.setText("Save error: " + ex.getMessage());
                 ex.printStackTrace();

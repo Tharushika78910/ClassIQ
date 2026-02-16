@@ -2,6 +2,8 @@ package Backend.model.dao.impl;
 
 import Backend.db.DBConnection;
 import Backend.model.dao.MarksDao;
+import Backend.model.dto.StudentDetailsDTO;
+import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
 
 import java.sql.Connection;
@@ -13,6 +15,52 @@ public class MarksDaoImpl implements MarksDao {
 
     private static final String FEEDBACK_COL = "feed_back";
 
+    /**
+     * Save/Update marks (used by MarksController).
+     * IMPORTANT: Your DB columns are mathematics, english, science, craft, languages.
+     * Your Java entity uses subject1.subject5, so we map:
+     * subject1->mathematics, subject2->english, subject3->science, subject4->craft, subject5->languages
+     */
+    @Override
+    public void saveMarks(StudentMarks marks) throws SQLException {
+
+        String sql = """
+            INSERT INTO student_marks
+              (student_id, mathematics, english, science, craft, languages, total, average, feed_back)
+            VALUES
+              (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+              mathematics = VALUES(mathematics),
+              english     = VALUES(english),
+              science     = VALUES(science),
+              craft       = VALUES(craft),
+              languages   = VALUES(languages),
+              total       = VALUES(total),
+              average     = VALUES(average)
+        """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, marks.getStudentId());
+            ps.setInt(2, marks.getSubject1()); // mathematics
+            ps.setInt(3, marks.getSubject2()); // english
+            ps.setInt(4, marks.getSubject3()); // science
+            ps.setInt(5, marks.getSubject4()); // craft
+            ps.setInt(6, marks.getSubject5()); // languages
+            ps.setInt(7, marks.getTotal());
+            ps.setDouble(8, marks.getAverage());
+
+            String fb = marks.getFeedback() == null ? "" : marks.getFeedback();
+            ps.setString(9, fb);
+
+            ps.executeUpdate();
+        }
+    }
+
+    /**
+     * Load marks row only (used by some screens).
+     */
     @Override
     public StudentMarks findByStudentId(int studentId) throws SQLException {
 
@@ -24,16 +72,19 @@ public class MarksDaoImpl implements MarksDao {
             ps.setInt(1, studentId);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return null; // no row yet
+                if (!rs.next()) return null;
 
                 StudentMarks m = new StudentMarks();
                 m.setMarksId(rs.getInt("marks_id"));
                 m.setStudentId(rs.getInt("student_id"));
-                m.setSubject1(rs.getInt("subject1"));
-                m.setSubject2(rs.getInt("subject2"));
-                m.setSubject3(rs.getInt("subject3"));
-                m.setSubject4(rs.getInt("subject4"));
-                m.setSubject5(rs.getInt("subject5"));
+
+                // DB -> entity mapping
+                m.setSubject1(rs.getObject("mathematics") == null ? 0 : rs.getInt("mathematics"));
+                m.setSubject2(rs.getObject("english") == null ? 0 : rs.getInt("english"));
+                m.setSubject3(rs.getObject("science") == null ? 0 : rs.getInt("science"));
+                m.setSubject4(rs.getObject("craft") == null ? 0 : rs.getInt("craft"));
+                m.setSubject5(rs.getObject("languages") == null ? 0 : rs.getInt("languages"));
+
                 m.setTotal(rs.getInt("total"));
                 m.setAverage(rs.getDouble("average"));
                 m.setFeedback(rs.getString(FEEDBACK_COL));
@@ -42,88 +93,109 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    // Insert marks OR update if the row already exists
+    /**
+     * Load Student + Marks together (used by TeacherStudentDetailsPage).
+     * This matches your DTO structure: StudentDetailsDTO has Student + StudentMarks.
+     */
     @Override
-    public void saveMarks(StudentMarks marks) throws SQLException {
+    public StudentDetailsDTO findStudentDetails(int studentId) throws SQLException {
 
-        if (marks == null) throw new IllegalArgumentException("marks cannot be null");
-
-        // 1) Try UPDATE first
-        String updateSql = """
-            UPDATE student_marks
-            SET subject1=?, subject2=?, subject3=?, subject4=?, subject5=?, total=?, average=?
-            WHERE student_id=?
+        String sql = """
+            SELECT
+                s.student_id, s.first_name, s.last_name, s.student_number, s.email, s.user_id,
+                sm.marks_id, sm.mathematics, sm.english, sm.science, sm.craft, sm.languages,
+                sm.total, sm.average, sm.feed_back
+            FROM student s
+            LEFT JOIN student_marks sm ON sm.student_id = s.student_id
+            WHERE s.student_id = ?
         """;
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(updateSql)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, marks.getSubject1());
-            ps.setInt(2, marks.getSubject2());
-            ps.setInt(3, marks.getSubject3());
-            ps.setInt(4, marks.getSubject4());
-            ps.setInt(5, marks.getSubject5());
-            ps.setInt(6, marks.getTotal());
-            ps.setDouble(7, marks.getAverage());
-            ps.setInt(8, marks.getStudentId());
+            ps.setInt(1, studentId);
 
-            int updated = ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
 
-            // 2) If no row updated -> INSERT
-            if (updated == 0) {
+                // Student
+                Student st = new Student();
+                st.setStudentId(rs.getInt("student_id"));
+                st.setFirstName(rs.getString("first_name"));
+                st.setLastName(rs.getString("last_name"));
+                st.setStudentNumber(rs.getString("student_number"));
+                st.setEmail(rs.getString("email"));
+                st.setUserId(rs.getInt("user_id"));
 
-                String insertSql = """
-                    INSERT INTO student_marks
-                    (student_id, subject1, subject2, subject3, subject4, subject5, total, average, feed_back)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+                // Marks
+                StudentMarks mk = new StudentMarks();
+                mk.setStudentId(studentId);
 
-                try (PreparedStatement ins = con.prepareStatement(insertSql)) {
-                    ins.setInt(1, marks.getStudentId());
-                    ins.setInt(2, marks.getSubject1());
-                    ins.setInt(3, marks.getSubject2());
-                    ins.setInt(4, marks.getSubject3());
-                    ins.setInt(5, marks.getSubject4());
-                    ins.setInt(6, marks.getSubject5());
-                    ins.setInt(7, marks.getTotal());
-                    ins.setDouble(8, marks.getAverage());
+                Integer marksId = (Integer) rs.getObject("marks_id");
+                if (marksId != null) mk.setMarksId(marksId);
 
-                    // keep feedback if provided, otherwise empty
-                    String fb = marks.getFeedback() == null ? "" : marks.getFeedback();
-                    ins.setString(9, fb);
+                mk.setSubject1(rs.getObject("mathematics") == null ? 0 : rs.getInt("mathematics"));
+                mk.setSubject2(rs.getObject("english") == null ? 0 : rs.getInt("english"));
+                mk.setSubject3(rs.getObject("science") == null ? 0 : rs.getInt("science"));
+                mk.setSubject4(rs.getObject("craft") == null ? 0 : rs.getInt("craft"));
+                mk.setSubject5(rs.getObject("languages") == null ? 0 : rs.getInt("languages"));
 
-                    ins.executeUpdate();
-                }
+                mk.setTotal(rs.getObject("total") == null ? 0 : rs.getInt("total"));
+                mk.setAverage(rs.getObject("average") == null ? 0.0 : rs.getDouble("average"));
+                mk.setFeedback(rs.getString(FEEDBACK_COL));
+
+                StudentDetailsDTO dto = new StudentDetailsDTO();
+                dto.setStudent(st);
+                dto.setMarks(mk);
+
+                return dto;
             }
         }
     }
 
+    /**
+     * Save or update only feedback.
+     * If the student_marks row doesn't exist yet, insert with 0 marks (because total/average NOT NULL).
+     */
     @Override
     public void saveOrUpdateFeedback(int studentId, String feedback) throws SQLException {
 
-        String updateSql = "UPDATE student_marks SET " + FEEDBACK_COL + " = ? WHERE student_id = ?";
+        String fb = feedback == null ? "" : feedback;
+
+        String sql = """
+            INSERT INTO student_marks
+              (student_id, mathematics, english, science, craft, languages, total, average, feed_back)
+            VALUES
+              (?, 0, 0, 0, 0, 0, 0, 0.0, ?)
+            ON DUPLICATE KEY UPDATE
+              feed_back = VALUES(feed_back)
+        """;
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(updateSql)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, feedback == null ? "" : feedback);
-            ps.setInt(2, studentId);
+            ps.setInt(1, studentId);
+            ps.setString(2, fb);
+            ps.executeUpdate();
+        }
+    }
 
-            int updated = ps.executeUpdate();
+    /**
+     * Load feedback only.
+     */
+    @Override
+    public String findFeedback(int studentId) throws SQLException {
 
-            // If no row updated -> INSERT row (marks default 0)
-            if (updated == 0) {
-                String insertSql = """
-                    INSERT INTO student_marks
-                    (student_id, subject1, subject2, subject3, subject4, subject5, total, average, feed_back)
-                    VALUES (?, 0, 0, 0, 0, 0, 0, 0, ?)
-                    """;
+        String sql = "SELECT feed_back FROM student_marks WHERE student_id = ?";
 
-                try (PreparedStatement ins = con.prepareStatement(insertSql)) {
-                    ins.setInt(1, studentId);
-                    ins.setString(2, feedback == null ? "" : feedback);
-                    ins.executeUpdate();
-                }
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                return rs.getString("feed_back");
             }
         }
     }
