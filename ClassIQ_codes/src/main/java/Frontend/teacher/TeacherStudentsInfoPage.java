@@ -24,22 +24,27 @@ public class TeacherStudentsInfoPage {
 
     public Parent getView() {
 
-        // Root fills the available space
-        StackPane root = new StackPane();
+        // ==========================
+        // ROOT (BorderPane so we can add bottom buttons)
+        // ==========================
+        BorderPane root = new BorderPane();
         root.setPadding(new Insets(20));
         root.getStyleClass().add("page-bg"); // keep your background style
 
-        // Center container (this will be in the middle)
+        // ==========================
+        // CENTER CONTENT (your existing UI - unchanged)
+        // ==========================
+        StackPane centerWrap = new StackPane();
+        centerWrap.setPadding(new Insets(20));
+
         VBox centerBox = new VBox(15);
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setMaxWidth(650);
 
-        // Title (optional) - remove if you don’t want it
         Label title = new Label("Students Info");
         title.setFont(Font.font(26));
         title.setTextFill(Color.BLACK);
 
-        // Table
         TableView<StudentRow> table = new TableView<>();
         table.setPrefHeight(320);
         table.setMaxWidth(650);
@@ -54,7 +59,6 @@ public class TeacherStudentsInfoPage {
 
         table.getColumns().addAll(colNumber, colName);
 
-        // Search row
         HBox searchRow = new HBox(12);
         searchRow.setAlignment(Pos.CENTER);
 
@@ -71,7 +75,6 @@ public class TeacherStudentsInfoPage {
 
         searchRow.getChildren().addAll(searchLbl, searchField, enterBtn);
 
-        // Load table data
         ObservableList<StudentRow> rows = FXCollections.observableArrayList();
         try {
             for (Student s : controller.getAllStudentsBasic()) {
@@ -86,7 +89,6 @@ public class TeacherStudentsInfoPage {
             ex.printStackTrace();
         }
 
-        // Click row -> fill textbox
         table.setOnMouseClicked(e -> {
             StudentRow selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -94,7 +96,6 @@ public class TeacherStudentsInfoPage {
             }
         });
 
-        // Enter button -> go next interface
         Runnable goNext = () -> {
             String sn = searchField.getText() == null ? "" : searchField.getText().trim();
             if (sn.isEmpty()) {
@@ -112,7 +113,6 @@ public class TeacherStudentsInfoPage {
                 status.setText("");
                 dashboard.showPage(new TeacherStudentDetailsPage(dashboard, s.getStudentNumber()).getView());
 
-
             } catch (Exception ex) {
                 status.setText("Error: " + ex.getMessage());
                 ex.printStackTrace();
@@ -122,14 +122,38 @@ public class TeacherStudentsInfoPage {
         enterBtn.setOnAction(e -> goNext.run());
         searchField.setOnAction(e -> goNext.run());
 
-        // Put everything in the center
         centerBox.getChildren().addAll(title, table, searchRow, status);
-        root.getChildren().add(centerBox);
+        centerWrap.getChildren().add(centerBox);
+
+        root.setCenter(centerWrap);
+
+        // ==========================
+        // BOTTOM BAR (Back + Logout)  ✅ added
+        // ==========================
+        Button btnBack = new Button("Back");
+        btnBack.getStyleClass().add("secondary-btn");
+        btnBack.setOnAction(e -> dashboard.showHome());
+
+        Button btnLogout = new Button("Logout");
+        btnLogout.getStyleClass().add("logout-btn"); // uses your CSS
+        btnLogout.setOnAction(e -> dashboard.showPage(new Label("Logged out (placeholder)")));
+
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
+
+        AnchorPane.setLeftAnchor(btnBack, 20.0);
+        AnchorPane.setBottomAnchor(btnBack, 10.0);
+
+        AnchorPane.setRightAnchor(btnLogout, 20.0);
+        AnchorPane.setBottomAnchor(btnLogout, 10.0);
+
+        bottomBar.getChildren().addAll(btnBack, btnLogout);
+
+        root.setBottom(bottomBar);
 
         return root;
     }
 
-    // Table row model
     public static class StudentRow {
         private final String studentNumber;
         private final String fullName;
