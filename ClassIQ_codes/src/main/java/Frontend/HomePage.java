@@ -79,8 +79,8 @@ public class HomePage {
         loginBtn.setOnMouseEntered(e -> loginBtn.setStyle(buttonStyle(SAGE_BUTTON_HOVER)));
         loginBtn.setOnMouseExited(e -> loginBtn.setStyle(buttonStyle(SAGE_BUTTON)));
         loginBtn.setOnAction(e -> {
-            LoginPage loginPage = new LoginPage();
-            stage.setScene(loginPage.getScene(stage));
+            LoginPage loginPage = new LoginPage(stage);
+            stage.setScene(loginPage.getScene());
         });
         glassPanel.getChildren().add(loginBtn);
 

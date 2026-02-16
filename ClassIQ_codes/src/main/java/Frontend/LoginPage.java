@@ -1,256 +1,246 @@
 package Frontend;
 
+import Backend.model.dao.impl.AppUserDaoImpl;
+import Backend.model.dao.impl.UserProfileDaoImpl;
 import Frontend.student.StudentDashboard;
 import Frontend.teacher.TeacherDashboard;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 public class LoginPage {
 
-    public Scene getScene(Stage stage) {
+    private static final String BG_IMAGE = "/Homepage.png";
+    private static final String LOGO = "/logo.png";
+    private static final String STUDENT_AVATAR = "/Student.png";
+    private static final String TEACHER_AVATAR = "/Teacher.png";
 
-        // background img
-        Image bgImage = new Image(getClass().getResourceAsStream("/Login.png"));
-        ImageView bgImageView = new ImageView(bgImage);
-        bgImageView.setPreserveRatio(false);
+    private final Stage stage;
 
-        // teacher panel
-        VBox teacherPanel = createLoginPanel();
-        ImageView teacherIconView = createCroppedIcon("/Teacher.png", 90, 90);
-        Label teacherLabel = new Label("I am a Teacher");
-        teacherLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 18));
+    public LoginPage(Stage stage) {
+        this.stage = stage;
+    }
 
-        HBox teacherUsernameBox = createInputBox("Username", 180);
-        HBox teacherPasswordBox = createInputBox("Password", 180, true);
+    public Scene getScene() {
+        return new Scene(getView(), Main.APP_WIDTH, Main.APP_HEIGHT);
+    }
 
-        Hyperlink teacherForgot = new Hyperlink("forgot password?");
-        teacherForgot.setTextFill(Color.web("#1976D2"));
+    public Parent getView() {
 
-        Button teacherLogin = createFancyButton("Log in");
-        teacherLogin.setOnAction(e -> {
-            TeacherDashboard dashboard = new TeacherDashboard(
-                    "Mr. Matti Valovirta",
-                    "mattiv@metropolia.com",
-                    "/Teacher.png"
-            );
+        StackPane root = new StackPane();
 
-            //  always same size
-            Scene teacherScene = new Scene(dashboard, Main.APP_WIDTH, Main.APP_HEIGHT);
-            teacherScene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
-            teacherScene.getStylesheets().add(getClass().getResource("/css/teacher.css").toExternalForm());
+        // ===== Background =====
+        ImageView bg = new ImageView();
+        try {
+            bg.setImage(new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream(BG_IMAGE))));
+        } catch (Exception ignored) {}
 
-            stage.setTitle("Teacher Dashboard");
-            stage.setScene(teacherScene);
-        });
+        bg.setPreserveRatio(false);
+        bg.fitWidthProperty().bind(root.widthProperty());
+        bg.fitHeightProperty().bind(root.heightProperty());
 
-        teacherPanel.getChildren().addAll(
-                teacherIconView, teacherLabel,
-                teacherUsernameBox, teacherPasswordBox,
-                teacherForgot, teacherLogin
+        root.getChildren().add(bg);
+
+        // ===== Main Content =====
+        VBox mainBox = new VBox(35);
+        mainBox.setAlignment(Pos.CENTER);
+
+        // IMPORTANT: prevent VBox from blocking Back button
+        mainBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+
+        // ===== Logo (NO WHITE PANEL) =====
+        ImageView logo = new ImageView();
+        try {
+            logo.setImage(new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream(LOGO))));
+        } catch (Exception ignored) {}
+
+        logo.setPreserveRatio(true);
+        logo.setSmooth(true);
+        logo.setFitWidth(320);
+        logo.setStyle(
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 20, 0.3, 0, 4);"
         );
 
-        // student panel
-        VBox studentPanel = createLoginPanel();
-        ImageView studentIconView = createCroppedIcon("/Student.png", 90, 90);
-        Label studentLabel = new Label("I am a Student");
-        studentLabel.setFont(Font.font("KyivType Sans", FontWeight.BOLD, 18));
+        // ===== Login Cards =====
+        HBox cards = new HBox(70);
+        cards.setAlignment(Pos.CENTER);
 
-        HBox studentUsernameBox = createInputBox("Username", 180);
-        HBox studentPasswordBox = createInputBox("Password", 180, true);
+        VBox teacherCard = buildLoginCard("I am a Teacher", TEACHER_AVATAR, "TEACHER");
+        VBox studentCard = buildLoginCard("I am a Student", STUDENT_AVATAR, "STUDENT");
 
-        Hyperlink studentForgot = new Hyperlink("forgot password?");
-        studentForgot.setTextFill(Color.web("#1976D2"));
+        cards.getChildren().addAll(teacherCard, studentCard);
 
-        Button studentLogin = createFancyButton("Log in");
-        studentLogin.setOnAction(e -> {
-            StudentDashboard dashboard = new StudentDashboard(
-                    "Bao Tran",
-                    "bao@student.com",
-                    "/Student.png"
-            );
+        mainBox.getChildren().addAll(logo, cards);
 
-            // always same size
-            Scene studentScene = new Scene(dashboard, Main.APP_WIDTH, Main.APP_HEIGHT);
-            studentScene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
-            studentScene.getStylesheets().add(getClass().getResource("/css/student.css").toExternalForm());
+        root.getChildren().add(mainBox);
 
-            stage.setTitle("Student Dashboard");
-            stage.setScene(studentScene);
-        });
+        // ===== Back Button (TOP RIGHT) =====
+        Button backBtn = new Button("← Back");
 
-        studentPanel.getChildren().addAll(
-                studentIconView, studentLabel,
-                studentUsernameBox, studentPasswordBox,
-                studentForgot, studentLogin
-        );
+        String backNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
-        // center content
-        HBox panelsBox = new HBox(50, teacherPanel, studentPanel);
-        panelsBox.setAlignment(Pos.CENTER);
+        String backHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
 
-        VBox mainContent = new VBox(40, panelsBox);
-        mainContent.setAlignment(Pos.CENTER);
-        mainContent.setPadding(new Insets(40, 20, 20, 20));
-        mainContent.setTranslateX(80);
+        backBtn.setStyle(backNormal);
+        backBtn.setOnMouseEntered(e -> backBtn.setStyle(backHover));
+        backBtn.setOnMouseExited(e -> backBtn.setStyle(backNormal));
 
-        // root stack pane
-        StackPane root = new StackPane(bgImageView, mainContent);
+        StackPane.setAlignment(backBtn, Pos.TOP_RIGHT);
+        StackPane.setMargin(backBtn, new Insets(22));
 
-        // home button
-        Button homeBtn = new Button("Home");
-        homeBtn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-        homeBtn.setStyle(
-                "-fx-background-radius: 12; " +
-                        "-fx-background-color: linear-gradient(to bottom, #32CD32, #28a428); " +
-                        "-fx-text-fill: white; " +
-                        "-fx-padding: 8 20 8 20; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0, 0, 2);"
-        );
-        StackPane.setAlignment(homeBtn, Pos.TOP_RIGHT);
-        StackPane.setMargin(homeBtn, new Insets(20, 20, 0, 0));
-
-        homeBtn.setOnAction(e -> {
+        backBtn.setOnAction(e -> {
             HomePage home = new HomePage();
-            Scene homeScene = home.getScene(stage);
-            stage.setTitle("Class iQ - Home");
-            stage.setScene(homeScene);
+            stage.setScene(home.getScene(stage));
         });
 
-        root.getChildren().add(homeBtn);
+        // ADD LAST so it stays on top
+        root.getChildren().add(backBtn);
 
-        bgImageView.fitWidthProperty().bind(root.widthProperty());
-        bgImageView.fitHeightProperty().bind(root.heightProperty());
-
-        // always same size
-        return new Scene(root, Main.APP_WIDTH, Main.APP_HEIGHT);
+        return root;
     }
 
-    private VBox createLoginPanel() {
-        VBox panel = new VBox(20);
-        panel.setAlignment(Pos.TOP_CENTER);
-        panel.setPadding(new Insets(30));
-        panel.setPrefWidth(300);
-        panel.setMaxWidth(300);
+    private VBox buildLoginCard(String titleText, String avatarPath, String roleType) {
 
-        LinearGradient panelGradient = new LinearGradient(
-                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.rgb(162, 184, 172, 0.85)),
-                new Stop(1, Color.rgb(180, 200, 185, 0.85))
-        );
-        panel.setBackground(new Background(new BackgroundFill(panelGradient, new CornerRadii(20), Insets.EMPTY)));
+        VBox card = new VBox(14);
+        card.setAlignment(Pos.CENTER);
+        card.setPadding(new Insets(28));
+        card.setPrefWidth(340);
 
-        return panel;
-    }
-
-    private HBox createInputBox(String labelText, double fieldWidth) {
-        return createInputBox(labelText, fieldWidth, false);
-    }
-
-    private HBox createInputBox(String labelText, double fieldWidth, boolean isPassword) {
-        HBox box = new HBox(10);
-        box.setAlignment(Pos.CENTER_LEFT);
-
-        Label label = new Label(labelText);
-        label.setPrefWidth(90);
-        label.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 14));
-
-        Control input = isPassword ? new PasswordField() : new TextField();
-        input.setPrefWidth(fieldWidth);
-        input.setStyle(
-                "-fx-background-radius: 10; " +
-                        "-fx-border-radius: 10; " +
-                        "-fx-border-color: #A2B8AC; " +
-                        "-fx-padding: 8; " +
-                        "-fx-font-size: 14px;"
+        card.setStyle(
+                "-fx-background-color: rgba(156,196,183,0.80);" +
+                        "-fx-background-radius: 28;"
         );
 
-        input.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                input.setStyle(
-                        "-fx-background-radius: 10; " +
-                                "-fx-border-radius: 10; " +
-                                "-fx-border-color: #32CD32; " +
-                                "-fx-padding: 8; " +
-                                "-fx-font-size: 14px;"
-                );
-            } else {
-                input.setStyle(
-                        "-fx-background-radius: 10; " +
-                                "-fx-border-radius: 10; " +
-                                "-fx-border-color: #A2B8AC; " +
-                                "-fx-padding: 8; " +
-                                "-fx-font-size: 14px;"
-                );
+        ImageView avatar = new ImageView();
+        try {
+            avatar.setImage(new Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream(avatarPath))));
+        } catch (Exception ignored) {}
+
+        avatar.setFitWidth(90);
+        avatar.setFitHeight(90);
+        avatar.setPreserveRatio(true);
+
+        Label title = new Label(titleText);
+        title.setStyle(
+                "-fx-font-size: 22px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-text-fill: #1f1f1f;"
+        );
+
+        TextField tfUser = new TextField();
+        tfUser.setPromptText("Username");
+        tfUser.setPrefWidth(240);
+
+        PasswordField tfPass = new PasswordField();
+        tfPass.setPromptText("Password");
+        tfPass.setPrefWidth(240);
+
+        Hyperlink forgot = new Hyperlink("forgot password?");
+        forgot.setStyle("-fx-text-fill: #2F6DAA; -fx-font-size: 13px;");
+        forgot.setOnAction(e ->
+                new Alert(Alert.AlertType.INFORMATION,
+                        "Forgot password feature not implemented yet.")
+                        .showAndWait());
+
+        Label error = new Label();
+        error.setTextFill(Color.DARKRED);
+        error.setStyle("-fx-font-size: 13px;");
+
+        Button loginBtn = new Button("Log in");
+        loginBtn.setPrefWidth(240);
+        loginBtn.setStyle(
+                "-fx-background-color: #28A745;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 14;" +
+                        "-fx-font-size: 15px;" +
+                        "-fx-padding: 10 0 10 0;"
+        );
+
+        loginBtn.setOnAction(e -> {
+
+            error.setText("");
+
+            String username = tfUser.getText() == null ? "" : tfUser.getText().trim();
+            String password = tfPass.getText() == null ? "" : tfPass.getText();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                error.setText("Enter username and password.");
+                return;
             }
-        });
 
-        box.getChildren().addAll(label, input);
-        return box;
-    }
+            AppUserDaoImpl auth = new AppUserDaoImpl();
+            AppUserDaoImpl.LoginResult result = auth.login(username, password);
 
-    private Button createFancyButton(String text) {
-        Button btn = new Button(text);
-        btn.setPrefWidth(180);
-        btn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-        btn.setStyle(
-                "-fx-background-radius: 12; " +
-                        "-fx-background-color: linear-gradient(to bottom, #32CD32, #28a428); " +
-                        "-fx-text-fill: white; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);"
-        );
-        return btn;
-    }
+            if (result == null) {
+                error.setText("Invalid credentials.");
+                return;
+            }
 
-    private ImageView createCroppedIcon(String path, double width, double height) {
-        Image img = new Image(getClass().getResourceAsStream(path));
-        Rectangle2D viewport = getVisibleBounds(img);
-        ImageView view = new ImageView(img);
-        view.setViewport(viewport);
-        view.setFitWidth(width);
-        view.setFitHeight(height);
-        view.setPreserveRatio(true);
-        view.setSmooth(true);
-        return view;
-    }
+            if (!roleType.equalsIgnoreCase(result.role)) {
+                error.setText("You are not registered as " + roleType + ".");
+                return;
+            }
 
-    private Rectangle2D getVisibleBounds(Image img) {
-        PixelReader reader = img.getPixelReader();
-        int width = (int) img.getWidth();
-        int height = (int) img.getHeight();
+            UserProfileDaoImpl profileDao = new UserProfileDaoImpl();
 
-        int minX = width, minY = height, maxX = 0, maxY = 0;
+            if ("STUDENT".equalsIgnoreCase(result.role)) {
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int argb = reader.getArgb(x, y);
-                int alpha = (argb >> 24) & 0xff;
-                if (alpha != 0) {
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
+                var sp = profileDao.findStudentByUserId(result.userId);
+                if (sp == null) {
+                    error.setText("Student profile not found.");
+                    return;
                 }
+
+                StudentDashboard dash =
+                        new StudentDashboard(sp.name, sp.email, STUDENT_AVATAR);
+
+                stage.getScene().setRoot(dash);
+
+            } else if ("TEACHER".equalsIgnoreCase(result.role)) {
+
+                var tp = profileDao.findTeacherByUserId(result.userId);
+                if (tp == null) {
+                    error.setText("Teacher profile not found.");
+                    return;
+                }
+
+                TeacherDashboard dash =
+                        new TeacherDashboard(tp.name, tp.email, TEACHER_AVATAR);
+
+                stage.getScene().setRoot(dash);
             }
-        }
+        });
 
-        if (minX > maxX || minY > maxY) {
-            return new Rectangle2D(0, 0, width, height);
-        }
+        card.getChildren().addAll(
+                avatar, title, tfUser, tfPass, forgot, error, loginBtn
+        );
 
-        return new Rectangle2D(minX, minY, maxX - minX + 1, maxY - minY + 1);
+        return card;
     }
 }
