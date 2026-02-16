@@ -11,6 +11,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import Frontend.LoginPage;
+import Frontend.Session;
+import javafx.stage.Stage;
+
 
 import java.util.Objects;
 
@@ -34,14 +38,22 @@ public class TeacherDashboard extends BorderPane {
         this.teacherEmail = email;
         this.teacherProfileImagePath = profileImagePath;
 
+        // load both general + teacher styles
+        getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource("/css/app.css")
+        ).toExternalForm());
+
+        getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource("/css/teacher.css")
+        ).toExternalForm());
+
+        getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource("/css/teacher-dashboard.css")
+        ).toExternalForm());
+
         getStyleClass().add("teacher-root");
 
-        getStylesheets().add(
-                getClass().getResource("/css/teacher-dashboard.css").toExternalForm()
-        );
-
         setCenter(contentArea);
-
         showHome();
     }
 
@@ -69,6 +81,27 @@ public class TeacherDashboard extends BorderPane {
         AnchorPane layer = new AnchorPane();
         layer.setPadding(new Insets(30));
 
+        // Back Button (Login Style) - Top Left
+        Button backBtn = new Button("← Back");
+        backBtn.getStyleClass().add("back-pill-btn");
+        AnchorPane.setTopAnchor(backBtn, 20.0);
+        AnchorPane.setLeftAnchor(backBtn, 20.0);
+
+        // If dashboard is the first page, you can decide what it should do.
+        // Right now it just reloads home (safe).
+        backBtn.setOnAction(e -> {
+            // Clear session (optional but recommended)
+            Session.clear();
+
+            // Get current stage from the button
+            Stage stage = (Stage) backBtn.getScene().getWindow();
+
+            // Load login page back into the SAME scene
+            LoginPage loginPage = new LoginPage(stage);
+            stage.getScene().setRoot(loginPage.getView());
+        });
+
+
         // Teacher info (Top Right)
         HBox teacherBox = buildTeacherInfo(name, email, profileImagePath);
         AnchorPane.setTopAnchor(teacherBox, 20.0);
@@ -95,8 +128,7 @@ public class TeacherDashboard extends BorderPane {
         AnchorPane.setRightAnchor(logoutBtn, 20.0);
         AnchorPane.setBottomAnchor(logoutBtn, 20.0);
 
-        // ===== Button Actions =====
-        // (IMPORTANT: button is index 1 because image is index 0)
+        // Button Actions
         Button markBtn = (Button) markBlock.getChildren().get(1);
         Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
         Button studentBtn = (Button) studentBlock.getChildren().get(1);
@@ -122,7 +154,9 @@ public class TeacherDashboard extends BorderPane {
                 showPage(simplePlaceholder("Logged out (placeholder)"))
         );
 
+        // Add back button to the layer
         layer.getChildren().addAll(
+                backBtn,
                 teacherBox,
                 markBlock,
                 gradingBlock,
@@ -134,19 +168,16 @@ public class TeacherDashboard extends BorderPane {
         return root;
     }
 
-    // ✅ SMALLER CIRCLES + SPACE SO THEY DON'T TOUCH BUTTONS
     private VBox buildTopicBlock(String title, String imagePath) {
 
-        VBox box = new VBox(16);          // ✅ more spacing between circle and button
+        VBox box = new VBox(16);
         box.setAlignment(Pos.TOP_CENTER);
 
-        // ----- Image -----
         ImageView iv = new ImageView();
         try {
             iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
         } catch (Exception ignored) {}
 
-        // ✅ Smaller circle size
         iv.setFitWidth(140);
         iv.setFitHeight(140);
         iv.setPreserveRatio(false);
@@ -159,14 +190,10 @@ public class TeacherDashboard extends BorderPane {
         circleHolder.setMaxSize(140, 140);
         circleHolder.getStyleClass().add("circle-holder");
 
-        // ----- Button -----
         Button btn = new Button(title);
         btn.getStyleClass().add("topic-btn");
-
-        // ✅ Smaller button
         btn.setPrefSize(160, 32);
 
-        // ✅ Image first, button under
         box.getChildren().addAll(circleHolder, btn);
         return box;
     }

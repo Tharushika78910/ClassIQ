@@ -6,12 +6,12 @@ import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 public class TeacherStudentDetailsPage {
 
@@ -27,42 +27,97 @@ public class TeacherStudentDetailsPage {
 
     public Parent getView() {
 
-        StackPane root = new StackPane();
-        root.setPadding(new Insets(20));
+        // =========================
+        // ROOT (Header + Center Card)
+        // =========================
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(16));
         root.getStyleClass().add("page-bg");
 
-        VBox card = new VBox(14);
-        card.setPadding(new Insets(25));
-        card.setAlignment(Pos.TOP_LEFT);
-        card.setMaxWidth(700);
+        // =========================
+        // HEADER BAR (like Image 2)
+        // =========================
+        Label headerTitle = new Label("Student Details");
+        headerTitle.getStyleClass().add("header-title");
 
-        card.setBackground(new Background(new BackgroundFill(
-                Color.rgb(255, 255, 255, 0.78),
-                new CornerRadii(18),
-                Insets.EMPTY
-        )));
+        Label headerSub = new Label("View marks and write feedback");
+        headerSub.getStyleClass().add("subtitle");
 
-        Label title = new Label("Student Details");
-        title.setFont(Font.font(24));
+        VBox titleBox = new VBox(2, headerTitle, headerSub);
+        titleBox.setAlignment(Pos.CENTER_LEFT);
+
+        Button btnBack = new Button("← Back");
+        btnBack.getStyleClass().add("back-pill-btn");
+
+        //  Dashboard button same style as Back button
+        Button btnDashboard = new Button("Dashboard");
+        btnDashboard.getStyleClass().add("back-pill-btn");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox header = new HBox(12, titleBox, spacer, btnBack, btnDashboard);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("header-bar");
+
+        root.setTop(header);
+
+        // =========================
+        // MAIN CARD (Two-column Layout B)
+        // =========================
+        HBox card = new HBox(18);
+        card.setPadding(new Insets(18));
+        card.setMaxWidth(900);
+        card.getStyleClass().add("details-card");
+
+        // ---------- LEFT COLUMN (Profile panel)
+        VBox left = new VBox(10);
+        left.getStyleClass().add("details-left");
+        left.setPrefWidth(300);
+
+        Label profileTitle = new Label("Student Profile");
+        profileTitle.getStyleClass().add("section-title");
 
         Label lblStudentNo = new Label("Student Number: " + studentNumber);
-        lblStudentNo.setFont(Font.font(16));
+        lblStudentNo.getStyleClass().add("info-text");
 
         Label lblName = new Label("Name: ");
-        lblName.setFont(Font.font(16));
+        lblName.getStyleClass().add("info-text");
 
         Label lblEmail = new Label("Email: ");
-        lblEmail.setFont(Font.font(16));
+        lblEmail.getStyleClass().add("info-text");
 
-        // Subjects + Marks grid
+        // Totals "chips"
+        Label totalChip = new Label("Total: 0");
+        totalChip.getStyleClass().add("info-chip");
+
+        Label avgChip = new Label("Average: 0.00");
+        avgChip.getStyleClass().add("info-chip");
+
+        VBox chips = new VBox(8, totalChip, avgChip);
+        chips.setPadding(new Insets(6, 0, 0, 0));
+
+        left.getChildren().addAll(profileTitle, lblStudentNo, lblName, lblEmail, new Separator(), chips);
+
+        // ---------- RIGHT COLUMN (Marks + Feedback + Actions)
+        VBox right = new VBox(14);
+        right.getStyleClass().add("details-right");
+        right.setFillWidth(true);
+
+        // Marks Section
+        Label marksTitle = new Label("Marks");
+        marksTitle.getStyleClass().add("section-title");
+
         GridPane grid = new GridPane();
-        grid.setHgap(40);
+        grid.getStyleClass().add("marks-grid");
+        grid.setHgap(30);
         grid.setVgap(10);
 
-        Label subHead = new Label("Subjects");
-        subHead.setFont(Font.font(16));
+        Label subHead = new Label("Subject");
+        subHead.getStyleClass().add("table-head");
+
         Label markHead = new Label("Marks");
-        markHead.setFont(Font.font(16));
+        markHead.getStyleClass().add("table-head");
 
         grid.add(subHead, 0, 0);
         grid.add(markHead, 1, 0);
@@ -79,42 +134,56 @@ public class TeacherStudentDetailsPage {
         addRow(grid, 4, "Craft",       m4);
         addRow(grid, 5, "Language",    m5);
 
-        // Total + Average
-        Label totalVal = new Label("0");
-        Label avgVal = new Label("0");
-
-        GridPane totals = new GridPane();
-        totals.setHgap(12);
-        totals.setVgap(8);
-        totals.add(new Label("Total:"), 0, 0);
-        totals.add(totalVal, 1, 0);
-        totals.add(new Label("Average:"), 0, 1);
-        totals.add(avgVal, 1, 1);
-
         // Feedback
         Label fbLbl = new Label("Feedback");
-        fbLbl.setFont(Font.font(16));
+        fbLbl.getStyleClass().add("section-title");
 
         TextArea feedbackArea = new TextArea();
-        feedbackArea.setPrefRowCount(3);
+        feedbackArea.setPrefRowCount(4);
         feedbackArea.setWrapText(true);
-
-        // FORCE ENABLE + EDITABLE (teacher must be able to type)
         feedbackArea.setDisable(false);
         feedbackArea.setEditable(true);
+        feedbackArea.getStyleClass().add("feedback-area");
 
+        // Actions
         Button btnSave = new Button("Save");
+        btnSave.getStyleClass().add("primary-btn");
+
+        //  Edit button same style as Save button
         Button btnEdit = new Button("Edit");
-        Button btnBack = new Button("Back");
-        Button btnDashboard = new Button("Dashboard");
+        btnEdit.getStyleClass().add("primary-btn");
+
+        HBox actions = new HBox(10, btnEdit, btnSave);
+        actions.setAlignment(Pos.CENTER_RIGHT);
 
         Label status = new Label();
         status.setTextFill(Color.DARKRED);
+        status.getStyleClass().add("status-text");
 
-        HBox buttons = new HBox(10, btnSave, btnEdit, btnBack, btnDashboard);
-        buttons.setAlignment(Pos.CENTER_LEFT);
+        right.getChildren().addAll(
+                marksTitle,
+                grid,
+                new Separator(),
+                fbLbl,
+                feedbackArea,
+                actions,
+                status
+        );
 
-        // ===== Load data from DB =====
+        // Vertical separator between columns
+        Separator vSep = new Separator(Orientation.VERTICAL);
+        vSep.getStyleClass().add("v-sep");
+
+        card.getChildren().addAll(left, vSep, right);
+
+        StackPane center = new StackPane(card);
+        center.setPadding(new Insets(18));
+        root.setCenter(center);
+
+        // =========================
+        // LOGIC (unchanged)
+        // =========================
+
         try {
             StudentDetailsDTO dto = controller.getDetails(studentNumber);
             Student s = dto.getStudent();
@@ -129,8 +198,8 @@ public class TeacherStudentDetailsPage {
             m4.setText(String.valueOf(mk.getSubject4()));
             m5.setText(String.valueOf(mk.getSubject5()));
 
-            totalVal.setText(String.valueOf(mk.getTotal()));
-            avgVal.setText(String.format("%.2f", mk.getAverage()));
+            totalChip.setText("Total: " + mk.getTotal());
+            avgChip.setText(String.format("Average: %.2f", mk.getAverage()));
 
             // On open: EMPTY textbox so teacher can type NEW feedback immediately
             feedbackArea.clear();
@@ -141,7 +210,7 @@ public class TeacherStudentDetailsPage {
             ex.printStackTrace();
         }
 
-        // Edit: load existing feedback into box, then teacher types new and saves
+        // Edit: load existing feedback
         btnEdit.setOnAction(e -> {
             try {
                 String fb = controller.loadFeedback(studentNumber);
@@ -157,7 +226,7 @@ public class TeacherStudentDetailsPage {
             }
         });
 
-        // Save: save into student_marks.feed_back, then CLEAR textbox
+        // Save: save feedback and clear textbox
         btnSave.setOnAction(e -> {
             try {
                 String newFb = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();
@@ -174,7 +243,6 @@ public class TeacherStudentDetailsPage {
 
                 controller.saveFeedback(studentNumber, newFb);
 
-                // clear after save
                 feedbackArea.clear();
                 status.setText("Feedback saved successfully.");
 
@@ -190,49 +258,16 @@ public class TeacherStudentDetailsPage {
 
         btnDashboard.setOnAction(e -> dashboard.showHome());
 
-        card.getChildren().addAll(
-                title,
-                lblStudentNo,
-                lblName,
-                lblEmail,
-                new Separator(),
-                grid,
-                new Separator(),
-                totals,
-                fbLbl,
-                feedbackArea,
-                buttons,
-                status
-        );
-
-        //Green outer frame (like Image 1)
-        StackPane greenFrame = new StackPane(card);
-
-
-        greenFrame.setAlignment(Pos.CENTER);
-
-
-        greenFrame.setPadding(new Insets(20));  // increase if you want more top/bottom space
-
-
-        greenFrame.setMaxWidth(720);
-        greenFrame.setPrefWidth(720);  // force width
-
-
-        greenFrame.setStyle("""
-            -fx-background-color: rgba(200, 230, 200, 0.70);
-            -fx-background-radius: 18;
-            -fx-border-color: rgba(60, 90, 60, 0.55);
-            -fx-border-width: 2;
-            -fx-border-radius: 18;
-        """);
-
-        root.getChildren().add(greenFrame);
         return root;
     }
 
     private void addRow(GridPane grid, int row, String subject, Label markLabel) {
-        grid.add(new Label(subject), 0, row);
+        Label subjectLbl = new Label(subject);
+        subjectLbl.getStyleClass().add("table-cell");
+
+        markLabel.getStyleClass().add("table-cell");
+
+        grid.add(subjectLbl, 0, row);
         grid.add(markLabel, 1, row);
     }
 }

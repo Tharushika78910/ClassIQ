@@ -2,8 +2,10 @@ package Frontend.teacher;
 
 import Backend.controller.StudentInfoController;
 import Backend.model.entity.Student;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -11,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 public class TeacherStudentsInfoPage {
 
@@ -25,70 +26,143 @@ public class TeacherStudentsInfoPage {
     public Parent getView() {
 
         // ==========================
-        // ROOT (BorderPane so we can add bottom buttons)
+        // ROOT
         // ==========================
         BorderPane root = new BorderPane();
-        root.setPadding(new Insets(20));
-        root.getStyleClass().add("page-bg"); // keep your background style
+        root.setPadding(new Insets(18));
+        root.getStyleClass().add("page-bg");
 
         // ==========================
-        // CENTER CONTENT (your existing UI - unchanged)
+        // HEADER BAR (Professional)
         // ==========================
-        StackPane centerWrap = new StackPane();
-        centerWrap.setPadding(new Insets(20));
+        Label headerTitle = new Label("Students");
+        headerTitle.getStyleClass().addAll("header-title");
 
-        VBox centerBox = new VBox(15);
-        centerBox.setAlignment(Pos.CENTER);
-        centerBox.setMaxWidth(650);
+        Label headerSub = new Label("Search and open a student profile");
+        headerSub.getStyleClass().add("subtitle");
 
-        Label title = new Label("Students Info");
-        title.setFont(Font.font(26));
-        title.setTextFill(Color.BLACK);
+        VBox titleBox = new VBox(2, headerTitle, headerSub);
+
+        Button backBtn = new Button("← Back");
+        backBtn.getStyleClass().add("back-pill-btn");
+
+        backBtn.setOnAction(e -> dashboard.showHome());
+
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.getStyleClass().add("logout-btn");
+        logoutBtn.setOnAction(e -> dashboard.showPage(new Label("Logged out (placeholder)")));
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox header = new HBox(12, titleBox, spacer, backBtn, logoutBtn);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("header-bar");
+
+        root.setTop(header);
+
+
+        VBox card = new VBox(14);
+        card.setPadding(new Insets(16));
+        card.setMaxWidth(760);
+        card.getStyleClass().add("card");
+
 
         TableView<StudentRow> table = new TableView<>();
-        table.setPrefHeight(320);
-        table.setMaxWidth(650);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        table.setPrefHeight(420);
+        table.getStyleClass().add("app-table");
 
         TableColumn<StudentRow, String> colNumber = new TableColumn<>("Student Number");
         colNumber.setCellValueFactory(new PropertyValueFactory<>("studentNumber"));
-        colNumber.setPrefWidth(200);
+        colNumber.setMinWidth(180);
 
         TableColumn<StudentRow, String> colName = new TableColumn<>("Full Name");
         colName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        colName.setPrefWidth(430);
+        colName.setMinWidth(380);
 
-        table.getColumns().addAll(colNumber, colName);
+        table.getColumns().setAll(colNumber, colName);
+        table.setPlaceholder(new Label("No students found."));
 
-        HBox searchRow = new HBox(12);
-        searchRow.setAlignment(Pos.CENTER);
+        // Row hover feels more “modern”
+        table.setRowFactory(tv -> {
+            TableRow<StudentRow> row = new TableRow<>();
+            row.hoverProperty().addListener((obs, wasHover, isHover) -> {
+                if (!row.isEmpty()) {
+                    row.setStyle(isHover
+                            ? "-fx-background-color: rgba(156,195,174,0.25);"
+                            : "");
+                }
+            });
+            return row;
+        });
 
-        Label searchLbl = new Label("Search student");
-        searchLbl.setFont(Font.font(16));
 
-        TextField searchField = new TextField();
-        searchField.setPromptText("Enter Student Number (ex: S1001)");
-        searchField.setPrefWidth(320);
-
-        Button enterBtn = new Button("Enter");
+        ObservableList<StudentRow> rows = FXCollections.observableArrayList();
         Label status = new Label();
         status.setTextFill(Color.DARKRED);
 
-        searchRow.getChildren().addAll(searchLbl, searchField, enterBtn);
-
-        ObservableList<StudentRow> rows = FXCollections.observableArrayList();
         try {
             for (Student s : controller.getAllStudentsBasic()) {
+                String fullName = (s.getFirstName() == null ? "" : s.getFirstName()) + " " +
+                        (s.getLastName() == null ? "" : s.getLastName());
                 rows.add(new StudentRow(
                         s.getStudentNumber(),
-                        s.getFirstName() + " " + s.getLastName()
+                        fullName.trim()
                 ));
             }
-            table.setItems(rows);
         } catch (Exception ex) {
             status.setText("Error loading student list.");
             ex.printStackTrace();
         }
 
+        FilteredList<StudentRow> filtered = new FilteredList<>(rows, r -> true);
+        table.setItems(filtered);
+
+
+        Label searchIcon = new Label("🔎");
+        searchIcon.getStyleClass().add("muted-text");
+
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search by Student Number (e.g., S1001) or Name");
+        searchField.getStyleClass().add("input");
+
+        Button clearBtn = new Button("Clear");
+        clearBtn.getStyleClass().add("secondary-btn");
+
+        Button openBtn = new Button("Open Profile");
+        openBtn.getStyleClass().add("primary-btn");
+
+        // Disable open when empty
+        openBtn.disableProperty().bind(
+                Bindings.createBooleanBinding(() ->
+                                searchField.getText() == null || searchField.getText().trim().isEmpty(),
+                        searchField.textProperty())
+        );
+
+        HBox searchBar = new HBox(10, searchIcon, searchField, clearBtn, openBtn);
+        searchBar.setAlignment(Pos.CENTER_LEFT);
+
+        // live filter while typing (by ID or name)
+        searchField.textProperty().addListener((obs, old, text) -> {
+            String q = text == null ? "" : text.trim().toLowerCase();
+            if (q.isEmpty()) {
+                filtered.setPredicate(r -> true);
+            } else {
+                filtered.setPredicate(r ->
+                        r.getStudentNumber().toLowerCase().contains(q) ||
+                                r.getFullName().toLowerCase().contains(q)
+                );
+            }
+        });
+
+        clearBtn.setOnAction(e -> {
+            searchField.clear();
+            table.getSelectionModel().clearSelection();
+            status.setText("");
+        });
+
+        // click row fills search
         table.setOnMouseClicked(e -> {
             StudentRow selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -97,16 +171,20 @@ public class TeacherStudentsInfoPage {
         });
 
         Runnable goNext = () -> {
-            String sn = searchField.getText() == null ? "" : searchField.getText().trim();
-            if (sn.isEmpty()) {
-                status.setText("Please enter student number.");
+            String input = searchField.getText() == null ? "" : searchField.getText().trim();
+            if (input.isEmpty()) {
+                status.setText("Please enter a student number or name.");
                 return;
             }
 
+            // If user selected a row, prefer that
+            StudentRow selected = table.getSelectionModel().getSelectedItem();
+            String studentNumberToOpen = selected != null ? selected.getStudentNumber() : input;
+
             try {
-                Student s = controller.findStudentByNumber(sn);
+                Student s = controller.findStudentByNumber(studentNumberToOpen);
                 if (s == null) {
-                    status.setText("Student not found: " + sn);
+                    status.setText("Student not found: " + studentNumberToOpen);
                     return;
                 }
 
@@ -119,37 +197,20 @@ public class TeacherStudentsInfoPage {
             }
         };
 
-        enterBtn.setOnAction(e -> goNext.run());
+        openBtn.setOnAction(e -> goNext.run());
         searchField.setOnAction(e -> goNext.run());
 
-        centerBox.getChildren().addAll(title, table, searchRow, status);
-        centerWrap.getChildren().add(centerBox);
-
-        root.setCenter(centerWrap);
-
         // ==========================
-        // BOTTOM BAR (Back + Logout)  ✅ added
+        // BUILD CARD
         // ==========================
-        Button btnBack = new Button("Back");
-        btnBack.getStyleClass().add("secondary-btn");
-        btnBack.setOnAction(e -> dashboard.showHome());
+        Label sectionTitle = new Label("All Students");
+        sectionTitle.getStyleClass().add("section-title");
 
-        Button btnLogout = new Button("Logout");
-        btnLogout.getStyleClass().add("logout-btn"); // uses your CSS
-        btnLogout.setOnAction(e -> dashboard.showPage(new Label("Logged out (placeholder)")));
+        card.getChildren().addAll(sectionTitle, table, searchBar, status);
 
-        AnchorPane bottomBar = new AnchorPane();
-        bottomBar.setPadding(new Insets(15));
-
-        AnchorPane.setLeftAnchor(btnBack, 20.0);
-        AnchorPane.setBottomAnchor(btnBack, 10.0);
-
-        AnchorPane.setRightAnchor(btnLogout, 20.0);
-        AnchorPane.setBottomAnchor(btnLogout, 10.0);
-
-        bottomBar.getChildren().addAll(btnBack, btnLogout);
-
-        root.setBottom(bottomBar);
+        StackPane center = new StackPane(card);
+        center.setPadding(new Insets(22));
+        root.setCenter(center);
 
         return root;
     }

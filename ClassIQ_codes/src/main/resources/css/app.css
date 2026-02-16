@@ -26,3 +26,138 @@
 .sidebar-title { -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 6 0 8 0; }
 
 .app-table { -fx-background-color: transparent; }
+
+.primary-btn {
+    -fx-background-color: #2f7d57;
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-background-radius: 10;
+    -fx-padding: 8 14;
+    -fx-cursor: hand;
+}
+.primary-btn:hover { -fx-opacity: 0.92; }
+
+.secondary-btn {
+    -fx-background-color: rgba(0,0,0,0.06);
+    -fx-text-fill: #222;
+    -fx-font-weight: 600;
+    -fx-background-radius: 10;
+    -fx-padding: 8 14;
+    -fx-cursor: hand;
+}
+.secondary-btn:hover { -fx-background-color: rgba(0,0,0,0.10); }
+
+.input {
+    -fx-background-color: white;
+    -fx-border-color: rgba(0,0,0,0.15);
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 8 10;
+}
+
+.app-table {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(0,0,0,0.12);
+    -fx-border-width: 1;
+}
+
+/* ==============================
+   Pill Back Button (Login Style)
+   ============================== */
+
+.back-pill-btn {
+    -fx-background-color: white;
+    -fx-text-fill: #2f7d57;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+
+    -fx-border-color: rgba(47,125,87,0.4);
+    -fx-border-width: 1;
+
+    -fx-padding: 6 18;
+
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(gaussian,
+            rgba(0,0,0,0.12),
+            6, 0, 0, 2);
+}
+
+/* Hover */
+.back-pill-btn:hover {
+    -fx-background-color: #e9f6f0;
+}
+
+/* Click / Press */
+.back-pill-btn:pressed {
+    -fx-background-color: #2f7d57;
+    -fx-text-fill: white;
+}
+
+/* =========================
+   Student Details (Layout B)
+   ========================= */
+
+.details-card {
+    -fx-background-color: rgba(255,255,255,0.86);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(0,0,0,0.10);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 14, 0, 0, 4);
+}
+
+.details-left {
+    -fx-background-color: rgba(47,125,87,0.06);
+    -fx-background-radius: 14;
+    -fx-padding: 14;
+}
+
+.details-right {
+    -fx-padding: 6 4 4 4;
+}
+
+.v-sep {
+    -fx-opacity: 0.30;
+}
+
+.info-text {
+    -fx-font-size: 14px;
+}
+
+.info-chip {
+    -fx-background-color: rgba(47,125,87,0.14);
+    -fx-text-fill: #1f5b3f;
+    -fx-font-weight: 700;
+    -fx-background-radius: 12;
+    -fx-padding: 8 10;
+}
+
+.marks-grid {
+    -fx-padding: 6 4 2 4;
+}
+
+.table-head {
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
+}
+
+.table-cell {
+    -fx-font-size: 13px;
+}
+
+.feedback-area {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(0,0,0,0.15);
+    -fx-background-color: rgba(255,255,255,0.95);
+}
+
+.status-text {
+    -fx-font-size: 12px;
+}
+
