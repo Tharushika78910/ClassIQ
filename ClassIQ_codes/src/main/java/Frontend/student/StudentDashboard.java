@@ -108,7 +108,7 @@ public class StudentDashboard extends BorderPane {
             StudentMyGradesPage page = new StudentMyGradesPage(
                     this::showHome, // Back goes to Home
                     () -> showPage(simplePlaceholder("Logged out (placeholder)")),
-                    "/Frontend/images/Login.png"
+                    null
             );
             showPage(page.getView());
         });

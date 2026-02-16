@@ -169,17 +169,7 @@ public class StudentMyGradesPage {
         StackPane root = new StackPane(page);
         root.setPadding(new Insets(10));
 
-        Image bg = tryLoad(backgroundResourcePath);
-        if (bg != null) {
-            BackgroundImage bgi = new BackgroundImage(
-                    bg,
-                    BackgroundRepeat.NO_REPEAT,
-                    BackgroundRepeat.NO_REPEAT,
-                    BackgroundPosition.CENTER,
-                    new BackgroundSize(100, 100, true, true, true, true)
-            );
-            root.setBackground(new Background(bgi));
-        }
+
 
         // Old usage (no args) still works: it will show the same layout but Back/Logout won't do anything.
         return root;
