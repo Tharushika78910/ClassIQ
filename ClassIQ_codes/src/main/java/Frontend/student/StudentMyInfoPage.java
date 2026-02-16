@@ -1,5 +1,10 @@
 package Frontend.student;
 
+import Backend.model.dao.impl.MarksDaoImpl;
+import Backend.model.entity.Student;
+import Backend.model.entity.StudentMarks;
+import Backend.service.GradeService;
+import Frontend.Session;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -20,6 +25,18 @@ public class StudentMyInfoPage {
         Label title = new Label("My Info");
         title.getStyleClass().add("title-xl");
 
+        //  Get logged-in student from Session
+        Student s = Session.getCurrentStudent();
+
+        if (s == null) {
+            Label err = new Label("No student session found. Please log in again.");
+            err.getStyleClass().add("section-title");
+            root.getChildren().addAll(title, err);
+            return root;
+        }
+
+        String fullName = s.getFirstName() + " " + s.getLastName();
+
         VBox infoCard = new VBox(10);
         infoCard.getStyleClass().add("card");
 
@@ -27,17 +44,14 @@ public class StudentMyInfoPage {
 
         VBox left = new VBox(6);
         left.getChildren().addAll(
-                new Label("Name: Bao Tran"),
-                new Label("Class: 10A"),
-                new Label("Term: 1"),
-                new Label("Roll No: 12")
+                new Label("Name: " + fullName),
+                new Label("Student No: " + (s.getStudentNumber() == null ? "" : s.getStudentNumber())),
+                new Label("Student ID: " + s.getStudentId())
         );
 
         VBox right = new VBox(6);
         right.getChildren().addAll(
-                new Label("Email: bao@student.com"),
-                new Label("Phone: +358 00 000 000"),
-                new Label("Address: Helsinki")
+                new Label("Email: " + (s.getEmail() == null ? "" : s.getEmail()))
         );
 
         infoRow.getChildren().addAll(left, right);
@@ -59,17 +73,36 @@ public class StudentMyInfoPage {
         TableColumn<SummaryRow, Integer> colTotal = new TableColumn<>("Total");
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
 
-        TableColumn<SummaryRow, String> colGrade = new TableColumn<>("Grade");
+        TableColumn<SummaryRow, String> colGrade = new TableColumn<>("grade");
+        colGrade.setText("Grade");
         colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
 
         table.getColumns().addAll(colSub, colTotal, colGrade);
 
+        // Load marks from DB
+        MarksDaoImpl marksDao = new MarksDaoImpl();
+        GradeService gradeService = new GradeService();
+
+        StudentMarks m = null;
+        try {
+            m = marksDao.findByStudentId(s.getStudentId());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // If no marks row exists yet, show zeros
+        int math = (m == null) ? 0 : m.getSubject1();      // mathematics
+        int eng  = (m == null) ? 0 : m.getSubject2();      // english
+        int sci  = (m == null) ? 0 : m.getSubject3();      // science
+        int craft= (m == null) ? 0 : m.getSubject4();      // craft
+        int lang = (m == null) ? 0 : m.getSubject5();      // languages
+
         table.setItems(FXCollections.observableArrayList(
-                new SummaryRow("Mathematics", 90, "A"),
-                new SummaryRow("Science", 78, "B"),
-                new SummaryRow("English", 70, "B"),
-                new SummaryRow("History", 62, "C"),
-                new SummaryRow("Geography",84,"A")
+                new SummaryRow("Mathematics", math, gradeService.calculateGrade(math)),
+                new SummaryRow("English", eng, gradeService.calculateGrade(eng)),
+                new SummaryRow("Science", sci, gradeService.calculateGrade(sci)),
+                new SummaryRow("Craft", craft, gradeService.calculateGrade(craft)),
+                new SummaryRow("Languages", lang, gradeService.calculateGrade(lang))
         ));
 
         tableCard.getChildren().add(table);

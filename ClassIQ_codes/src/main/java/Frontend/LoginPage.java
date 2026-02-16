@@ -2,6 +2,8 @@ package Frontend;
 
 import Backend.model.dao.impl.AppUserDaoImpl;
 import Backend.model.dao.impl.UserProfileDaoImpl;
+import Backend.model.dao.impl.StudentDaoImpl;
+import Backend.model.entity.Student;
 import Frontend.student.StudentDashboard;
 import Frontend.teacher.TeacherDashboard;
 import javafx.geometry.Insets;
@@ -196,9 +198,34 @@ public class LoginPage {
                     return;
                 }
 
-                StudentDashboard dash = new StudentDashboard(sp.name, sp.email, STUDENT_AVATAR);
+                // Store session info
+                Session.setRole(Session.Role.STUDENT);
+                Session.setUserId(result.userId);
 
+                // Load full Student from DB using studentId
+                StudentDaoImpl studentDao = new StudentDaoImpl();
+                Student fullStudent;
+                try {
+                    fullStudent = studentDao.findById(sp.studentId);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    error.setText("Failed to load student details.");
+                    return;
+                }
+
+                if (fullStudent == null) {
+                    error.setText("Student record not found.");
+                    return;
+                }
+
+                Session.setCurrentStudent(fullStudent);
+
+                // Use session values (or sp values) to show sidebar
+                String fullName = fullStudent.getFirstName() + " " + fullStudent.getLastName();
+
+                StudentDashboard dash = new StudentDashboard(fullName, fullStudent.getEmail(), STUDENT_AVATAR);
                 stage.getScene().setRoot(wrapWithBackground(dash));
+
 
             } else if ("TEACHER".equalsIgnoreCase(result.role)) {
                 var tp = profileDao.findTeacherByUserId(result.userId);

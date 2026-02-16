@@ -17,9 +17,8 @@ public class MarksDaoImpl implements MarksDao {
 
     /**
      * Save/Update marks (used by MarksController).
-     * IMPORTANT: Your DB columns are mathematics, english, science, craft, languages.
-     * Your Java entity uses subject1.subject5, so we map:
-     * subject1->mathematics, subject2->english, subject3->science, subject4->craft, subject5->languages
+     * DB columns: mathematics, english, science, craft, languages
+     * Entity mapping: subject1->mathematics, subject2->english, subject3->science, subject4->craft, subject5->languages
      */
     @Override
     public void saveMarks(StudentMarks marks) throws SQLException {
@@ -36,7 +35,8 @@ public class MarksDaoImpl implements MarksDao {
               craft       = VALUES(craft),
               languages   = VALUES(languages),
               total       = VALUES(total),
-              average     = VALUES(average)
+              average     = VALUES(average),
+              feed_back   = VALUES(feed_back)
         """;
 
         try (Connection con = DBConnection.getConnection();
@@ -48,6 +48,7 @@ public class MarksDaoImpl implements MarksDao {
             ps.setInt(4, marks.getSubject3()); // science
             ps.setInt(5, marks.getSubject4()); // craft
             ps.setInt(6, marks.getSubject5()); // languages
+
             ps.setInt(7, marks.getTotal());
             ps.setDouble(8, marks.getAverage());
 
@@ -59,7 +60,7 @@ public class MarksDaoImpl implements MarksDao {
     }
 
     /**
-     * Load marks row only (used by some screens).
+     * Load marks row only (used by screens that need only marks).
      */
     @Override
     public StudentMarks findByStudentId(int studentId) throws SQLException {
@@ -78,23 +79,26 @@ public class MarksDaoImpl implements MarksDao {
                 m.setMarksId(rs.getInt("marks_id"));
                 m.setStudentId(rs.getInt("student_id"));
 
-                // DB -> entity mapping
+                // Nullable subjects -> use getObject check
                 m.setSubject1(rs.getObject("mathematics") == null ? 0 : rs.getInt("mathematics"));
                 m.setSubject2(rs.getObject("english") == null ? 0 : rs.getInt("english"));
                 m.setSubject3(rs.getObject("science") == null ? 0 : rs.getInt("science"));
                 m.setSubject4(rs.getObject("craft") == null ? 0 : rs.getInt("craft"));
                 m.setSubject5(rs.getObject("languages") == null ? 0 : rs.getInt("languages"));
 
-                m.setTotal(rs.getInt("total"));
-                m.setAverage(rs.getDouble("average"));
+                // total/average are NOT NULL in DB, but keep safe anyway
+                m.setTotal(rs.getObject("total") == null ? 0 : rs.getInt("total"));
+                m.setAverage(rs.getObject("average") == null ? 0.0 : rs.getDouble("average"));
+
                 m.setFeedback(rs.getString(FEEDBACK_COL));
+
                 return m;
             }
         }
     }
 
     /**
-     * Load Student + Marks together (used by TeacherStudentDetailsPage).
+     * Load Student + Marks together (used by TeacherStudentDetailsPage and can be reused for student pages).
      * This matches your DTO structure: StudentDetailsDTO has Student + StudentMarks.
      */
     @Override
@@ -118,7 +122,7 @@ public class MarksDaoImpl implements MarksDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
 
-                // Student
+                // Student entity
                 Student st = new Student();
                 st.setStudentId(rs.getInt("student_id"));
                 st.setFirstName(rs.getString("first_name"));
@@ -127,7 +131,7 @@ public class MarksDaoImpl implements MarksDao {
                 st.setEmail(rs.getString("email"));
                 st.setUserId(rs.getInt("user_id"));
 
-                // Marks
+                // Marks entity
                 StudentMarks mk = new StudentMarks();
                 mk.setStudentId(studentId);
 
@@ -142,6 +146,7 @@ public class MarksDaoImpl implements MarksDao {
 
                 mk.setTotal(rs.getObject("total") == null ? 0 : rs.getInt("total"));
                 mk.setAverage(rs.getObject("average") == null ? 0.0 : rs.getDouble("average"));
+
                 mk.setFeedback(rs.getString(FEEDBACK_COL));
 
                 StudentDetailsDTO dto = new StudentDetailsDTO();
@@ -195,7 +200,7 @@ public class MarksDaoImpl implements MarksDao {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
-                return rs.getString("feed_back");
+                return rs.getString(FEEDBACK_COL);
             }
         }
     }
