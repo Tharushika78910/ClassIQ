@@ -1,5 +1,7 @@
 package Frontend.teacher;
 
+import Frontend.LoginPage;
+import Frontend.Session;
 import Frontend.student.StudentMyGradesPage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,10 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import Frontend.LoginPage;
-import Frontend.Session;
 import javafx.stage.Stage;
-
 
 import java.util.Objects;
 
@@ -61,8 +60,12 @@ public class TeacherDashboard extends BorderPane {
         showPage(buildHomeView(teacherName, teacherEmail, teacherProfileImagePath));
     }
 
+    /**
+     * ✅ UPDATED: Responsive layout so circles stay centered when maximize/resize
+     */
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
+        // Root with background
         StackPane root = new StackPane();
         root.getStyleClass().add("figma-root");
 
@@ -78,55 +81,36 @@ public class TeacherDashboard extends BorderPane {
             root.setBackground(new Background(bg));
         } catch (Exception ignored) {}
 
-        AnchorPane layer = new AnchorPane();
-        layer.setPadding(new Insets(30));
+        // Main layout overlay
+        BorderPane layout = new BorderPane();
+        layout.setPadding(new Insets(20));
 
-        // Back Button (Login Style) - Top Left
+        // ===== TOP BAR (Back left, Teacher info right) =====
         Button backBtn = new Button("← Back");
         backBtn.getStyleClass().add("back-pill-btn");
-        AnchorPane.setTopAnchor(backBtn, 20.0);
-        AnchorPane.setLeftAnchor(backBtn, 20.0);
 
-        // If dashboard is the first page, you can decide what it should do.
-        // Right now it just reloads home (safe).
         backBtn.setOnAction(e -> {
-            // Clear session (optional but recommended)
             Session.clear();
-
-            // Get current stage from the button
             Stage stage = (Stage) backBtn.getScene().getWindow();
-
-            // Load login page back into the SAME scene
             LoginPage loginPage = new LoginPage(stage);
             stage.getScene().setRoot(loginPage.getView());
         });
 
-
-        // Teacher info (Top Right)
         HBox teacherBox = buildTeacherInfo(name, email, profileImagePath);
-        AnchorPane.setTopAnchor(teacherBox, 20.0);
-        AnchorPane.setRightAnchor(teacherBox, 20.0);
 
-        // Mark Sheet
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox topBar = new HBox(12, backBtn, spacer, teacherBox);
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(10, 10, 10, 10));
+
+        layout.setTop(topBar);
+
+        // ===== CENTER (3 blocks always centered) =====
         VBox markBlock = buildTopicBlock("Mark sheet", MARK_IMAGE);
-        AnchorPane.setTopAnchor(markBlock, 120.0);
-        AnchorPane.setLeftAnchor(markBlock, 270.0);
-
-        // Grading Criteria
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
-        AnchorPane.setTopAnchor(gradingBlock, 120.0);
-        AnchorPane.setLeftAnchor(gradingBlock, 720.0);
-
-        // Student Info
         VBox studentBlock = buildTopicBlock("Student Info", STUDENT_IMAGE);
-        AnchorPane.setTopAnchor(studentBlock, 380.0);
-        AnchorPane.setLeftAnchor(studentBlock, 500.0);
-
-        // Logout (Bottom Right)
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-        AnchorPane.setRightAnchor(logoutBtn, 20.0);
-        AnchorPane.setBottomAnchor(logoutBtn, 20.0);
 
         // Button Actions
         Button markBtn = (Button) markBlock.getChildren().get(1);
@@ -150,21 +134,39 @@ public class TeacherDashboard extends BorderPane {
                 showPage(new TeacherStudentsInfoPage(this).getView())
         );
 
+        // Grid: 2 blocks top row, student block centered below spanning 2 columns
+        GridPane grid = new GridPane();
+        grid.setHgap(120);
+        grid.setVgap(80);
+        grid.setAlignment(Pos.CENTER);
+
+        grid.add(markBlock, 0, 0);
+        grid.add(gradingBlock, 1, 0);
+
+        grid.add(studentBlock, 0, 1, 2, 1); // span 2 columns
+        GridPane.setHalignment(studentBlock, javafx.geometry.HPos.CENTER);
+
+        // Wrap center grid so it truly stays centered
+        StackPane centerWrap = new StackPane(grid);
+        centerWrap.setAlignment(Pos.CENTER);
+
+        layout.setCenter(centerWrap);
+
+        // ===== BOTTOM RIGHT (Logout) =====
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.getStyleClass().add("logout-btn");
+
         logoutBtn.setOnAction(e ->
                 showPage(simplePlaceholder("Logged out (placeholder)"))
         );
 
-        // Add back button to the layer
-        layer.getChildren().addAll(
-                backBtn,
-                teacherBox,
-                markBlock,
-                gradingBlock,
-                studentBlock,
-                logoutBtn
-        );
+        HBox bottomBar = new HBox(logoutBtn);
+        bottomBar.setAlignment(Pos.BOTTOM_RIGHT);
+        bottomBar.setPadding(new Insets(10));
 
-        root.getChildren().add(layer);
+        layout.setBottom(bottomBar);
+
+        root.getChildren().add(layout);
         return root;
     }
 

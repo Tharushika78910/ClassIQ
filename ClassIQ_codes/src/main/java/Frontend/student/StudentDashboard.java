@@ -21,11 +21,11 @@ public class StudentDashboard extends BorderPane {
     private final String studentEmail;
     private final String studentProfileImagePath;
 
-    // ✅ Images (CHANGE PATHS if yours are different)
+    // ✅ Images
     private static final String BG_IMAGE      = "/Homepage.png";
     private static final String INFO_IMAGE    = "/images/studentInfo.png";
     private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
-    private static final String REPORT_IMAGE  = "/images/Report Card.png"; // change to your real file
+    private static final String REPORT_IMAGE  = "/images/Report Card.png"; // keep your real file name
 
     public StudentDashboard(String name, String email, String profileImagePath) {
 
@@ -33,7 +33,6 @@ public class StudentDashboard extends BorderPane {
         this.studentEmail = email;
         this.studentProfileImagePath = profileImagePath;
 
-        // ✅ Use same CSS as teacher (so circle-holder, topic-btn, logout-btn, teacher-info styles work)
         getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
         );
@@ -46,12 +45,13 @@ public class StudentDashboard extends BorderPane {
         showPage(buildHomeView(studentName, studentEmail, studentProfileImagePath));
     }
 
+    // ✅ UPDATED: Responsive layout (center stays centered when maximize)
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
         StackPane root = new StackPane();
         root.getStyleClass().add("figma-root");
 
-
+        // Background
         try {
             BackgroundImage bg = new BackgroundImage(
                     new Image(Objects.requireNonNull(getClass().getResourceAsStream(BG_IMAGE))),
@@ -61,43 +61,33 @@ public class StudentDashboard extends BorderPane {
                     new BackgroundSize(
                             BackgroundSize.AUTO, BackgroundSize.AUTO,
                             false, false,
-                            true,  // contain
-                            true   // cover  ✅ important
+                            true,
+                            true
                     )
             );
             root.setBackground(new Background(bg));
         } catch (Exception ignored) {}
 
-        AnchorPane layer = new AnchorPane();
-        layer.setPadding(new Insets(30));
+        // Use BorderPane for responsive zones
+        BorderPane layout = new BorderPane();
+        layout.setPadding(new Insets(30));
 
-        //  Top-right student info
+        // ===== TOP RIGHT Student Info =====
         HBox studentBox = buildStudentInfo(name, email, profileImagePath);
-        AnchorPane.setTopAnchor(studentBox, 20.0);
-        AnchorPane.setRightAnchor(studentBox, 20.0);
 
-        //  My Info block
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox topBar = new HBox(spacer, studentBox);
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        layout.setTop(topBar);
+
+        // ===== CENTER: 3 circles always centered =====
         VBox infoBlock = buildTopicBlock("My Info", INFO_IMAGE);
-        AnchorPane.setTopAnchor(infoBlock, 120.0);
-        AnchorPane.setLeftAnchor(infoBlock, 280.0);
-
-        //  Grading Criteria block (opens StudentMyGradesPage)
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
-        AnchorPane.setTopAnchor(gradingBlock, 120.0);
-        AnchorPane.setLeftAnchor(gradingBlock, 700.0);
-
-        // Report Card block
         VBox reportBlock = buildTopicBlock("Report Card", REPORT_IMAGE);
-        AnchorPane.setTopAnchor(reportBlock, 380.0);
-        AnchorPane.setLeftAnchor(reportBlock, 480.0);
 
-        // Bottom-right logout
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-        AnchorPane.setRightAnchor(logoutBtn, 20.0);
-        AnchorPane.setBottomAnchor(logoutBtn, 20.0);
-
-        // ===== Actions =====
+        // Actions (same as before)
         Button infoBtn = (Button) infoBlock.getChildren().get(1);
         Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
         Button reportBtn = (Button) reportBlock.getChildren().get(1);
@@ -115,21 +105,37 @@ public class StudentDashboard extends BorderPane {
 
         reportBtn.setOnAction(e -> showPage(new StudentReportCardPage().getView()));
 
+        // Grid: 2 top, 1 bottom centered
+        GridPane grid = new GridPane();
+        grid.setHgap(120);
+        grid.setVgap(80);
+        grid.setAlignment(Pos.CENTER);
+
+        grid.add(infoBlock, 0, 0);
+        grid.add(gradingBlock, 1, 0);
+
+        grid.add(reportBlock, 0, 1, 2, 1); // span 2 columns
+        GridPane.setHalignment(reportBlock, javafx.geometry.HPos.CENTER);
+
+        StackPane centerWrap = new StackPane(grid);
+        centerWrap.setAlignment(Pos.CENTER);
+        layout.setCenter(centerWrap);
+
+        // ===== BOTTOM RIGHT Logout =====
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.getStyleClass().add("logout-btn");
         logoutBtn.setOnAction(e -> showPage(simplePlaceholder("Logged out (placeholder)")));
 
-        layer.getChildren().addAll(
-                studentBox,
-                infoBlock,
-                gradingBlock,
-                reportBlock,
-                logoutBtn
-        );
+        HBox bottom = new HBox(logoutBtn);
+        bottom.setAlignment(Pos.BOTTOM_RIGHT);
+        bottom.setPadding(new Insets(10, 0, 0, 0));
+        layout.setBottom(bottom);
 
-        root.getChildren().add(layer);
+        root.getChildren().add(layout);
         return root;
     }
 
-    //  same circle + button as teacher
+    // Same circle + button style
     private VBox buildTopicBlock(String title, String imagePath) {
 
         VBox box = new VBox(16);
@@ -160,7 +166,7 @@ public class StudentDashboard extends BorderPane {
         return box;
     }
 
-    //  top-right info box (reuse teacher-info css)
+    // Top-right info box
     private HBox buildStudentInfo(String name, String email, String profileImagePath) {
 
         HBox wrap = new HBox(12);
