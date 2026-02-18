@@ -1,9 +1,14 @@
 package Frontend.teacher;
 
+import Backend.model.dao.impl.StudentDaoImpl;
 import Backend.model.dao.impl.TeacherMarkSheetDaoImpl;
+import Backend.model.entity.Student;
 import Backend.service.WeightedMarkService;
+import Frontend.LoginPage;
+import Frontend.Session;
 
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,7 +16,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
+
+import java.util.List;
+import java.util.Map;
 
 public class TeacherMarkSheetPage {
 
@@ -32,30 +41,23 @@ public class TeacherMarkSheetPage {
         root.setPadding(new Insets(20));
         root.getStyleClass().add("page-bg");
 
-        /* ===========================
-           CENTER CONTENT (CENTERED)
-        ============================ */
+        // CENTER CONTENT
+
+
         VBox centerBox = new VBox(15);
         centerBox.setPadding(new Insets(10));
-        centerBox.setAlignment(Pos.TOP_CENTER); // ✅ Center everything
+        centerBox.setAlignment(Pos.TOP_CENTER);
 
-        Label subjectTitle = new Label("Mathematics");
+        String subject = Session.getTeacherSubject();
+        if (subject == null || subject.isBlank()) subject = "Mathematics";
+
+        Label subjectTitle = new Label(subject);
         subjectTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
         buildTable();
 
-        // ✅ Reduce table width
-        table.setMaxWidth(780);
-        table.setPrefWidth(780);
-
-        // ✅ Show 15 visible rows (grid)
-        table.setFixedCellSize(28);
-        table.setPrefHeight((28 * 15) + 30); // 15 rows + header
-
         VBox card = new VBox(12);
         card.getStyleClass().add("card");
-        card.setMaxWidth(800); // ✅ container width smaller
-        card.setPadding(new Insets(12));
 
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
@@ -65,40 +67,53 @@ public class TeacherMarkSheetPage {
 
         status.getStyleClass().add("muted-text");
 
+        loadStudentsAndMarks();
+
         btnSave.setOnAction(e -> {
+            status.setText("");
+
+            if (!Session.isTeacherLoggedIn()) {
+                status.setText("Teacher session not found.");
+                return;
+            }
+
             if (!allInputsValid()) {
                 status.setText("Please enter valid marks before saving.");
                 return;
             }
+
+            int teacherId = Session.getTeacherId();
+            String subj = Session.getTeacherSubject();
+            if (subj == null || subj.isBlank()) subj = "Mathematics";
 
             try {
                 TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
                 int savedCount = 0;
 
                 for (MarkRow r : table.getItems()) {
-
                     if (r.getAssignment() == 0 &&
                             r.getProject() == 0 &&
                             r.getFinalExam() == 0) {
                         continue;
                     }
 
-                    int dbStudentId = mapUiStudentToDbId(r.getStudentId());
-
                     dao.saveTeacherMarkSheetRow(
-                            dbStudentId,
+                            r.getStudentDbId(),
                             r.getStudentName(),
                             r.getAssignment(),
                             r.getProject(),
                             r.getFinalExam(),
                             r.getTotal(),
-                            r.getGrade()
+                            r.getGrade(),
+                            teacherId,
+                            subj
                     );
 
                     savedCount++;
                 }
 
-                status.setText("Saved " + savedCount + " record(s) to database.");
+                status.setText("Saved " + savedCount + " record(s).");
+                loadStudentsAndMarks();
 
             } catch (Exception ex) {
                 status.setText("Database error: " + ex.getMessage());
@@ -107,12 +122,28 @@ public class TeacherMarkSheetPage {
         });
 
         btnClear.setOnAction(e -> {
-            for (MarkRow r : table.getItems()) {
-                r.setAssignment(0);
-                r.setProject(0);
-                r.setFinalExam(0);
+            status.setText("");
+
+            if (!Session.isTeacherLoggedIn()) {
+                status.setText("Teacher session not found.");
+                return;
             }
-            status.setText("All marks cleared.");
+
+            int teacherId = Session.getTeacherId();
+            String subj = Session.getTeacherSubject();
+            if (subj == null || subj.isBlank()) subj = "Mathematics";
+
+            try {
+                TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
+                int deleted = dao.deleteMarksForTeacherSubject(teacherId, subj);
+
+                status.setText("All marks cleared. Deleted " + deleted + " record(s).");
+                loadStudentsAndMarks();
+
+            } catch (Exception ex) {
+                status.setText("Database error: " + ex.getMessage());
+                ex.printStackTrace();
+            }
         });
 
         HBox actions = new HBox(10, btnSave, btnClear, status);
@@ -120,27 +151,43 @@ public class TeacherMarkSheetPage {
 
         card.getChildren().addAll(table, actions);
 
-        // ✅ keep card centered
-        StackPane centeredCard = new StackPane(card);
-        centeredCard.setAlignment(Pos.TOP_CENTER);
-
-        centerBox.getChildren().addAll(subjectTitle, centeredCard);
+        centerBox.getChildren().addAll(subjectTitle, card);
         root.setCenter(centerBox);
 
-        /* ===========================
-           BOTTOM BUTTON BAR
-        ============================ */
-        Button btnBack = new Button("Back");
-        btnBack.getStyleClass().add("secondary-btn");
+        // BOTTOM BUTTON BAR (LoginPage Back style)
 
-        Button btnLogout = new Button("Logout");
-        btnLogout.getStyleClass().add("logout-btn");
+        String pillNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
+        String pillHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
+
+        Button btnBack = new Button("← Back");
+        btnBack.setStyle(pillNormal);
+        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
+        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
         btnBack.setOnAction(e -> dashboard.showHome());
 
-        btnLogout.setOnAction(e ->
-                dashboard.showPage(new Label("Logged out (placeholder)"))
-        );
+        Button btnLogout = new Button("Logout");
+        btnLogout.setStyle(pillNormal);
+        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
+        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
+        btnLogout.setOnAction(e -> {
+            Session.clear();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new LoginPage(stage).getScene());
+        });
 
         AnchorPane bottomBar = new AnchorPane();
         bottomBar.setPadding(new Insets(15));
@@ -157,23 +204,64 @@ public class TeacherMarkSheetPage {
         return root;
     }
 
-    private int mapUiStudentToDbId(String uiStudentId) {
-        return switch (uiStudentId) {
-            case "S001" -> 201;
-            case "S002" -> 202;
-            case "S003" -> 203;
-            case "S004" -> 204;
-            case "S005" -> 205;
-            default -> throw new IllegalArgumentException("No DB mapping for: " + uiStudentId);
-        };
+    // LOAD DATA FROM DATABASE
+
+    private void loadStudentsAndMarks() {
+
+        if (!Session.isTeacherLoggedIn()) return;
+
+        int teacherId = Session.getTeacherId();
+        String subj = Session.getTeacherSubject();
+        if (subj == null || subj.isBlank()) subj = "Mathematics";
+
+        try {
+            StudentDaoImpl studentDao = new StudentDaoImpl();
+            List<Student> students = studentDao.findAll();
+
+            ObservableList<MarkRow> rows = FXCollections.observableArrayList();
+
+            for (Student s : students) {
+                String fullName = s.getFirstName() + " " + s.getLastName();
+                rows.add(new MarkRow(
+                        s.getStudentId(),
+                        s.getStudentNumber(),
+                        fullName
+                ));
+            }
+
+            TeacherMarkSheetDaoImpl markDao = new TeacherMarkSheetDaoImpl();
+            Map<Integer, int[]> existing = markDao.loadExistingMarks(teacherId, subj);
+
+            for (MarkRow r : rows) {
+                int[] m = existing.get(r.getStudentDbId());
+                if (m != null) {
+                    r.setAssignment(m[0]);
+                    r.setProject(m[1]);
+                    r.setFinalExam(m[2]);
+                } else {
+                    r.setAssignment(0);
+                    r.setProject(0);
+                    r.setFinalExam(0);
+                }
+            }
+
+            table.setItems(rows);
+
+        } catch (Exception ex) {
+            status.setText("Load error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
+    // TABLE BUILD
+
     private void buildTable() {
+
         table.setEditable(true);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        TableColumn<MarkRow, String> colId = new TableColumn<>("Student ID");
-        colId.setCellValueFactory(c -> c.getValue().studentIdProperty());
+        TableColumn<MarkRow, String> colNo = new TableColumn<>("Student No");
+        colNo.setCellValueFactory(c -> c.getValue().studentNumberProperty());
 
         TableColumn<MarkRow, String> colName = new TableColumn<>("Student Name");
         colName.setCellValueFactory(c -> c.getValue().studentNameProperty());
@@ -194,15 +282,10 @@ public class TeacherMarkSheetPage {
         colGrade.setCellValueFactory(c -> c.getValue().gradeProperty());
 
         table.getColumns().setAll(
-                colId, colName,
+                colNo, colName,
                 colAssignment, colProject, colFinal,
                 colTotal, colGrade
         );
-
-        // ✅ No hardcoded list here.
-        // Keep your existing DB-loading code elsewhere in your project
-        // that sets table items.
-        // (If your project loads DB rows after getView(), it will still work.)
     }
 
     private TableColumn<MarkRow, Integer> editableMarkColumn(
@@ -240,21 +323,22 @@ public class TeacherMarkSheetPage {
         return true;
     }
 
-    /* ===========================
-       INNER CLASSES
-    ============================ */
+    // INNER CLASS
 
     public static class MarkRow {
-        private final StringProperty studentId = new SimpleStringProperty();
+        private final IntegerProperty studentDbId = new SimpleIntegerProperty();
+        private final StringProperty studentNumber = new SimpleStringProperty();
         private final StringProperty studentName = new SimpleStringProperty();
+
         private final IntegerProperty assignment = new SimpleIntegerProperty(0);
         private final IntegerProperty project = new SimpleIntegerProperty(0);
         private final IntegerProperty finalExam = new SimpleIntegerProperty(0);
         private final IntegerProperty total = new SimpleIntegerProperty();
         private final StringProperty grade = new SimpleStringProperty();
 
-        public MarkRow(String id, String name) {
-            studentId.set(id);
+        public MarkRow(int dbId, String studentNo, String name) {
+            studentDbId.set(dbId);
+            studentNumber.set(studentNo);
             studentName.set(name);
 
             assignment.addListener((o, a, b) -> recalc());
@@ -272,7 +356,8 @@ public class TeacherMarkSheetPage {
             ));
         }
 
-        public StringProperty studentIdProperty() { return studentId; }
+        public int getStudentDbId() { return studentDbId.get(); }
+        public StringProperty studentNumberProperty() { return studentNumber; }
         public StringProperty studentNameProperty() { return studentName; }
         public IntegerProperty totalProperty() { return total; }
         public StringProperty gradeProperty() { return grade; }
@@ -285,7 +370,6 @@ public class TeacherMarkSheetPage {
         public void setProject(int v) { project.set(v); }
         public void setFinalExam(int v) { finalExam.set(v); }
 
-        public String getStudentId() { return studentId.get(); }
         public String getStudentName() { return studentName.get(); }
         public int getTotal() { return total.get(); }
         public String getGrade() { return grade.get(); }
@@ -301,18 +385,10 @@ public class TeacherMarkSheetPage {
     }
 
     public static class IntegerStringConverter extends StringConverter<Integer> {
-        @Override
-        public String toString(Integer v) {
-            return v == null ? "0" : v.toString();
-        }
-
-        @Override
-        public Integer fromString(String s) {
-            try {
-                return Integer.parseInt(s.trim());
-            } catch (Exception e) {
-                return 0;
-            }
+        @Override public String toString(Integer v) { return v == null ? "0" : v.toString(); }
+        @Override public Integer fromString(String s) {
+            try { return Integer.parseInt(s.trim()); }
+            catch (Exception e) { return 0; }
         }
     }
 }

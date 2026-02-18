@@ -24,11 +24,13 @@ public class UserProfileDaoImpl {
         public final int teacherId;
         public final String name;
         public final String email;
+        public final String subject;
 
-        public TeacherProfile(int teacherId, String name, String email) {
+        public TeacherProfile(int teacherId, String name, String email, String subject) { // ✅ UPDATE
             this.teacherId = teacherId;
             this.name = name;
             this.email = email;
+            this.subject = subject;
         }
     }
 
@@ -59,7 +61,7 @@ public class UserProfileDaoImpl {
 
     public TeacherProfile findTeacherByUserId(int userId) {
         String sql = """
-                SELECT teacher_id, first_name, last_name, email
+                SELECT teacher_id, first_name, last_name, email, subject
                 FROM teacher
                 WHERE user_id = ?
                 """;
@@ -73,7 +75,12 @@ public class UserProfileDaoImpl {
                 if (!rs.next()) return null;
 
                 String name = rs.getString("first_name") + " " + rs.getString("last_name");
-                return new TeacherProfile(rs.getInt("teacher_id"), name, rs.getString("email"));
+                return new TeacherProfile(
+                        rs.getInt("teacher_id"),
+                        name,
+                        rs.getString("email"),
+                        rs.getString("subject") //
+                );
             }
 
         } catch (Exception e) {

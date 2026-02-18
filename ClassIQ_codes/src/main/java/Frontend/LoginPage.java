@@ -50,10 +50,10 @@ public class LoginPage {
         mainBox.setAlignment(Pos.CENTER);
 
         mainBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        mainBox.setBackground(Background.EMPTY); // ensure no default background
+        mainBox.setBackground(Background.EMPTY);
         mainBox.setStyle("-fx-background-color: transparent;");
 
-        // Logo (
+        // Logo
         ImageView logo = new ImageView();
         try {
             logo.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(LOGO))));
@@ -106,7 +106,7 @@ public class LoginPage {
 
         backBtn.setOnAction(e -> {
             HomePage home = new HomePage();
-            stage.setScene(home.getScene(stage)); // HomePage unchanged
+            stage.setScene(home.getScene(stage));
         });
 
         root.getChildren().add(backBtn);
@@ -220,12 +220,10 @@ public class LoginPage {
 
                 Session.setCurrentStudent(fullStudent);
 
-                // Use session values (or sp values) to show sidebar
                 String fullName = fullStudent.getFirstName() + " " + fullStudent.getLastName();
 
                 StudentDashboard dash = new StudentDashboard(fullName, fullStudent.getEmail(), STUDENT_AVATAR);
                 stage.getScene().setRoot(wrapWithBackground(dash));
-
 
             } else if ("TEACHER".equalsIgnoreCase(result.role)) {
                 var tp = profileDao.findTeacherByUserId(result.userId);
@@ -234,9 +232,15 @@ public class LoginPage {
                     return;
                 }
 
+                // Store teacher session info
+                Session.setRole(Session.Role.TEACHER);
+                Session.setUserId(result.userId);
+                Session.setTeacherId(tp.teacherId);
+
+                // This is for TeacherProfile to include 'subject' and query to SELECT subject
+                Session.setTeacherSubject(tp.subject);
+
                 TeacherDashboard dash = new TeacherDashboard(tp.name, tp.email, TEACHER_AVATAR);
-
-
                 stage.getScene().setRoot(wrapWithBackground(dash));
             }
         });
@@ -262,7 +266,6 @@ public class LoginPage {
 
     private Parent wrapWithBackground(Parent pageContent) {
         ImageView bg = createBackgroundView();
-        StackPane wrapper = new StackPane(bg, pageContent);
-        return wrapper;
+        return new StackPane(bg, pageContent);
     }
 }
