@@ -3,20 +3,17 @@ package Frontend.student;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import java.io.InputStream;
-
 public class StudentMyGradesPage {
 
+    // ✅ keep these so TeacherDashboard constructor call works
     private final Runnable onBack;
     private final Runnable onLogout;
     private final String backgroundResourcePath;
@@ -25,6 +22,7 @@ public class StudentMyGradesPage {
         this(null, null, null);
     }
 
+    // ✅ MUST exist because TeacherDashboard uses it
     public StudentMyGradesPage(Runnable onBack, Runnable onLogout, String backgroundResourcePath) {
         this.onBack = onBack;
         this.onLogout = onLogout;
@@ -34,7 +32,7 @@ public class StudentMyGradesPage {
     public Node getView() {
 
         // =========================
-        // Content (your text)
+        // Content
         // =========================
         VBox content = new VBox(18);
         content.setPadding(new Insets(22));
@@ -109,7 +107,7 @@ public class StudentMyGradesPage {
         content.getChildren().addAll(title, criteriaTitle, criteriaText, gradeScaleTitle, gradeTable);
 
         // =========================
-        // Scroll inside the card
+        // Scroll
         // =========================
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
@@ -118,7 +116,7 @@ public class StudentMyGradesPage {
         scroll.setBackground(Background.EMPTY);
 
         // =========================
-        // Center card (dull green + border + rounded corners)
+        // Card
         // =========================
         StackPane card = new StackPane(scroll);
         card.setAlignment(Pos.TOP_LEFT);
@@ -126,7 +124,6 @@ public class StudentMyGradesPage {
         card.setMaxWidth(860);
         card.setPrefWidth(860);
 
-        // Dull green with frame + rounded corners (NOT huge radius)
         card.setStyle("""
             -fx-background-color: rgba(200, 230, 200, 0.70);
             -fx-background-radius: 18;
@@ -135,57 +132,17 @@ public class StudentMyGradesPage {
             -fx-border-radius: 18;
         """);
 
-        // Wrap card so it stays in the middle (removes that marked empty area)
         StackPane centeredCard = new StackPane(card);
         centeredCard.setAlignment(Pos.TOP_CENTER);
         centeredCard.setPadding(new Insets(28, 28, 18, 28));
 
-        // =========================
-        // Bottom buttons bar
-        // =========================
-        BorderPane bottomBar = new BorderPane();
-        bottomBar.setPadding(new Insets(10, 20, 18, 20));
-
-        Button backBtn = new Button("Back");
-        backBtn.getStyleClass().add("secondary-btn");
-
-        backBtn.setOnAction(e -> { if (onBack != null) onBack.run(); });
-
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-
-        logoutBtn.setOnAction(e -> { if (onLogout != null) onLogout.run(); });
-
-        bottomBar.setLeft(backBtn);
-        bottomBar.setRight(logoutBtn);
-
+        // ✅ No bottom bar here (TeacherDashboard provides the Back pill)
         BorderPane page = new BorderPane();
         page.setCenter(centeredCard);
-        page.setBottom(bottomBar);
 
-        // =========================
-        // Background image on ROOT
-        // =========================
         StackPane root = new StackPane(page);
         root.setPadding(new Insets(10));
 
-
-
-        // Old usage (no args) still works: it will show the same layout but Back/Logout won't do anything.
         return root;
-    }
-
-    private Image tryLoad(String path) {
-        if (path == null) return null;
-
-        InputStream is = getClass().getResourceAsStream(path);
-        if (is == null && !path.startsWith("/")) {
-            is = getClass().getResourceAsStream("/" + path);
-        }
-        // fallback if your image is directly in resources
-        if (is == null) {
-            is = getClass().getResourceAsStream("/Login.png");
-        }
-        return is != null ? new Image(is) : null;
     }
 }

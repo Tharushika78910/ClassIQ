@@ -60,7 +60,6 @@ public class TeacherDashboard extends BorderPane {
         showPage(buildHomeView(teacherName, teacherEmail, teacherProfileImagePath));
     }
 
-
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
         // Root with background
@@ -83,23 +82,13 @@ public class TeacherDashboard extends BorderPane {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(20));
 
-        // ===== TOP BAR (Back left, Teacher info right) =====
-        Button backBtn = new Button("← Back");
-        backBtn.getStyleClass().add("back-pill-btn");
-
-        backBtn.setOnAction(e -> {
-            Session.clear();
-            Stage stage = (Stage) backBtn.getScene().getWindow();
-            LoginPage loginPage = new LoginPage(stage);
-            stage.getScene().setRoot(loginPage.getView());
-        });
-
+        // ===== TOP BAR (Teacher info right) =====
         HBox teacherBox = buildTeacherInfo(name, email, profileImagePath);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox topBar = new HBox(12, backBtn, spacer, teacherBox);
+        HBox topBar = new HBox(12, spacer, teacherBox);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10, 10, 10, 10));
 
@@ -115,21 +104,24 @@ public class TeacherDashboard extends BorderPane {
         Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
         Button studentBtn = (Button) studentBlock.getChildren().get(1);
 
+        // MarkSheet page (unchanged)
         markBtn.setOnAction(e ->
                 showPage(new TeacherMarkSheetPage(this).getView())
         );
 
+        // ✅ Wrap grading criteria page with TeacherDashboard back pill
         gradingBtn.setOnAction(e -> {
             StudentMyGradesPage page = new StudentMyGradesPage(
                     this::showHome,
                     () -> showPage(simplePlaceholder("Logged out (placeholder)")),
                     "/Frontend/images/Login.png"
             );
-            showPage(page.getView());
+            showPage(wrapWithBackPill(page.getView()));
         });
 
+        // ✅ Wrap student feedback page with TeacherDashboard back pill
         studentBtn.setOnAction(e ->
-                showPage(new TeacherStudentsInfoPage(this).getView())
+                showPage(wrapWithBackPill(new TeacherStudentsInfoPage(this).getView()))
         );
 
         // Grid: 2 blocks top row, student block centered below spanning 2 columns
@@ -150,18 +142,55 @@ public class TeacherDashboard extends BorderPane {
 
         layout.setCenter(centerWrap);
 
-        // ===== BOTTOM RIGHT (Logout) =====
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
+        // ===== BOTTOM BAR (MarkSheet-style pill buttons) =====
+        String pillNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
-        logoutBtn.setOnAction(e ->
+        String pillHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
+
+        Button btnBack = new Button("← Back");
+        btnBack.setStyle(pillNormal);
+        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
+        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
+        // Back from dashboard -> Login
+        btnBack.setOnAction(e -> {
+            Session.clear();
+            Stage stage = (Stage) root.getScene().getWindow();
+            LoginPage loginPage = new LoginPage(stage);
+            stage.getScene().setRoot(loginPage.getView());
+        });
+
+        Button btnLogout = new Button("Logout");
+        btnLogout.setStyle(pillNormal);
+        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
+        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
+        // keep your old placeholder behavior
+        btnLogout.setOnAction(e ->
                 showPage(simplePlaceholder("Logged out (placeholder)"))
         );
 
-        HBox bottomBar = new HBox(logoutBtn);
-        bottomBar.setAlignment(Pos.BOTTOM_RIGHT);
-        bottomBar.setPadding(new Insets(10));
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
 
+        AnchorPane.setLeftAnchor(btnBack, 20.0);
+        AnchorPane.setBottomAnchor(btnBack, 10.0);
+
+        AnchorPane.setRightAnchor(btnLogout, 20.0);
+        AnchorPane.setBottomAnchor(btnLogout, 10.0);
+
+        bottomBar.getChildren().addAll(btnBack, btnLogout);
         layout.setBottom(bottomBar);
 
         root.getChildren().add(layout);
@@ -239,6 +268,45 @@ public class TeacherDashboard extends BorderPane {
         lbl.setFont(Font.font(18));
         box.getChildren().add(lbl);
         return box;
+    }
+
+    // ✅ Adds ONLY the pill Back button (Back -> showHome) for inside pages
+    private Node wrapWithBackPill(Node pageContent) {
+
+        BorderPane wrapper = new BorderPane();
+        wrapper.setCenter(pageContent);
+
+        String pillNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+
+        String pillHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
+
+        Button btnBack = new Button("← Back");
+        btnBack.setStyle(pillNormal);
+        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
+        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
+        btnBack.setOnAction(e -> showHome());
+
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
+        AnchorPane.setLeftAnchor(btnBack, 20.0);
+        AnchorPane.setBottomAnchor(btnBack, 10.0);
+        bottomBar.getChildren().add(btnBack);
+
+        wrapper.setBottom(bottomBar);
+        return wrapper;
     }
 
     public void showPage(Node node) {

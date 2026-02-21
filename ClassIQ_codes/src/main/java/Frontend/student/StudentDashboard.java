@@ -24,11 +24,11 @@ public class StudentDashboard extends BorderPane {
     private final String studentEmail;
     private final String studentProfileImagePath;
 
-    // ✅ Images
+    // Images
     private static final String BG_IMAGE      = "/Homepage.png";
     private static final String INFO_IMAGE    = "/images/studentInfo.png";
     private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
-    private static final String REPORT_IMAGE  = "/images/Report Card.png"; // keep your real file name
+    private static final String REPORT_IMAGE  = "/images/Report Card.png";
 
     public StudentDashboard(String name, String email, String profileImagePath) {
 
@@ -48,7 +48,6 @@ public class StudentDashboard extends BorderPane {
         showPage(buildHomeView(studentName, studentEmail, studentProfileImagePath));
     }
 
-    // ✅ UPDATED: Responsive layout (center stays centered when maximize)
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
         StackPane root = new StackPane();
@@ -64,14 +63,12 @@ public class StudentDashboard extends BorderPane {
                     new BackgroundSize(
                             BackgroundSize.AUTO, BackgroundSize.AUTO,
                             false, false,
-                            true,
-                            true
+                            true, true
                     )
             );
             root.setBackground(new Background(bg));
         } catch (Exception ignored) {}
 
-        // Use BorderPane for responsive zones
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(30));
 
@@ -85,30 +82,25 @@ public class StudentDashboard extends BorderPane {
         topBar.setAlignment(Pos.CENTER_LEFT);
         layout.setTop(topBar);
 
-        // ===== CENTER: 3 circles always centered =====
+        // ===== CENTER: 3 circles =====
         VBox infoBlock = buildTopicBlock("My Info", INFO_IMAGE);
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
         VBox reportBlock = buildTopicBlock("Report Card", REPORT_IMAGE);
 
-        // Actions
         Button infoBtn = (Button) infoBlock.getChildren().get(1);
         Button btnGradingCriteria = (Button) gradingBlock.getChildren().get(1);
         Button reportBtn = (Button) reportBlock.getChildren().get(1);
 
         infoBtn.setOnAction(e -> showPage(new StudentMyInfoPage(this).getView()));
 
-        btnGradingCriteria.setOnAction(e -> {
-            StudentMyGradesPage page = new StudentMyGradesPage(
-                    this::showHome, // Back goes Home
-                    () -> showPage(simplePlaceholder("Logged out (placeholder)")),
-                    null
-            );
-            showPage(page.getView());
-        });
+        // ✅ IMPORTANT: after you removed buttons from StudentMyGradesPage,
+        // create it using the no-args constructor
+        btnGradingCriteria.setOnAction(e ->
+                showPage(new StudentMyGradesPage().getView())
+        );
 
         reportBtn.setOnAction(e -> showPage(new StudentReportCardPage(this).getView()));
 
-        // Grid: 2 top, 1 bottom centered
         GridPane grid = new GridPane();
         grid.setHgap(120);
         grid.setVgap(80);
@@ -117,15 +109,14 @@ public class StudentDashboard extends BorderPane {
         grid.add(infoBlock, 0, 0);
         grid.add(gradingBlock, 1, 0);
 
-        grid.add(reportBlock, 0, 1, 2, 1); // span 2 columns
+        grid.add(reportBlock, 0, 1, 2, 1);
         GridPane.setHalignment(reportBlock, javafx.geometry.HPos.CENTER);
 
         StackPane centerWrap = new StackPane(grid);
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        // ===== BOTTOM RIGHT Logout (TeacherMarkSheet style + real logout) =====
-
+        // ===== BOTTOM RIGHT Logout =====
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -163,7 +154,6 @@ public class StudentDashboard extends BorderPane {
         return root;
     }
 
-    // Same circle + button style
     private VBox buildTopicBlock(String title, String imagePath) {
 
         VBox box = new VBox(16);
@@ -194,7 +184,6 @@ public class StudentDashboard extends BorderPane {
         return box;
     }
 
-    // Top-right info box
     private HBox buildStudentInfo(String name, String email, String profileImagePath) {
 
         HBox wrap = new HBox(12);
