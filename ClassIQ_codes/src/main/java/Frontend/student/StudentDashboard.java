@@ -1,5 +1,7 @@
 package Frontend.student;
 
+import Frontend.LoginPage;
+import Frontend.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 import java.util.Objects;
 
@@ -87,23 +90,23 @@ public class StudentDashboard extends BorderPane {
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
         VBox reportBlock = buildTopicBlock("Report Card", REPORT_IMAGE);
 
-        // Actions (same as before)
+        // Actions
         Button infoBtn = (Button) infoBlock.getChildren().get(1);
-        Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
+        Button btnGradingCriteria = (Button) gradingBlock.getChildren().get(1);
         Button reportBtn = (Button) reportBlock.getChildren().get(1);
 
-        infoBtn.setOnAction(e -> showPage(new StudentMyInfoPage().getView()));
+        infoBtn.setOnAction(e -> showPage(new StudentMyInfoPage(this).getView()));
 
-        gradingBtn.setOnAction(e -> {
+        btnGradingCriteria.setOnAction(e -> {
             StudentMyGradesPage page = new StudentMyGradesPage(
-                    this::showHome, // Back goes to Home
+                    this::showHome, // Back goes Home
                     () -> showPage(simplePlaceholder("Logged out (placeholder)")),
                     null
             );
             showPage(page.getView());
         });
 
-        reportBtn.setOnAction(e -> showPage(new StudentReportCardPage().getView()));
+        reportBtn.setOnAction(e -> showPage(new StudentReportCardPage(this).getView()));
 
         // Grid: 2 top, 1 bottom centered
         GridPane grid = new GridPane();
@@ -121,10 +124,35 @@ public class StudentDashboard extends BorderPane {
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        // ===== BOTTOM RIGHT Logout =====
+        // ===== BOTTOM RIGHT Logout (TeacherMarkSheet style + real logout) =====
+
+        String pillNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+
+        String pillHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
+
         Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-        logoutBtn.setOnAction(e -> showPage(simplePlaceholder("Logged out (placeholder)")));
+        logoutBtn.setStyle(pillNormal);
+        logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(pillHover));
+        logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(pillNormal));
+
+        logoutBtn.setOnAction(e -> {
+            Session.clear();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new LoginPage(stage).getScene());
+        });
 
         HBox bottom = new HBox(logoutBtn);
         bottom.setAlignment(Pos.BOTTOM_RIGHT);

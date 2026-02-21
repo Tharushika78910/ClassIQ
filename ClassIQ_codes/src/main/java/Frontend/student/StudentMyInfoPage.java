@@ -1,129 +1,133 @@
 package Frontend.student;
 
-import Backend.model.dao.impl.MarksDaoImpl;
 import Backend.model.entity.Student;
-import Backend.model.entity.StudentMarks;
-import Backend.service.GradeService;
+import Frontend.LoginPage;
 import Frontend.Session;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 public class StudentMyInfoPage {
 
+    private final StudentDashboard dashboard;
+
+    public StudentMyInfoPage(StudentDashboard dashboard) {
+        this.dashboard = dashboard;
+    }
+
     public Parent getView() {
-        VBox root = new VBox(14);
-        root.setPadding(new Insets(20));
+
+        BorderPane root = new BorderPane();
         root.getStyleClass().add("page-bg");
 
-        Label title = new Label("My Info");
-        title.getStyleClass().add("title-xl");
-
-        //  Get logged-in student from Session
         Student s = Session.getCurrentStudent();
+
+        // -------- CENTER CONTENT (your My Info block) --------
+        StackPane center = new StackPane();
+        center.setAlignment(Pos.CENTER);
 
         if (s == null) {
             Label err = new Label("No student session found. Please log in again.");
-            err.getStyleClass().add("section-title");
-            root.getChildren().addAll(title, err);
-            return root;
+            err.setStyle("-fx-font-size: 18px;");
+            center.getChildren().add(err);
+            root.setCenter(center);
+        } else {
+
+            String fullName = s.getFirstName() + " " + s.getLastName();
+
+            VBox content = new VBox(40);
+            content.setAlignment(Pos.TOP_LEFT);
+            content.setMaxWidth(650);
+
+            // 🔹 Position block (use your current preferred values)
+            content.setTranslateX(90);
+            content.setTranslateY(110);
+
+            Label title = new Label("My Info");
+            title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold;");
+
+            GridPane grid = new GridPane();
+            grid.setVgap(22);
+            grid.setHgap(60);
+            grid.setAlignment(Pos.TOP_LEFT);
+
+            String labelStyle = "-fx-font-size: 20px; -fx-font-weight: bold;";
+            String valueStyle = "-fx-font-size: 20px;";
+
+            Label lblName = new Label("Full Name"); lblName.setStyle(labelStyle);
+            Label valName = new Label(fullName); valName.setStyle(valueStyle);
+
+            Label lblStudentNo = new Label("Student Number"); lblStudentNo.setStyle(labelStyle);
+            Label valStudentNo = new Label(s.getStudentNumber()); valStudentNo.setStyle(valueStyle);
+
+            Label lblEmail = new Label("Email"); lblEmail.setStyle(labelStyle);
+            Label valEmail = new Label(s.getEmail()); valEmail.setStyle(valueStyle);
+
+            Label lblClass = new Label("Class"); lblClass.setStyle(labelStyle);
+            Label valClass = new Label("10A"); valClass.setStyle(valueStyle);
+
+            grid.add(lblName, 0, 0);       grid.add(valName, 1, 0);
+            grid.add(lblStudentNo, 0, 1);  grid.add(valStudentNo, 1, 1);
+            grid.add(lblEmail, 0, 2);      grid.add(valEmail, 1, 2);
+            grid.add(lblClass, 0, 3);      grid.add(valClass, 1, 3);
+
+            content.getChildren().addAll(title, grid);
+            center.getChildren().add(content);
+            root.setCenter(center);
         }
 
-        String fullName = s.getFirstName() + " " + s.getLastName();
+        // -------- BOTTOM BAR (copied from TeacherMarkSheetPage) --------
+        String pillNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
-        VBox infoCard = new VBox(10);
-        infoCard.getStyleClass().add("card");
+        String pillHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
 
-        HBox infoRow = new HBox(30);
+        Button btnBack = new Button("← Back");
+        btnBack.setStyle(pillNormal);
+        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
+        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
+        btnBack.setOnAction(e -> {
+            if (dashboard != null) dashboard.showHome();
+        });
 
-        VBox left = new VBox(6);
-        left.getChildren().addAll(
-                new Label("Name: " + fullName),
-                new Label("Student No: " + (s.getStudentNumber() == null ? "" : s.getStudentNumber())),
-                new Label("Student ID: " + s.getStudentId())
-        );
+        Button btnLogout = new Button("Logout");
+        btnLogout.setStyle(pillNormal);
+        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
+        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
+        btnLogout.setOnAction(e -> {
+            Session.clear();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new LoginPage(stage).getScene());
+        });
 
-        VBox right = new VBox(6);
-        right.getChildren().addAll(
-                new Label("Email: " + (s.getEmail() == null ? "" : s.getEmail()))
-        );
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
 
-        infoRow.getChildren().addAll(left, right);
-        infoCard.getChildren().add(infoRow);
+        AnchorPane.setLeftAnchor(btnBack, 20.0);
+        AnchorPane.setBottomAnchor(btnBack, 10.0);
 
-        Label marksTitle = new Label("Marks Summary");
-        marksTitle.getStyleClass().add("section-title");
+        AnchorPane.setRightAnchor(btnLogout, 20.0);
+        AnchorPane.setBottomAnchor(btnLogout, 10.0);
 
-        VBox tableCard = new VBox(10);
-        tableCard.getStyleClass().add("card");
+        bottomBar.getChildren().addAll(btnBack, btnLogout);
+        root.setBottom(bottomBar);
 
-        TableView<SummaryRow> table = new TableView<>();
-        table.getStyleClass().add("app-table");
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<SummaryRow, String> colSub = new TableColumn<>("Subject");
-        colSub.setCellValueFactory(new PropertyValueFactory<>("subject"));
-
-        TableColumn<SummaryRow, Integer> colTotal = new TableColumn<>("Total");
-        colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
-
-        TableColumn<SummaryRow, String> colGrade = new TableColumn<>("grade");
-        colGrade.setText("Grade");
-        colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
-
-        table.getColumns().addAll(colSub, colTotal, colGrade);
-
-        // Load marks from DB
-        MarksDaoImpl marksDao = new MarksDaoImpl();
-        GradeService gradeService = new GradeService();
-
-        StudentMarks m = null;
-        try {
-            m = marksDao.findByStudentId(s.getStudentId());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        // If no marks row exists yet, show zeros
-        int math = (m == null) ? 0 : m.getSubject1();      // mathematics
-        int eng  = (m == null) ? 0 : m.getSubject2();      // english
-        int sci  = (m == null) ? 0 : m.getSubject3();      // science
-        int craft= (m == null) ? 0 : m.getSubject4();      // craft
-        int lang = (m == null) ? 0 : m.getSubject5();      // languages
-
-        table.setItems(FXCollections.observableArrayList(
-                new SummaryRow("Mathematics", math, gradeService.calculateGrade(math)),
-                new SummaryRow("English", eng, gradeService.calculateGrade(eng)),
-                new SummaryRow("Science", sci, gradeService.calculateGrade(sci)),
-                new SummaryRow("Craft", craft, gradeService.calculateGrade(craft)),
-                new SummaryRow("Languages", lang, gradeService.calculateGrade(lang))
-        ));
-
-        tableCard.getChildren().add(table);
-
-        root.getChildren().addAll(title, infoCard, marksTitle, tableCard);
         return root;
-    }
-
-    public static class SummaryRow {
-        private final String subject;
-        private final int total;
-        private final String grade;
-
-        public SummaryRow(String subject, int total, String grade) {
-            this.subject = subject;
-            this.total = total;
-            this.grade = grade;
-        }
-
-        public String getSubject() { return subject; }
-        public int getTotal() { return total; }
-        public String getGrade() { return grade; }
     }
 }
