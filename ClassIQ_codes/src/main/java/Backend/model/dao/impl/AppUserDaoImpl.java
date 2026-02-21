@@ -20,7 +20,9 @@ public class AppUserDaoImpl {
         }
     }
 
+    // LOGIN
     public LoginResult login(String username, String password) {
+
         String sql = """
                 SELECT user_id, user_name, role
                 FROM app_user
@@ -34,6 +36,7 @@ public class AppUserDaoImpl {
             ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (!rs.next()) return null;
 
                 return new LoginResult(
@@ -46,6 +49,56 @@ public class AppUserDaoImpl {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    // VERIFY USERNAME + EMAIL
+    public Integer findUserIdByUsernameAndEmail(String username, String email) {
+
+        String sql = """
+                SELECT au.user_id
+                FROM app_user au
+                LEFT JOIN student s ON s.user_id = au.user_id
+                LEFT JOIN teacher t ON t.user_id = au.user_id
+                WHERE au.user_name = ?
+                  AND (s.email = ? OR t.email = ?)
+                LIMIT 1
+                """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setString(2, email);
+            ps.setString(3, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt("user_id");
+                return null;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // UPDATE PASSWORD
+    public boolean updatePassword(int userId, String newPassword) {
+
+        String sql = "UPDATE app_user SET password = ? WHERE user_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
