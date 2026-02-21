@@ -27,16 +27,16 @@ public class TeacherStudentDetailsPage {
 
     public Parent getView() {
 
-        // =========================
-        // ROOT (Header + Center Card)
-        // =========================
+
+        // ROOT
+
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(16));
         root.getStyleClass().add("page-bg");
 
-        // =========================
-        // HEADER BAR (like Image 2)
-        // =========================
+
+        // HEADER
+
         Label headerTitle = new Label("Student Details");
         headerTitle.getStyleClass().add("header-title");
 
@@ -46,31 +46,21 @@ public class TeacherStudentDetailsPage {
         VBox titleBox = new VBox(2, headerTitle, headerSub);
         titleBox.setAlignment(Pos.CENTER_LEFT);
 
-        Button btnBack = new Button("← Back");
-        btnBack.getStyleClass().add("back-pill-btn");
-
-        //  Dashboard button same style as Back button
-        Button btnDashboard = new Button("Dashboard");
-        btnDashboard.getStyleClass().add("back-pill-btn");
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox header = new HBox(12, titleBox, spacer, btnBack, btnDashboard);
+        HBox header = new HBox(titleBox);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("header-bar");
 
         root.setTop(header);
 
-        // =========================
-        // MAIN CARD (Two-column Layout B)
-        // =========================
+
+        // MAIN CARD
+
         HBox card = new HBox(18);
         card.setPadding(new Insets(18));
         card.setMaxWidth(900);
         card.getStyleClass().add("details-card");
 
-        // ---------- LEFT COLUMN (Profile panel)
+        // LEFT COLUMN
         VBox left = new VBox(10);
         left.getStyleClass().add("details-left");
         left.setPrefWidth(300);
@@ -87,7 +77,6 @@ public class TeacherStudentDetailsPage {
         Label lblEmail = new Label("Email: ");
         lblEmail.getStyleClass().add("info-text");
 
-        // Totals "chips"
         Label totalChip = new Label("Total: 0");
         totalChip.getStyleClass().add("info-chip");
 
@@ -99,12 +88,11 @@ public class TeacherStudentDetailsPage {
 
         left.getChildren().addAll(profileTitle, lblStudentNo, lblName, lblEmail, new Separator(), chips);
 
-        // ---------- RIGHT COLUMN (Marks + Feedback + Actions)
+        // RIGHT COLUMN
         VBox right = new VBox(14);
         right.getStyleClass().add("details-right");
         right.setFillWidth(true);
 
-        // Marks Section
         Label marksTitle = new Label("Marks");
         marksTitle.getStyleClass().add("section-title");
 
@@ -129,27 +117,22 @@ public class TeacherStudentDetailsPage {
         Label m5 = new Label("0");
 
         addRow(grid, 1, "Mathematics", m1);
-        addRow(grid, 2, "English",     m2);
-        addRow(grid, 3, "Science",     m3);
-        addRow(grid, 4, "Craft",       m4);
-        addRow(grid, 5, "Language",    m5);
+        addRow(grid, 2, "English", m2);
+        addRow(grid, 3, "Science", m3);
+        addRow(grid, 4, "Craft", m4);
+        addRow(grid, 5, "Language", m5);
 
-        // Feedback
         Label fbLbl = new Label("Feedback");
         fbLbl.getStyleClass().add("section-title");
 
         TextArea feedbackArea = new TextArea();
         feedbackArea.setPrefRowCount(4);
         feedbackArea.setWrapText(true);
-        feedbackArea.setDisable(false);
-        feedbackArea.setEditable(true);
         feedbackArea.getStyleClass().add("feedback-area");
 
-        // Actions
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
 
-        //  Edit button same style as Save button
         Button btnEdit = new Button("Edit");
         btnEdit.getStyleClass().add("primary-btn");
 
@@ -170,7 +153,6 @@ public class TeacherStudentDetailsPage {
                 status
         );
 
-        // Vertical separator between columns
         Separator vSep = new Separator(Orientation.VERTICAL);
         vSep.getStyleClass().add("v-sep");
 
@@ -180,9 +162,23 @@ public class TeacherStudentDetailsPage {
         center.setPadding(new Insets(18));
         root.setCenter(center);
 
-        // =========================
-        // LOGIC (unchanged)
-        // =========================
+
+        // BOTTOM LEFT BUTTONS
+
+        Button btnBack = new Button("← Back");
+        btnBack.getStyleClass().add("back-pill-btn");
+
+        Button btnDashboard = new Button("Dashboard");
+        btnDashboard.getStyleClass().add("back-pill-btn");
+
+        HBox bottomBar = new HBox(10, btnBack, btnDashboard);
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
+        bottomBar.setPadding(new Insets(10, 0, 0, 10));
+
+        root.setBottom(bottomBar);
+
+
+        // LOGIC
 
         try {
             StudentDetailsDTO dto = controller.getDetails(studentNumber);
@@ -201,7 +197,6 @@ public class TeacherStudentDetailsPage {
             totalChip.setText("Total: " + mk.getTotal());
             avgChip.setText(String.format("Average: %.2f", mk.getAverage()));
 
-            // On open: EMPTY textbox so teacher can type NEW feedback immediately
             feedbackArea.clear();
             status.setText("");
 
@@ -210,15 +205,11 @@ public class TeacherStudentDetailsPage {
             ex.printStackTrace();
         }
 
-        // Edit: load existing feedback
         btnEdit.setOnAction(e -> {
             try {
                 String fb = controller.loadFeedback(studentNumber);
-                feedbackArea.setDisable(false);
-                feedbackArea.setEditable(true);
                 feedbackArea.setText(fb == null ? "" : fb);
                 feedbackArea.requestFocus();
-                feedbackArea.positionCaret(feedbackArea.getText().length());
                 status.setText("Edit the feedback and press Save.");
             } catch (Exception ex) {
                 status.setText("Edit load error: " + ex.getMessage());
@@ -226,7 +217,6 @@ public class TeacherStudentDetailsPage {
             }
         });
 
-        // Save: save feedback and clear textbox
         btnSave.setOnAction(e -> {
             try {
                 String newFb = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();

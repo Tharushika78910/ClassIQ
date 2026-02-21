@@ -25,16 +25,15 @@ public class TeacherStudentsInfoPage {
 
     public Parent getView() {
 
-        // ==========================
+
         // ROOT
-        // ==========================
+
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(18));
         root.getStyleClass().add("page-bg");
 
-        // ==========================
-        // HEADER BAR (Professional)
-        // ==========================
+        // HEADER BAR (NO BUTTONS)
+
         Label headerTitle = new Label("Students");
         headerTitle.getStyleClass().addAll("header-title");
 
@@ -43,30 +42,22 @@ public class TeacherStudentsInfoPage {
 
         VBox titleBox = new VBox(2, headerTitle, headerSub);
 
-        Button backBtn = new Button("← Back");
-        backBtn.getStyleClass().add("back-pill-btn");
-
-        backBtn.setOnAction(e -> dashboard.showHome());
-
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-        logoutBtn.setOnAction(e -> dashboard.showPage(new Label("Logged out (placeholder)")));
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox header = new HBox(12, titleBox, spacer, backBtn, logoutBtn);
+        HBox header = new HBox(titleBox);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("header-bar");
 
         root.setTop(header);
 
 
+        // CARD CONTAINER
+
         VBox card = new VBox(14);
         card.setPadding(new Insets(16));
         card.setMaxWidth(760);
         card.getStyleClass().add("card");
 
+
+        // TABLE
 
         TableView<StudentRow> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
@@ -84,7 +75,6 @@ public class TeacherStudentsInfoPage {
         table.getColumns().setAll(colNumber, colName);
         table.setPlaceholder(new Label("No students found."));
 
-        // Row hover feels more “modern”
         table.setRowFactory(tv -> {
             TableRow<StudentRow> row = new TableRow<>();
             row.hoverProperty().addListener((obs, wasHover, isHover) -> {
@@ -97,6 +87,8 @@ public class TeacherStudentsInfoPage {
             return row;
         });
 
+
+        // LOAD DATA
 
         ObservableList<StudentRow> rows = FXCollections.observableArrayList();
         Label status = new Label();
@@ -120,6 +112,8 @@ public class TeacherStudentsInfoPage {
         table.setItems(filtered);
 
 
+        // SEARCH BAR
+
         Label searchIcon = new Label("🔎");
         searchIcon.getStyleClass().add("muted-text");
 
@@ -133,7 +127,6 @@ public class TeacherStudentsInfoPage {
         Button openBtn = new Button("Open Profile");
         openBtn.getStyleClass().add("primary-btn");
 
-        // Disable open when empty
         openBtn.disableProperty().bind(
                 Bindings.createBooleanBinding(() ->
                                 searchField.getText() == null || searchField.getText().trim().isEmpty(),
@@ -143,7 +136,6 @@ public class TeacherStudentsInfoPage {
         HBox searchBar = new HBox(10, searchIcon, searchField, clearBtn, openBtn);
         searchBar.setAlignment(Pos.CENTER_LEFT);
 
-        // live filter while typing (by ID or name)
         searchField.textProperty().addListener((obs, old, text) -> {
             String q = text == null ? "" : text.trim().toLowerCase();
             if (q.isEmpty()) {
@@ -162,7 +154,6 @@ public class TeacherStudentsInfoPage {
             status.setText("");
         });
 
-        // click row fills search
         table.setOnMouseClicked(e -> {
             StudentRow selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -177,7 +168,6 @@ public class TeacherStudentsInfoPage {
                 return;
             }
 
-            // If user selected a row, prefer that
             StudentRow selected = table.getSelectionModel().getSelectedItem();
             String studentNumberToOpen = selected != null ? selected.getStudentNumber() : input;
 
@@ -189,7 +179,9 @@ public class TeacherStudentsInfoPage {
                 }
 
                 status.setText("");
-                dashboard.showPage(new TeacherStudentDetailsPage(dashboard, s.getStudentNumber()).getView());
+                dashboard.showPage(
+                        new TeacherStudentDetailsPage(dashboard, s.getStudentNumber()).getView()
+                );
 
             } catch (Exception ex) {
                 status.setText("Error: " + ex.getMessage());
@@ -200,9 +192,9 @@ public class TeacherStudentsInfoPage {
         openBtn.setOnAction(e -> goNext.run());
         searchField.setOnAction(e -> goNext.run());
 
-        // ==========================
+
         // BUILD CARD
-        // ==========================
+
         Label sectionTitle = new Label("All Students");
         sectionTitle.getStyleClass().add("section-title");
 
@@ -211,6 +203,19 @@ public class TeacherStudentsInfoPage {
         StackPane center = new StackPane(card);
         center.setPadding(new Insets(22));
         root.setCenter(center);
+
+        // ==========================
+        // BOTTOM BAR (Back Button)
+        // ==========================
+        Button backBtn = new Button("← Back");
+        backBtn.getStyleClass().add("back-pill-btn");
+        backBtn.setOnAction(e -> dashboard.showHome());
+
+        HBox bottomBar = new HBox(backBtn);
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
+        bottomBar.setPadding(new Insets(10, 0, 0, 10));
+
+        root.setBottom(bottomBar);
 
         return root;
     }
