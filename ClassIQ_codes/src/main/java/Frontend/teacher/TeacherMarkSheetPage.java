@@ -41,23 +41,27 @@ public class TeacherMarkSheetPage {
         root.setPadding(new Insets(20));
         root.getStyleClass().add("page-bg");
 
-        // CENTER CONTENT
-
-
-        VBox centerBox = new VBox(15);
-        centerBox.setPadding(new Insets(10));
-        centerBox.setAlignment(Pos.TOP_CENTER);
+        // Main centered content
+        VBox centerBox = new VBox(16);
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setFillWidth(false);
 
         String subject = Session.getTeacherSubject();
         if (subject == null || subject.isBlank()) subject = "Mathematics";
 
         Label subjectTitle = new Label(subject);
-        subjectTitle.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        subjectTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: 800; -fx-text-fill: #1f2d2a;");
 
         buildTable();
 
         VBox card = new VBox(12);
         card.getStyleClass().add("card");
+        card.setAlignment(Pos.CENTER);
+        card.setFillWidth(false);
+
+        // Fix card width to match table (centers perfectly)
+        card.setPrefWidth(table.getPrefWidth() + 40);
+        card.setMaxWidth(Region.USE_PREF_SIZE);
 
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
@@ -91,11 +95,7 @@ public class TeacherMarkSheetPage {
                 int savedCount = 0;
 
                 for (MarkRow r : table.getItems()) {
-                    if (r.getAssignment() == 0 &&
-                            r.getProject() == 0 &&
-                            r.getFinalExam() == 0) {
-                        continue;
-                    }
+                    if (r.getAssignment() == 0 && r.getProject() == 0 && r.getFinalExam() == 0) continue;
 
                     dao.saveTeacherMarkSheetRow(
                             r.getStudentDbId(),
@@ -108,7 +108,6 @@ public class TeacherMarkSheetPage {
                             teacherId,
                             subj
                     );
-
                     savedCount++;
                 }
 
@@ -148,14 +147,17 @@ public class TeacherMarkSheetPage {
 
         HBox actions = new HBox(10, btnSave, btnClear, status);
         actions.setAlignment(Pos.CENTER_LEFT);
+        actions.setPadding(new Insets(2, 0, 0, 0));
 
         card.getChildren().addAll(table, actions);
-
         centerBox.getChildren().addAll(subjectTitle, card);
-        root.setCenter(centerBox);
 
-        // BOTTOM BUTTON BAR (LoginPage Back style)
+        // CENTER in the BorderPane
+        StackPane centerWrap = new StackPane(centerBox);
+        centerWrap.setAlignment(Pos.CENTER);
+        root.setCenter(centerWrap);
 
+        // BOTTOM BUTTON BAR
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -204,8 +206,6 @@ public class TeacherMarkSheetPage {
         return root;
     }
 
-    // LOAD DATA FROM DATABASE
-
     private void loadStudentsAndMarks() {
 
         if (!Session.isTeacherLoggedIn()) return;
@@ -253,12 +253,19 @@ public class TeacherMarkSheetPage {
         }
     }
 
-    // TABLE BUILD
-
     private void buildTable() {
 
         table.setEditable(true);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
+        // Row height
+        table.setFixedCellSize(42);
+
+        table.setRowFactory(tv -> {
+            TableRow<MarkRow> row = new TableRow<>();
+            row.setStyle("-fx-cell-size: 42px;");
+            return row;
+        });
 
         TableColumn<MarkRow, String> colNo = new TableColumn<>("Student No");
         colNo.setCellValueFactory(c -> c.getValue().studentNumberProperty());
@@ -281,11 +288,52 @@ public class TeacherMarkSheetPage {
         TableColumn<MarkRow, String> colGrade = new TableColumn<>("Grade");
         colGrade.setCellValueFactory(c -> c.getValue().gradeProperty());
 
+
+        colNo.setPrefWidth(110);
+        colName.setPrefWidth(280);
+
+        // Tight numeric columns
+        colAssignment.setPrefWidth(95);
+        colProject.setPrefWidth(85);
+        colFinal.setPrefWidth(110);
+        colTotal.setPrefWidth(70);
+        colGrade.setPrefWidth(75);
+
+        // Alignment: name left, numbers centered
+        colNo.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6;");
+        colName.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6;");
+
+        colAssignment.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
+        colProject.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
+        colFinal.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
+        colTotal.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
+        colGrade.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
+
         table.getColumns().setAll(
                 colNo, colName,
                 colAssignment, colProject, colFinal,
                 colTotal, colGrade
         );
+
+        // Table width = sum of columns
+        double tableW =
+                colNo.getPrefWidth()
+                        + colName.getPrefWidth()
+                        + colAssignment.getPrefWidth()
+                        + colProject.getPrefWidth()
+                        + colFinal.getPrefWidth()
+                        + colTotal.getPrefWidth()
+                        + colGrade.getPrefWidth()
+                        + 22; // borders/scrollbar safety
+
+        table.setPrefWidth(tableW);
+        table.setMaxWidth(tableW);
+
+        // Professional height: show 10 rows then scroll
+        int visibleRows = 10;
+        double tableH = visibleRows * table.getFixedCellSize() + 40; // + header
+        table.setPrefHeight(tableH);
+        table.setMaxHeight(tableH);
     }
 
     private TableColumn<MarkRow, Integer> editableMarkColumn(
@@ -295,6 +343,8 @@ public class TeacherMarkSheetPage {
     ) {
         TableColumn<MarkRow, Integer> col = new TableColumn<>(title);
         col.setCellValueFactory(c -> c.getValue().getPropertyFor(title).asObject());
+
+        // Editable numeric cell
         col.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
 
         col.setOnEditCommit(ev -> {
@@ -322,8 +372,6 @@ public class TeacherMarkSheetPage {
         }
         return true;
     }
-
-    // INNER CLASS
 
     public static class MarkRow {
         private final IntegerProperty studentDbId = new SimpleIntegerProperty();
