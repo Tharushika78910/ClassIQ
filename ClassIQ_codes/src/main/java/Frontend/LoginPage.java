@@ -21,8 +21,11 @@ import java.util.Objects;
 
 public class LoginPage {
 
-    private static final String BG_IMAGE = "/Homepage.png";
-    private static final String LOGO = "/shield_logo.png";
+    private static final String BG_IMAGE = "/Login.png";
+
+    // ✅ Changed logo image here
+    private static final String LOGO = "/Logoline.png";
+
     private static final String STUDENT_AVATAR = "/Student.png";
     private static final String TEACHER_AVATAR = "/Teacher.png";
 
@@ -40,11 +43,9 @@ public class LoginPage {
 
         StackPane root = new StackPane();
 
-        // Background
         ImageView bg = createBackgroundView();
         root.getChildren().add(bg);
 
-        // Center Content
         VBox mainBox = new VBox(25);
         mainBox.setAlignment(Pos.CENTER);
         mainBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
@@ -52,7 +53,6 @@ public class LoginPage {
         mainBox.setStyle("-fx-background-color: transparent;");
         mainBox.setTranslateY(-25);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             logo.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(LOGO))));
@@ -60,13 +60,14 @@ public class LoginPage {
 
         logo.setPreserveRatio(true);
         logo.setSmooth(true);
-        logo.setFitWidth(240);
+        logo.setFitWidth(350);
+        VBox.setMargin(logo, new Insets(20, 0, 0, 0));
 
-        // Cards container
-        HBox cards = new HBox(70);
+        HBox cards = new HBox(50);
         cards.setAlignment(Pos.CENTER);
         cards.setBackground(Background.EMPTY);
         cards.setStyle("-fx-background-color: transparent;");
+        cards.setTranslateY(-60); //login panel move it slightly more upward
 
         VBox teacherCard = buildLoginCard("I am a Teacher", TEACHER_AVATAR, "TEACHER");
         VBox studentCard = buildLoginCard("I am a Student", STUDENT_AVATAR, "STUDENT");
@@ -76,7 +77,6 @@ public class LoginPage {
         mainBox.getChildren().addAll(logo, cards);
         root.getChildren().add(mainBox);
 
-        // Back Button
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -116,11 +116,11 @@ public class LoginPage {
         VBox card = new VBox(14);
         card.setAlignment(Pos.CENTER);
         card.setPadding(new Insets(28));
-        card.setPrefWidth(340);
+        card.setPrefWidth(300);
 
         card.setStyle(
                 "-fx-background-color: rgba(156,196,183,0.85);" +
-                        "-fx-background-radius: 28;"
+                        "-fx-background-radius: 20;"
         );
 
         ImageView avatar = new ImageView();
