@@ -60,9 +60,7 @@ public class TeacherDashboard extends BorderPane {
         showPage(buildHomeView(teacherName, teacherEmail, teacherProfileImagePath));
     }
 
-    /**
-     * ✅ UPDATED: Responsive layout so circles stay centered when maximize/resize
-     */
+
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
         // Root with background
@@ -110,7 +108,7 @@ public class TeacherDashboard extends BorderPane {
         // ===== CENTER (3 blocks always centered) =====
         VBox markBlock = buildTopicBlock("Mark sheet", MARK_IMAGE);
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
-        VBox studentBlock = buildTopicBlock("Student Info", STUDENT_IMAGE);
+        VBox studentBlock = buildTopicBlock("Student Feedback", STUDENT_IMAGE);
 
         // Button Actions
         Button markBtn = (Button) markBlock.getChildren().get(1);
