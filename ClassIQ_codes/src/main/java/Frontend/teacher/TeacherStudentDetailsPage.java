@@ -5,6 +5,8 @@ import Backend.model.dto.StudentDetailsDTO;
 import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
 
+import Frontend.Session;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -27,16 +29,12 @@ public class TeacherStudentDetailsPage {
 
     public Parent getView() {
 
-
         // ROOT
-
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(16));
         root.getStyleClass().add("page-bg");
 
-
         // HEADER
-
         Label headerTitle = new Label("Student Details");
         headerTitle.getStyleClass().add("header-title");
 
@@ -52,9 +50,7 @@ public class TeacherStudentDetailsPage {
 
         root.setTop(header);
 
-
         // MAIN CARD
-
         HBox card = new HBox(18);
         card.setPadding(new Insets(18));
         card.setMaxWidth(900);
@@ -130,8 +126,14 @@ public class TeacherStudentDetailsPage {
         feedbackArea.setWrapText(true);
         feedbackArea.getStyleClass().add("feedback-area");
 
+        // Default: read-only until the teacher clicks Edit (and only Maths teacher is allowed).
+        feedbackArea.setEditable(false);
+
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
+
+        // Save is only enabled when editing is allowed and active.
+        btnSave.setDisable(true);
 
         Button btnEdit = new Button("Edit");
         btnEdit.getStyleClass().add("primary-btn");
@@ -162,9 +164,7 @@ public class TeacherStudentDetailsPage {
         center.setPadding(new Insets(18));
         root.setCenter(center);
 
-
         // BOTTOM LEFT BUTTONS
-
         Button btnBack = new Button("← Back");
         btnBack.getStyleClass().add("back-pill-btn");
 
@@ -177,8 +177,9 @@ public class TeacherStudentDetailsPage {
 
         root.setBottom(bottomBar);
 
-
         // LOGIC
+        final boolean canEditFeedback = Session.getTeacherSubject() != null
+                && "Mathematics".equalsIgnoreCase(Session.getTeacherSubject().trim());
 
         try {
             StudentDetailsDTO dto = controller.getDetails(studentNumber);
@@ -197,8 +198,19 @@ public class TeacherStudentDetailsPage {
             totalChip.setText("Total: " + mk.getTotal());
             avgChip.setText(String.format("Average: %.2f", mk.getAverage()));
 
-            feedbackArea.clear();
-            status.setText("");
+            // Load feedback immediately so all teachers can view it.
+            String fb = controller.loadFeedback(studentNumber);
+            feedbackArea.setText(fb == null ? "" : fb);
+
+            if (!canEditFeedback) {
+                // Non-maths teachers can only view.
+                btnEdit.setDisable(true);
+                btnSave.setDisable(true);
+                feedbackArea.setEditable(false);
+                status.setText("Only the Mathematics teacher can edit feedback.");
+            } else {
+                status.setText("");
+            }
 
         } catch (Exception ex) {
             status.setText("Load error: " + ex.getMessage());
@@ -207,8 +219,14 @@ public class TeacherStudentDetailsPage {
 
         btnEdit.setOnAction(e -> {
             try {
-                String fb = controller.loadFeedback(studentNumber);
-                feedbackArea.setText(fb == null ? "" : fb);
+                if (!canEditFeedback) {
+                    status.setText("Only the Mathematics teacher can edit feedback.");
+                    return;
+                }
+
+                // Make editable and enable save.
+                feedbackArea.setEditable(true);
+                btnSave.setDisable(false);
                 feedbackArea.requestFocus();
                 status.setText("Edit the feedback and press Save.");
             } catch (Exception ex) {
@@ -219,6 +237,11 @@ public class TeacherStudentDetailsPage {
 
         btnSave.setOnAction(e -> {
             try {
+                if (!canEditFeedback) {
+                    status.setText("Only the Mathematics teacher can save feedback.");
+                    return;
+                }
+
                 String newFb = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();
 
                 if (newFb.isEmpty()) {
@@ -231,9 +254,11 @@ public class TeacherStudentDetailsPage {
                     return;
                 }
 
-                controller.saveFeedback(studentNumber, newFb);
+                controller.saveFeedback(studentNumber, newFb, Session.getUserId());
 
-                feedbackArea.clear();
+                // After saving, lock the field again (still visible).
+                feedbackArea.setEditable(false);
+                btnSave.setDisable(true);
                 status.setText("Feedback saved successfully.");
 
             } catch (Exception ex) {
