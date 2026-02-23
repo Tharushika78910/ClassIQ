@@ -37,7 +37,7 @@ public class TeacherDashboard extends BorderPane {
         this.teacherEmail = email;
         this.teacherProfileImagePath = profileImagePath;
 
-        // load both general + teacher styles
+        // general + teacher styles
         getStylesheets().add(Objects.requireNonNull(
                 getClass().getResource("/css/app.css")
         ).toExternalForm());
@@ -82,7 +82,7 @@ public class TeacherDashboard extends BorderPane {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(20));
 
-        // ===== TOP BAR (Teacher info right) =====
+        // TOP BAR (Teacher info )
         HBox teacherBox = buildTeacherInfo(name, email, profileImagePath);
 
         Region spacer = new Region();
@@ -94,7 +94,7 @@ public class TeacherDashboard extends BorderPane {
 
         layout.setTop(topBar);
 
-        // ===== CENTER (3 blocks always centered) =====
+        // CENTER (3 blocks always centered)
         VBox markBlock = buildTopicBlock("Mark sheet", MARK_IMAGE);
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
         VBox studentBlock = buildTopicBlock("Student Feedback", STUDENT_IMAGE);
@@ -104,12 +104,12 @@ public class TeacherDashboard extends BorderPane {
         Button gradingBtn = (Button) gradingBlock.getChildren().get(1);
         Button studentBtn = (Button) studentBlock.getChildren().get(1);
 
-        // MarkSheet page (unchanged)
+        // MarkSheet page
         markBtn.setOnAction(e ->
                 showPage(new TeacherMarkSheetPage(this).getView())
         );
 
-        // ✅ Wrap grading criteria page with TeacherDashboard back pill
+        // Wrap grading criteria page with TeacherDashboard back pill
         gradingBtn.setOnAction(e -> {
             StudentMyGradesPage page = new StudentMyGradesPage(
                     this::showHome,
@@ -119,7 +119,7 @@ public class TeacherDashboard extends BorderPane {
             showPage(wrapWithBackPill(page.getView()));
         });
 
-        // ✅ Wrap student feedback page with TeacherDashboard back pill
+        // Wrap student feedback page with TeacherDashboard back pill
         studentBtn.setOnAction(e ->
                 showPage(wrapWithBackPill(new TeacherStudentsInfoPage(this).getView()))
         );
@@ -136,13 +136,13 @@ public class TeacherDashboard extends BorderPane {
         grid.add(studentBlock, 0, 1, 2, 1); // span 2 columns
         GridPane.setHalignment(studentBlock, javafx.geometry.HPos.CENTER);
 
-        // Wrap center grid so it truly stays centered
+        // Wrap center grid
         StackPane centerWrap = new StackPane(grid);
         centerWrap.setAlignment(Pos.CENTER);
 
         layout.setCenter(centerWrap);
 
-        // ===== BOTTOM BAR (MarkSheet-style pill buttons) =====
+        // BOTTOM BAR
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -164,7 +164,8 @@ public class TeacherDashboard extends BorderPane {
         btnBack.setStyle(pillNormal);
         btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
-        // Back from dashboard -> Login
+        // Back
+
         btnBack.setOnAction(e -> {
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
@@ -176,7 +177,8 @@ public class TeacherDashboard extends BorderPane {
         btnLogout.setStyle(pillNormal);
         btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
         btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
-        // keep your old placeholder behavior
+        // placeholder
+
         btnLogout.setOnAction(e ->
                 showPage(simplePlaceholder("Logged out (placeholder)"))
         );
@@ -270,7 +272,7 @@ public class TeacherDashboard extends BorderPane {
         return box;
     }
 
-    // ✅ Adds ONLY the pill Back button (Back -> showHome) for inside pages
+    // Back -> showHome for inside pages
     private Node wrapWithBackPill(Node pageContent) {
 
         BorderPane wrapper = new BorderPane();

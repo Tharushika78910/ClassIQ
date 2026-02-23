@@ -22,7 +22,7 @@ public class StudentDetailsController {
 
     public void saveFeedback(String studentNumber, String feedback, int teacherUserId) throws Exception {
 
-        // --- Authorization check (server-side enforcement)
+        // Authorization check (server-side enforcement)
         var teacher = userProfileDao.findTeacherByUserId(teacherUserId);
         if (teacher == null) {
             throw new SecurityException("Teacher profile not found.");

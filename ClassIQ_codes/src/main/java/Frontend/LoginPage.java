@@ -23,7 +23,7 @@ public class LoginPage {
 
     private static final String BG_IMAGE = "/Login.png";
 
-    // ✅ Changed logo image here
+    // logo image
     private static final String LOGO = "/Logoline.png";
 
     private static final String STUDENT_AVATAR = "/Student.png";

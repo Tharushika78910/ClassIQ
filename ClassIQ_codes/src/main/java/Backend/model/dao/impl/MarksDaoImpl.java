@@ -15,11 +15,6 @@ public class MarksDaoImpl implements MarksDao {
 
     private static final String FEEDBACK_COL = "feed_back";
 
-    /**
-     * Save/Update marks (used by MarksController).
-     * DB columns: mathematics, english, science, craft, languages
-     * Entity mapping: subject1->mathematics, subject2->english, subject3->science, subject4->craft, subject5->languages
-     */
     @Override
     public void saveMarks(StudentMarks marks) throws SQLException {
 
@@ -59,9 +54,8 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    /**
-     * Load marks row only (used by screens that need only marks).
-     */
+    // Load only marks row
+
     @Override
     public StudentMarks findByStudentId(int studentId) throws SQLException {
 
@@ -97,10 +91,6 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    /**
-     * Load Student + Marks together (used by TeacherStudentDetailsPage and can be reused for student pages).
-     * This matches your DTO structure: StudentDetailsDTO has Student + StudentMarks.
-     */
     @Override
     public StudentDetailsDTO findStudentDetails(int studentId) throws SQLException {
 
@@ -158,10 +148,6 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    /**
-     * Save or update only feedback.
-     * If the student_marks row doesn't exist yet, insert with 0 marks (because total/average NOT NULL).
-     */
     @Override
     public void saveOrUpdateFeedback(int studentId, String feedback) throws SQLException {
 
@@ -185,9 +171,8 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    /**
-     * Load feedback only.
-     */
+    // Load only feedback
+
     @Override
     public String findFeedback(int studentId) throws SQLException {
 

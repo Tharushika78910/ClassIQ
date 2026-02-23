@@ -17,15 +17,15 @@ public class MarksController {
 
     public void submitMarks(StudentMarks marks) throws SQLException {
 
-        // 1) ensure student exists (because student_id is FK)
+        // ensure student exists (because student_id is FK)
         if (!studentDao.existsById(marks.getStudentId())) {
             throw new IllegalArgumentException("Student ID not found: " + marks.getStudentId());
         }
 
-        // 2) calculate automatically
+        // calculate automatically
         marksService.calculateTotalAndAverage(marks);
 
-        // 3) save to database
+        // save to database
         marksDao.saveMarks(marks);
     }
 }

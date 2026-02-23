@@ -74,8 +74,6 @@ public class TeacherMarkSheetDaoImpl {
         }
     }
 
-    // load existing marks so UI can pre-fill
-    // returns: student_id -> [assignment, project, final_exam]
     public Map<Integer, int[]> loadExistingMarks(int teacherId, String subject) throws SQLException {
 
         Map<Integer, int[]> map = new HashMap<>();

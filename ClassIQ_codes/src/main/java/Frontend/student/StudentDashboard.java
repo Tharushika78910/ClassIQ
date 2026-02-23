@@ -72,7 +72,7 @@ public class StudentDashboard extends BorderPane {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(30));
 
-        // ===== TOP RIGHT Student Info =====
+        // TOP RIGHT Student Info
         HBox studentBox = buildStudentInfo(name, email, profileImagePath);
 
         Region spacer = new Region();
@@ -82,7 +82,7 @@ public class StudentDashboard extends BorderPane {
         topBar.setAlignment(Pos.CENTER_LEFT);
         layout.setTop(topBar);
 
-        // ===== CENTER: 3 circles =====
+        // CENTER: 3 circles
         VBox infoBlock = buildTopicBlock("My Info", INFO_IMAGE);
         VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
         VBox reportBlock = buildTopicBlock("Report Card", REPORT_IMAGE);
@@ -93,8 +93,8 @@ public class StudentDashboard extends BorderPane {
 
         infoBtn.setOnAction(e -> showPage(new StudentMyInfoPage(this).getView()));
 
-        // ✅ IMPORTANT: after you removed buttons from StudentMyGradesPage,
-        // create it using the no-args constructor
+        // after removed buttons from StudentMyGradesPage,
+        // creating it using the no-args constructor
         btnGradingCriteria.setOnAction(e ->
                 showPage(new StudentMyGradesPage().getView())
         );
@@ -116,7 +116,7 @@ public class StudentDashboard extends BorderPane {
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        // ===== BOTTOM RIGHT Logout =====
+        // BOTTOM RIGHT Logout
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +

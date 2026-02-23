@@ -26,7 +26,7 @@ public class StudentMyInfoPage {
 
         Student s = Session.getCurrentStudent();
 
-        // -------- CENTER CONTENT (your My Info block) --------
+        // CENTER CONTENT (My Info block)
         StackPane center = new StackPane();
         center.setAlignment(Pos.CENTER);
 
@@ -43,7 +43,7 @@ public class StudentMyInfoPage {
             content.setAlignment(Pos.TOP_LEFT);
             content.setMaxWidth(650);
 
-            // 🔹 Position block (use your current preferred values)
+            // Position block
             content.setTranslateX(90);
             content.setTranslateY(110);
 
@@ -80,7 +80,7 @@ public class StudentMyInfoPage {
             root.setCenter(center);
         }
 
-        // -------- BOTTOM BAR (copied from TeacherMarkSheetPage) --------
+        // BOTTOM BAR
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +

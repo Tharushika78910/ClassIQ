@@ -7,10 +7,6 @@ import Backend.service.GradeService;
 import java.sql.SQLException;
 import java.util.Map;
 
-/**
- * Wraps existing MarksController without modifying it.
- * Call this from JavaFX when you want grades + saved marks.
- */
 public class MarksGradingController {
 
     private final MarksController marksController = new MarksController(); // existing
@@ -18,10 +14,10 @@ public class MarksGradingController {
 
     public MarksWithGradesDTO submitMarksAndGetGrades(StudentMarks marks) throws SQLException {
 
-        // existing flow: validate student, calc total/avg, save to DB
+        // validate student, calc total/avg, save to DB
         marksController.submitMarks(marks);
 
-        // new: calculate grades
+        // calculate grades
         Map<String, String> grades = gradeService.calculateGradesPerSubject(marks);
 
         return new MarksWithGradesDTO(

@@ -6,11 +6,7 @@ public class StudentMarks {
     private int studentId;
 
     // subject1..subject5 mapping:
-    // subject1 -> mathematics
-    // subject2 -> english
-    // subject3 -> science
-    // subject4 -> craft
-    // subject5 -> languages
+
     private int subject1;
     private int subject2;
     private int subject3;
@@ -24,7 +20,7 @@ public class StudentMarks {
 
     public StudentMarks() {}
 
-    // ---- IDs ----
+    // IDs
     public int getMarksId() {
         return marksId;
     }
@@ -41,7 +37,7 @@ public class StudentMarks {
         this.studentId = studentId;
     }
 
-    // ---- Subjects ----
+    // Subjects
     public int getSubject1() {
         return subject1;
     }
@@ -82,7 +78,7 @@ public class StudentMarks {
         this.subject5 = subject5;
     }
 
-    // ---- Total / Average ----
+    // Total / Average
     public int getTotal() {
         return total;
     }
@@ -99,7 +95,7 @@ public class StudentMarks {
         this.average = average;
     }
 
-    // ---- Feedback ----
+    // Feedback
     public String getFeedback() {
         return feedback;
     }

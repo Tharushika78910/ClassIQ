@@ -13,7 +13,7 @@ import javafx.scene.text.TextFlow;
 
 public class StudentMyGradesPage {
 
-    // ✅ keep these so TeacherDashboard constructor call works
+    // TeacherDashboard constructor call
     private final Runnable onBack;
     private final Runnable onLogout;
     private final String backgroundResourcePath;
@@ -22,7 +22,6 @@ public class StudentMyGradesPage {
         this(null, null, null);
     }
 
-    // ✅ MUST exist because TeacherDashboard uses it
     public StudentMyGradesPage(Runnable onBack, Runnable onLogout, String backgroundResourcePath) {
         this.onBack = onBack;
         this.onLogout = onLogout;
@@ -31,9 +30,8 @@ public class StudentMyGradesPage {
 
     public Node getView() {
 
-        // =========================
         // Content
-        // =========================
+
         VBox content = new VBox(18);
         content.setPadding(new Insets(22));
         content.setAlignment(Pos.TOP_LEFT);
@@ -106,18 +104,16 @@ public class StudentMyGradesPage {
 
         content.getChildren().addAll(title, criteriaTitle, criteriaText, gradeScaleTitle, gradeTable);
 
-        // =========================
         // Scroll
-        // =========================
+
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setStyle("-fx-background-color: transparent;");
         scroll.setBackground(Background.EMPTY);
 
-        // =========================
         // Card
-        // =========================
+
         StackPane card = new StackPane(scroll);
         card.setAlignment(Pos.TOP_LEFT);
         card.setPadding(new Insets(6));
@@ -136,7 +132,7 @@ public class StudentMyGradesPage {
         centeredCard.setAlignment(Pos.TOP_CENTER);
         centeredCard.setPadding(new Insets(28, 28, 18, 28));
 
-        // ✅ No bottom bar here (TeacherDashboard provides the Back pill)
+        // TeacherDashboard provides the Back pill
         BorderPane page = new BorderPane();
         page.setCenter(centeredCard);
 
