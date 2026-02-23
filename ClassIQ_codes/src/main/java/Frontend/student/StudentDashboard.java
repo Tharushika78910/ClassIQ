@@ -101,7 +101,9 @@ public class StudentDashboard extends BorderPane {
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        // BOTTOM RIGHT Logout
+        // =========================
+        // BOTTOM LEFT Back (ADDED)
+        // =========================
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -119,6 +121,20 @@ public class StudentDashboard extends BorderPane {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
+        Button btnBack = new Button("← Back");
+        btnBack.setStyle(pillNormal);
+        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
+        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
+
+        // Same Back behavior as TeacherDashboard: back to Login
+        btnBack.setOnAction(e -> {
+            Session.clear();
+            Stage stage = (Stage) root.getScene().getWindow();
+            LoginPage loginPage = new LoginPage(stage);
+            stage.getScene().setRoot(loginPage.getView());
+        });
+
+        // BOTTOM RIGHT Logout (KEEP EXACTLY AS YOU HAD)
         Button logoutBtn = new Button("Logout");
         logoutBtn.setStyle(pillNormal);
         logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(pillHover));
@@ -130,10 +146,18 @@ public class StudentDashboard extends BorderPane {
             stage.setScene(new LoginPage(stage).getScene());
         });
 
-        HBox bottom = new HBox(logoutBtn);
-        bottom.setAlignment(Pos.BOTTOM_RIGHT);
-        bottom.setPadding(new Insets(10, 0, 0, 0));
-        layout.setBottom(bottom);
+        // Put Back (left) + Logout (right) without changing logout behavior
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
+
+        AnchorPane.setLeftAnchor(btnBack, 20.0);
+        AnchorPane.setBottomAnchor(btnBack, 10.0);
+
+        AnchorPane.setRightAnchor(logoutBtn, 20.0);
+        AnchorPane.setBottomAnchor(logoutBtn, 10.0);
+
+        bottomBar.getChildren().addAll(btnBack, logoutBtn);
+        layout.setBottom(bottomBar);
 
         root.getChildren().add(layout);
         return root;
