@@ -1,23 +1,23 @@
 package Frontend.student;
 
-import Backend.db.DBConnection;
 import Backend.model.dao.impl.MarksDaoImpl;
 import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
 import Frontend.LoginPage;
 import Frontend.Session;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.HashMap;
+import java.awt.Desktop;
+import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StudentReportCardPage {
@@ -33,22 +33,24 @@ public class StudentReportCardPage {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(30));
 
-        // =========================
-        // CENTER CONTENT
-        // =========================
+        // CENTER WRAPPER
+
         StackPane centerWrapper = new StackPane();
         centerWrapper.setPadding(new Insets(20));
 
-        VBox contentBox = new VBox(10);
-        contentBox.setAlignment(Pos.TOP_LEFT);
-        contentBox.setMaxWidth(760);
+        // MAIN CONTENT BOX (CENTERED BLOCK)
+        VBox contentBox = new VBox(12);
+        contentBox.setAlignment(Pos.TOP_CENTER);
+        contentBox.setMaxWidth(700);
+        contentBox.setPrefWidth(700);
 
         Label title = new Label("Academic Report Card");
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+        title.setStyle("-fx-font-size: 34px; -fx-font-weight: 800; -fx-text-fill: #1f2d2a;");
+        title.setMaxWidth(Double.MAX_VALUE);
+        title.setAlignment(Pos.CENTER);
 
-        // extra space under title
         Region titleGap = new Region();
-        titleGap.setPrefHeight(18);
+        titleGap.setPrefHeight(12);
 
         Student student = Session.getCurrentStudent();
         if (student == null) {
@@ -60,70 +62,94 @@ public class StudentReportCardPage {
             return root;
         }
 
-        // 1) Load SUBJECT -> (mark,total grade) from teacher_marksheet
-        Map<String, SubjectResult> subjectResults = loadResultsFromTeacherMarksheet(student.getStudentId());
+        // Load student_marks row ONLY
 
-        // 2) Load feedback from student_marks table
         StudentMarks marks = null;
         try {
             marks = new MarksDaoImpl().findByStudentId(student.getStudentId());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         String feedback = (marks == null || marks.getFeedback() == null || marks.getFeedback().isBlank())
                 ? "No feedback has been added yet."
                 : marks.getFeedback();
 
-        // =========================
-        // GRID (3 columns for subjects)
-        // =========================
+        // Mapping from your MarksDaoImpl:
+        Integer math  = (marks == null) ? null : marks.getSubject1(); // mathematics
+        Integer eng   = (marks == null) ? null : marks.getSubject2(); // english
+        Integer sci   = (marks == null) ? null : marks.getSubject3(); // science
+        Integer craft = (marks == null) ? null : marks.getSubject4(); // craft
+        Integer lang  = (marks == null) ? null : marks.getSubject5(); // languages
+
+        Integer total = (marks == null) ? null : marks.getTotal();
+        Double average = (marks == null) ? null : marks.getAverage();
+
+        Map<String, SubjectResult> subjectResults = new LinkedHashMap<>();
+        subjectResults.put("Mathematics", new SubjectResult(math, gradeFromMark(math)));
+        subjectResults.put("English", new SubjectResult(eng, gradeFromMark(eng)));
+        subjectResults.put("Science", new SubjectResult(sci, gradeFromMark(sci)));
+        subjectResults.put("Language", new SubjectResult(lang, gradeFromMark(lang)));
+        subjectResults.put("Craft", new SubjectResult(craft, gradeFromMark(craft)));
+
+        // GRID (CENTERED)
+
         GridPane grid = new GridPane();
         grid.setVgap(18);
-        grid.setHgap(60);
+        grid.setHgap(40);
+        grid.setAlignment(Pos.CENTER);
 
-        // Make columns align nicely
         ColumnConstraints c0 = new ColumnConstraints();
-        c0.setMinWidth(220);
+        c0.setMinWidth(260);
+        c0.setHalignment(javafx.geometry.HPos.LEFT);
+
         ColumnConstraints c1 = new ColumnConstraints();
-        c1.setMinWidth(90);
+        c1.setMinWidth(120);
+        c1.setHalignment(javafx.geometry.HPos.CENTER);
+
         ColumnConstraints c2 = new ColumnConstraints();
-        c2.setMinWidth(70);
+        c2.setMinWidth(120);
+        c2.setHalignment(javafx.geometry.HPos.CENTER);
+
         grid.getColumnConstraints().addAll(c0, c1, c2);
 
         int r = 0;
 
-        // Student Number + Class
         grid.add(labelLeft("Student Number"), 0, r);
-        grid.add(labelValue(nullSafe(student.getStudentNumber())), 1, r, 2, 1);
+        grid.add(labelCenter(nullSafe(student.getStudentNumber())), 1, r, 2, 1);
         r++;
 
         grid.add(labelLeft("Class"), 0, r);
-        grid.add(labelValue("10A"), 1, r, 2, 1);
+        grid.add(labelCenter("10A"), 1, r, 2, 1);
         r++;
 
-        // Subject rows (Subject | Mark | Grade)
         r = addSubjectRow(grid, r, "Mathematics", subjectResults);
         r = addSubjectRow(grid, r, "English", subjectResults);
         r = addSubjectRow(grid, r, "Science", subjectResults);
         r = addSubjectRow(grid, r, "Language", subjectResults);
         r = addSubjectRow(grid, r, "Craft", subjectResults);
 
-        // Feedback row (Feedback | text across 2 columns)
+        grid.add(labelLeft("Total"), 0, r);
+        grid.add(labelCenter(total == null ? "-" : String.valueOf(total)), 1, r, 2, 1);
+        r++;
+
+        grid.add(labelLeft("Average"), 0, r);
+        grid.add(labelCenter(average == null ? "-" : String.format("%.2f", average)), 1, r, 2, 1);
+        r++;
+
         grid.add(labelLeft("Feedback"), 0, r);
-        Label fb = labelValue(feedback);
+        Label fb = labelCenter(feedback);
         fb.setWrapText(true);
         fb.setMaxWidth(420);
         grid.add(fb, 1, r, 2, 1);
 
         contentBox.getChildren().addAll(title, titleGap, grid);
-
         centerWrapper.getChildren().add(contentBox);
         StackPane.setAlignment(contentBox, Pos.TOP_CENTER);
         root.setCenter(centerWrapper);
 
-        // =========================
-        // BOTTOM BUTTON BAR (TeacherMarkSheet style)
-        // =========================
+        // BOTTOM BUTTON BAR
+
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -147,6 +173,46 @@ public class StudentReportCardPage {
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
         btnBack.setOnAction(e -> dashboard.showHome());
 
+        Button btnPdf = new Button("Download PDF");
+        btnPdf.setStyle(pillNormal);
+        btnPdf.setOnMouseEntered(e -> btnPdf.setStyle(pillHover));
+        btnPdf.setOnMouseExited(e -> btnPdf.setStyle(pillNormal));
+        btnPdf.setOnAction(ev -> {
+            try {
+                Map<String, ReportCardPdfExporter.SubjectLine> pdfSubjects = new LinkedHashMap<>();
+                for (Map.Entry<String, SubjectResult> e2 : subjectResults.entrySet()) {
+                    SubjectResult sr = e2.getValue();
+                    pdfSubjects.put(e2.getKey(), new ReportCardPdfExporter.SubjectLine(sr.total, sr.grade));
+                }
+
+                File pdf = ReportCardPdfExporter.export(
+                        student.getStudentNumber(),
+                        student.getFirstName() + " " + student.getLastName(),
+                        "10A",
+                        pdfSubjects,
+                        total,
+                        average,
+                        feedback
+                );
+
+                Alert a = new Alert(Alert.AlertType.INFORMATION);
+                a.setHeaderText("PDF Generated");
+                a.setContentText("Saved to: " + pdf.getAbsolutePath());
+                a.showAndWait();
+
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(pdf);
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText("PDF Error");
+                a.setContentText(ex.getMessage());
+                a.showAndWait();
+            }
+        });
+
         Button btnLogout = new Button("Logout");
         btnLogout.setStyle(pillNormal);
         btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
@@ -163,93 +229,52 @@ public class StudentReportCardPage {
         AnchorPane.setLeftAnchor(btnBack, 20.0);
         AnchorPane.setBottomAnchor(btnBack, 10.0);
 
+        AnchorPane.setLeftAnchor(btnPdf, 165.0);
+        AnchorPane.setBottomAnchor(btnPdf, 10.0);
+
         AnchorPane.setRightAnchor(btnLogout, 20.0);
         AnchorPane.setBottomAnchor(btnLogout, 10.0);
 
-        bottomBar.getChildren().addAll(btnBack, btnLogout);
+        bottomBar.getChildren().addAll(btnBack, btnPdf, btnLogout);
         root.setBottom(bottomBar);
 
         return root;
     }
 
     private int addSubjectRow(GridPane grid, int rowIndex, String uiSubject, Map<String, SubjectResult> map) {
-
         SubjectResult sr = map.get(uiSubject);
         String markStr = (sr == null || sr.total == null) ? "-" : String.valueOf(sr.total);
         String gradeStr = (sr == null || sr.grade == null || sr.grade.isBlank()) ? "-" : sr.grade;
 
         grid.add(labelLeft(uiSubject), 0, rowIndex);
-        grid.add(labelValue(markStr), 1, rowIndex);
-        grid.add(labelValue(gradeStr), 2, rowIndex);
+        grid.add(labelCenter(markStr), 1, rowIndex);
+        grid.add(labelCenter(gradeStr), 2, rowIndex);
 
         return rowIndex + 1;
     }
 
-    /**
-     * Reads latest (total, grade) per subject for this student from teacher_marksheet.
-     * If multiple rows exist per subject, we keep the most recent (created_at DESC, id DESC).
-     */
-    private Map<String, SubjectResult> loadResultsFromTeacherMarksheet(int studentId) {
-
-        Map<String, SubjectResult> out = new HashMap<>();
-
-        String sql = """
-            SELECT subject, total, grade
-            FROM teacher_marksheet
-            WHERE student_id = ?
-            ORDER BY created_at DESC, id DESC
-        """;
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, studentId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-
-                    String subjectKey = normalizeSubject(rs.getString("subject"));
-                    if (subjectKey == null || subjectKey.isBlank()) continue;
-
-                    // keep first occurrence (latest) only
-                    if (!out.containsKey(subjectKey)) {
-                        Integer total = (Integer) rs.getObject("total"); // can be null
-                        String grade = rs.getString("grade");
-                        out.put(subjectKey, new SubjectResult(total, grade));
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return out;
-    }
-
-    private String normalizeSubject(String dbSubject) {
-        if (dbSubject == null) return null;
-        String s = dbSubject.trim().toLowerCase();
-
-        if (s.contains("math")) return "Mathematics";
-        if (s.contains("eng")) return "English";
-        if (s.contains("sci")) return "Science";
-        if (s.contains("craft")) return "Craft";
-        if (s.contains("lang")) return "Language"; // Language / Languages
-
-        // fallback
-        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    private String gradeFromMark(Integer mark) {
+        if (mark == null) return "-";
+        int m = mark;
+        if (m >= 75) return "A";
+        if (m >= 65) return "B";
+        if (m >= 55) return "C";
+        if (m >= 45) return "S";
+        return "F";
     }
 
     private Label labelLeft(String text) {
         Label l = new Label(text);
         l.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        l.setMaxWidth(Double.MAX_VALUE);
         return l;
     }
 
-    private Label labelValue(String text) {
+    private Label labelCenter(String text) {
         Label l = new Label(text);
         l.setStyle("-fx-font-size: 18px;");
+        l.setMaxWidth(Double.MAX_VALUE);
+        l.setAlignment(Pos.CENTER);
         return l;
     }
 
