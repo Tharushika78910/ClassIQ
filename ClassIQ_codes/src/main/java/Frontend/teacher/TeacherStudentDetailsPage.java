@@ -4,9 +4,7 @@ import Backend.controller.StudentDetailsController;
 import Backend.model.dto.StudentDetailsDTO;
 import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
-
 import Frontend.Session;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -126,13 +124,11 @@ public class TeacherStudentDetailsPage {
         feedbackArea.setWrapText(true);
         feedbackArea.getStyleClass().add("feedback-area");
 
-        // Default: read-only until the teacher clicks Edit (and only Maths teacher is allowed).
+        // Default state (will be set after checking canEditFeedback)
         feedbackArea.setEditable(false);
 
         Button btnSave = new Button("Save");
         btnSave.getStyleClass().add("primary-btn");
-
-        // Save is only enabled when editing is allowed and active.
         btnSave.setDisable(true);
 
         Button btnEdit = new Button("Edit");
@@ -177,9 +173,8 @@ public class TeacherStudentDetailsPage {
 
         root.setBottom(bottomBar);
 
-        // LOGIC
-        final boolean canEditFeedback = Session.getTeacherSubject() != null
-                && "Mathematics".equalsIgnoreCase(Session.getTeacherSubject().trim());
+        // LOGIC: allow Mathematics teacher only (tolerant match)
+        final boolean canEditFeedback = isMathSubject(Session.getTeacherSubject());
 
         try {
             StudentDetailsDTO dto = controller.getDetails(studentNumber);
@@ -198,47 +193,51 @@ public class TeacherStudentDetailsPage {
             totalChip.setText("Total: " + mk.getTotal());
             avgChip.setText(String.format("Average: %.2f", mk.getAverage()));
 
-            // Load feedback immediately so all teachers can view it.
+            // Load feedback for everyone
             String fb = controller.loadFeedback(studentNumber);
             feedbackArea.setText(fb == null ? "" : fb);
 
             if (!canEditFeedback) {
-                // Non-maths teachers can only view.
+                // Other teachers: view only
                 btnEdit.setDisable(true);
                 btnSave.setDisable(true);
                 feedbackArea.setEditable(false);
                 status.setText("Only the Mathematics teacher can edit feedback.");
             } else {
-                status.setText("");
+                //  Maths teacher should be ready to type immediately
+                btnEdit.setDisable(false);      // keep edit button for later (after save)
+                btnSave.setDisable(false);      // allow saving immediately
+                feedbackArea.setEditable(true); // cursor available
+                feedbackArea.requestFocus();
+                status.setText("Type feedback and press Save.");
+                status.setTextFill(Color.DARKRED);
             }
 
         } catch (Exception ex) {
             status.setText("Load error: " + ex.getMessage());
-            ex.printStackTrace();
+            System.err.println(ex.getMessage());
         }
 
+        // Edit unlocks again after Save locked it
         btnEdit.setOnAction(e -> {
-            try {
-                if (!canEditFeedback) {
-                    status.setText("Only the Mathematics teacher can edit feedback.");
-                    return;
-                }
-
-                // Make editable and enable save.
-                feedbackArea.setEditable(true);
-                btnSave.setDisable(false);
-                feedbackArea.requestFocus();
-                status.setText("Edit the feedback and press Save.");
-            } catch (Exception ex) {
-                status.setText("Edit load error: " + ex.getMessage());
-                ex.printStackTrace();
+            if (!canEditFeedback) {
+                status.setText("Only the Mathematics teacher can edit feedback.");
+                status.setTextFill(Color.DARKRED);
+                return;
             }
+
+            feedbackArea.setEditable(true);
+            btnSave.setDisable(false);
+            feedbackArea.requestFocus();
+            status.setText("Edit the feedback and press Save.");
+            status.setTextFill(Color.DARKRED);
         });
 
         btnSave.setOnAction(e -> {
             try {
                 if (!canEditFeedback) {
                     status.setText("Only the Mathematics teacher can save feedback.");
+                    status.setTextFill(Color.DARKRED);
                     return;
                 }
 
@@ -246,24 +245,29 @@ public class TeacherStudentDetailsPage {
 
                 if (newFb.isEmpty()) {
                     status.setText("Please type feedback before saving.");
+                    status.setTextFill(Color.DARKRED);
                     return;
                 }
 
                 if (newFb.length() > 255) {
                     status.setText("Feedback is too long (max 255 characters).");
+                    status.setTextFill(Color.DARKRED);
                     return;
                 }
 
                 controller.saveFeedback(studentNumber, newFb, Session.getUserId());
 
-                // After saving, lock the field again (still visible).
+                // After saving, lock again. (Then Edit button can unlock later)
                 feedbackArea.setEditable(false);
                 btnSave.setDisable(true);
-                status.setText("Feedback saved successfully.");
+
+                status.setTextFill(Color.FORESTGREEN);
+                status.setText("Feedback saved successfully. Click Edit to change it later.");
 
             } catch (Exception ex) {
+                status.setTextFill(Color.DARKRED);
                 status.setText("Save error: " + ex.getMessage());
-                ex.printStackTrace();
+                System.err.println(ex.getMessage());
             }
         });
 
@@ -284,5 +288,13 @@ public class TeacherStudentDetailsPage {
 
         grid.add(subjectLbl, 0, row);
         grid.add(markLabel, 1, row);
+    }
+
+    // Tolerant check: "Mathematics" / "Math" / "Maths" / variants
+    private boolean isMathSubject(String subject) {
+        if (subject == null) return false;
+        String s = subject.trim().toLowerCase();
+        return s.equals("maths")
+                || s.contains("mathematics") || s.contains("math");
     }
 }
