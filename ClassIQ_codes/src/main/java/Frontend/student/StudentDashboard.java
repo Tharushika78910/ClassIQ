@@ -25,10 +25,10 @@ public class StudentDashboard extends BorderPane {
     private final String studentProfileImagePath;
 
     // Images
-    private static final String BG_IMAGE      = "/Homepage.png";
-    private static final String INFO_IMAGE    = "/images/studentInfo.png";
-    private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
-    private static final String REPORT_IMAGE  = "/images/Report Card.png";
+    private static final String BG_IMAGE      = "/HomepageS.png";
+    private static final String INFO_IMAGE    = "/images/StudentInfoS.png";
+    private static final String GRADING_IMAGE = "/images/MarkSheetS.png";
+    private static final String REPORT_IMAGE  = "/images/Report CardS.png";
 
     public StudentDashboard(String name, String email, String profileImagePath) {
 
@@ -50,24 +50,9 @@ public class StudentDashboard extends BorderPane {
 
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
+        // Background is now handled by CSS
         StackPane root = new StackPane();
         root.getStyleClass().add("figma-root");
-
-        // Background
-        try {
-            BackgroundImage bg = new BackgroundImage(
-                    new Image(Objects.requireNonNull(getClass().getResourceAsStream(BG_IMAGE))),
-                    BackgroundRepeat.NO_REPEAT,
-                    BackgroundRepeat.NO_REPEAT,
-                    BackgroundPosition.CENTER,
-                    new BackgroundSize(
-                            BackgroundSize.AUTO, BackgroundSize.AUTO,
-                            false, false,
-                            true, true
-                    )
-            );
-            root.setBackground(new Background(bg));
-        } catch (Exception ignored) {}
 
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(30));

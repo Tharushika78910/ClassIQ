@@ -11,6 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class StudentMyInfoPage {
 
     private final StudentDashboard dashboard;
@@ -23,6 +25,11 @@ public class StudentMyInfoPage {
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("page-bg");
+
+        // Add CSS stylesheet
+        root.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
+        );
 
         Student s = Session.getCurrentStudent();
 

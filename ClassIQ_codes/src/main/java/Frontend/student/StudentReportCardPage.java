@@ -19,6 +19,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class StudentReportCardPage {
 
@@ -31,6 +32,13 @@ public class StudentReportCardPage {
     public Parent getView() {
 
         BorderPane root = new BorderPane();
+        root.getStyleClass().add("page-bg");
+        
+        // Add CSS stylesheet
+        root.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
+        );
+        
         root.setPadding(new Insets(30));
 
         // CENTER WRAPPER

@@ -11,6 +11,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import java.util.Objects;
+
 public class StudentMyGradesPage {
 
     // TeacherDashboard constructor call
@@ -138,6 +140,12 @@ public class StudentMyGradesPage {
 
         StackPane root = new StackPane(page);
         root.setPadding(new Insets(10));
+        root.getStyleClass().add("page-bg");
+        
+        // Add CSS stylesheet
+        root.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
+        );
 
         return root;
     }

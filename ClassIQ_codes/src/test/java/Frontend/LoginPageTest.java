@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class LoginPage {
+public class LoginPageTest {
 
     private static final String HOME_BG = "/Homepage.png";
     private static final String LOGO = "/logo.png";
@@ -26,7 +26,7 @@ public class LoginPage {
 
     private final Stage stage;
 
-    public LoginPage(Stage stage) {
+    public LoginPageTest(Stage stage) {
         this.stage = stage;
     }
 
