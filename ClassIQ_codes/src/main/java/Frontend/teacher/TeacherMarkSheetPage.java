@@ -2,6 +2,7 @@ package Frontend.teacher;
 
 import Backend.model.dao.impl.StudentDaoImpl;
 import Backend.model.dao.impl.TeacherMarkSheetDaoImpl;
+import Backend.model.dao.impl.StudentMarksDaoImpl;
 import Backend.model.entity.Student;
 import Backend.service.WeightedMarkService;
 import Frontend.LoginPage;
@@ -59,7 +60,7 @@ public class TeacherMarkSheetPage {
         card.setAlignment(Pos.CENTER);
         card.setFillWidth(false);
 
-        // Fix card width to match table (centers perfectly)
+        // center table
         card.setPrefWidth(table.getPrefWidth() + 40);
         card.setMaxWidth(Region.USE_PREF_SIZE);
 
@@ -72,6 +73,8 @@ public class TeacherMarkSheetPage {
         status.getStyleClass().add("muted-text");
 
         loadStudentsAndMarks();
+
+        // SAVE BUTTON (FIXED)
 
         btnSave.setOnAction(e -> {
             status.setText("");
@@ -92,11 +95,14 @@ public class TeacherMarkSheetPage {
 
             try {
                 TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
+                StudentMarksDaoImpl studentMarksDao = new StudentMarksDaoImpl();
+
                 int savedCount = 0;
 
                 for (MarkRow r : table.getItems()) {
                     if (r.getAssignment() == 0 && r.getProject() == 0 && r.getFinalExam() == 0) continue;
 
+                    // Save to teacher_marksheet
                     dao.saveTeacherMarkSheetRow(
                             r.getStudentDbId(),
                             r.getStudentName(),
@@ -108,6 +114,14 @@ public class TeacherMarkSheetPage {
                             teacherId,
                             subj
                     );
+
+                    // Save subject total to student_marks
+                    studentMarksDao.upsertSubjectTotal(
+                            r.getStudentDbId(),
+                            subj,
+                            r.getTotal()
+                    );
+
                     savedCount++;
                 }
 
@@ -119,6 +133,8 @@ public class TeacherMarkSheetPage {
                 ex.printStackTrace();
             }
         });
+
+        // CLEAR BUTTON
 
         btnClear.setOnAction(e -> {
             status.setText("");
@@ -134,9 +150,17 @@ public class TeacherMarkSheetPage {
 
             try {
                 TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
+                StudentMarksDaoImpl studentMarksDao = new StudentMarksDaoImpl();
+
+                // 1) Delete teacher_marksheet rows for this teacher + subject
                 int deleted = dao.deleteMarksForTeacherSubject(teacherId, subj);
 
-                status.setText("All marks cleared. Deleted " + deleted + " record(s).");
+                // 2) Clear subject totals in student_marks and recalc total/average
+                int updated = studentMarksDao.clearSubjectForAllStudents(subj);
+
+                status.setText("All marks cleared. Deleted " + deleted +
+                        " teacher record(s). Reset " + updated + " student_marks row(s).");
+
                 loadStudentsAndMarks();
 
             } catch (Exception ex) {
@@ -287,7 +311,6 @@ public class TeacherMarkSheetPage {
 
         TableColumn<MarkRow, String> colGrade = new TableColumn<>("Grade");
         colGrade.setCellValueFactory(c -> c.getValue().gradeProperty());
-
 
         colNo.setPrefWidth(110);
         colName.setPrefWidth(280);
