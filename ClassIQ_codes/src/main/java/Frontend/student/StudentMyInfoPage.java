@@ -51,9 +51,7 @@ public class StudentMyInfoPage {
 
             String fullName = s.getFirstName() + " " + s.getLastName();
 
-            // =========================
-            // LEFT SIDE: MY INFO (UNCHANGED DETAILS)
-            // =========================
+
             VBox leftContent = new VBox(40);
             leftContent.setAlignment(Pos.TOP_LEFT);
 
@@ -205,25 +203,24 @@ public class StudentMyInfoPage {
             rightScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
             rightScroll.setPrefViewportHeight(520);
 
-            // =========================
-            // MAIN LAYOUT (LEFT | DIVIDER | RIGHT)
-            // =========================
-            HBox main = new HBox(55);
+
+            HBox main = new HBox(25);
             main.setAlignment(Pos.TOP_LEFT);
 
-            // Drop "My Info" + all content a bit down (as requested)
+
             main.setPadding(new Insets(120, 60, 40, 150));
 
-            leftContent.setPrefWidth(420);
+            leftContent.setPrefWidth(520);
             rightScroll.setPrefWidth(520);
 
             main.getChildren().addAll(leftContent, divider, rightScroll);
+           // HBox.setMargin(rightScroll, new Insets(0, 0, 0, 20));
 
             center.getChildren().add(main);
             root.setCenter(center);
         }
 
-        // BOTTOM BAR (UNCHANGED)
+
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -241,13 +238,7 @@ public class StudentMyInfoPage {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
-        Button btnBack = new Button("← Back");
-        btnBack.setStyle(pillNormal);
-        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
-        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
-        btnBack.setOnAction(e -> {
-            if (dashboard != null) dashboard.showHome();
-        });
+        Button btnBack = dashboard.createStudentBackButton(() -> dashboard.showHome());
 
         Button btnLogout = new Button("Logout");
         btnLogout.setStyle(pillNormal);

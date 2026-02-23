@@ -2,7 +2,7 @@ package Frontend.teacher;
 
 import Frontend.LoginPage;
 import Frontend.Session;
-import Frontend.student.StudentMyGradesPage;
+import Frontend.teacher.TeacherMyGradesPage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -110,14 +110,9 @@ public class TeacherDashboard extends BorderPane {
         );
 
         // Wrap grading criteria page with TeacherDashboard back pill
-        gradingBtn.setOnAction(e -> {
-            StudentMyGradesPage page = new StudentMyGradesPage(
-                    this::showHome,
-                    () -> showPage(simplePlaceholder("Logged out (placeholder)")),
-                    "/Frontend/images/Login.png"
-            );
-            showPage(wrapWithBackPill(page.getView()));
-        });
+        gradingBtn.setOnAction(e ->
+                showPage(wrapWithBackPill(new TeacherMyGradesPage().getView()))
+        );
 
         // Wrap student feedback page with TeacherDashboard back pill
         studentBtn.setOnAction(e ->

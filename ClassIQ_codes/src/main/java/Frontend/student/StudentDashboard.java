@@ -30,6 +30,42 @@ public class StudentDashboard extends BorderPane {
     private static final String GRADING_IMAGE = "/images/MarkSheetS.png";
     private static final String REPORT_IMAGE  = "/images/Report CardS.png";
 
+    // ✅ Student back button styles (Sky Blue)
+    private static final String STUDENT_BACK_NORMAL =
+            "-fx-background-color: rgba(210,230,255,0.95);" +
+                    "-fx-text-fill: #1E4F9A;" +
+                    "-fx-font-weight: bold;" +
+                    "-fx-font-size: 14px;" +
+                    "-fx-background-radius: 18;" +
+                    "-fx-padding: 8 22 8 22;" +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+
+    private static final String STUDENT_BACK_HOVER =
+            "-fx-background-color: #7FB3FF;" +
+                    "-fx-text-fill: white;" +
+                    "-fx-font-weight: bold;" +
+                    "-fx-font-size: 14px;" +
+                    "-fx-background-radius: 18;" +
+                    "-fx-padding: 8 22 8 22;";
+
+    // ✅ Logout button styles (keep your original green)
+    private static final String LOGOUT_NORMAL =
+            "-fx-background-color: rgba(255,255,255,0.92);" +
+                    "-fx-text-fill: #2E6F62;" +
+                    "-fx-font-weight: bold;" +
+                    "-fx-font-size: 14px;" +
+                    "-fx-background-radius: 18;" +
+                    "-fx-padding: 8 22 8 22;" +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+
+    private static final String LOGOUT_HOVER =
+            "-fx-background-color: #9AC4B7;" +
+                    "-fx-text-fill: white;" +
+                    "-fx-font-weight: bold;" +
+                    "-fx-font-size: 14px;" +
+                    "-fx-background-radius: 18;" +
+                    "-fx-padding: 8 22 8 22;";
+
     public StudentDashboard(String name, String email, String profileImagePath) {
 
         this.studentName = name;
@@ -50,7 +86,7 @@ public class StudentDashboard extends BorderPane {
 
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
-        // Background is now handled by CSS
+        // Root (background handled by CSS)
         StackPane root = new StackPane();
         root.getStyleClass().add("figma-root");
 
@@ -77,13 +113,7 @@ public class StudentDashboard extends BorderPane {
         Button reportBtn = (Button) reportBlock.getChildren().get(1);
 
         infoBtn.setOnAction(e -> showPage(new StudentMyInfoPage(this).getView()));
-
-        // after removed buttons from StudentMyGradesPage,
-        // creating it using the no-args constructor
-        btnGradingCriteria.setOnAction(e ->
-                showPage(new StudentMyGradesPage().getView())
-        );
-
+        btnGradingCriteria.setOnAction(e -> showPage(new StudentMyGradesPage(this).getView()));
         reportBtn.setOnAction(e -> showPage(new StudentReportCardPage(this).getView()));
 
         GridPane grid = new GridPane();
@@ -93,7 +123,6 @@ public class StudentDashboard extends BorderPane {
 
         grid.add(infoBlock, 0, 0);
         grid.add(gradingBlock, 1, 0);
-
         grid.add(reportBlock, 0, 1, 2, 1);
         GridPane.setHalignment(reportBlock, javafx.geometry.HPos.CENTER);
 
@@ -102,51 +131,25 @@ public class StudentDashboard extends BorderPane {
         layout.setCenter(centerWrap);
 
         // =========================
-        // BOTTOM LEFT Back (ADDED)
+        // BOTTOM BAR: Back (Sky Blue) + Logout (Green)
         // =========================
-        String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
-
-        String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;";
-
-        Button btnBack = new Button("← Back");
-        btnBack.setStyle(pillNormal);
-        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
-        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
-
-        // Same Back behavior as TeacherDashboard: back to Login
-        btnBack.setOnAction(e -> {
+        Button btnBack = createStudentBackButton(() -> {
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
             LoginPage loginPage = new LoginPage(stage);
             stage.getScene().setRoot(loginPage.getView());
         });
 
-        // BOTTOM RIGHT Logout (KEEP EXACTLY AS YOU HAD)
         Button logoutBtn = new Button("Logout");
-        logoutBtn.setStyle(pillNormal);
-        logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(pillHover));
-        logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(pillNormal));
-
+        logoutBtn.setStyle(LOGOUT_NORMAL);
+        logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(LOGOUT_HOVER));
+        logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(LOGOUT_NORMAL));
         logoutBtn.setOnAction(e -> {
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
             stage.setScene(new LoginPage(stage).getScene());
         });
 
-        // Put Back (left) + Logout (right) without changing logout behavior
         AnchorPane bottomBar = new AnchorPane();
         bottomBar.setPadding(new Insets(15));
 
@@ -161,6 +164,16 @@ public class StudentDashboard extends BorderPane {
 
         root.getChildren().add(layout);
         return root;
+    }
+
+    // ✅ Reusable Sky Blue Back button for ALL student pages
+    public Button createStudentBackButton(Runnable action) {
+        Button btn = new Button("← Back");
+        btn.setStyle(STUDENT_BACK_NORMAL);
+        btn.setOnMouseEntered(e -> btn.setStyle(STUDENT_BACK_HOVER));
+        btn.setOnMouseExited(e -> btn.setStyle(STUDENT_BACK_NORMAL));
+        btn.setOnAction(e -> action.run());
+        return btn;
     }
 
     private VBox buildTopicBlock(String title, String imagePath) {

@@ -175,11 +175,7 @@ public class StudentReportCardPage {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
-        Button btnBack = new Button("← Back");
-        btnBack.setStyle(pillNormal);
-        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
-        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
-        btnBack.setOnAction(e -> dashboard.showHome());
+        Button btnBack = dashboard.createStudentBackButton(() -> dashboard.showHome());
 
         Button btnPdf = new Button("Download PDF");
         btnPdf.setStyle(pillNormal);
