@@ -18,4 +18,7 @@ public interface MarksDao {
     void saveOrUpdateFeedback(int studentId, String feedback) throws SQLException;
 
     String findFeedback(int studentId) throws SQLException;
+
+    //  delete/clear feedback only (do NOT delete marks row)
+    void deleteFeedback(int studentId) throws SQLException;
 }

@@ -134,7 +134,12 @@ public class TeacherStudentDetailsPage {
         Button btnEdit = new Button("Edit");
         btnEdit.getStyleClass().add("primary-btn");
 
-        HBox actions = new HBox(10, btnEdit, btnSave);
+        // NEW: Delete button
+        Button btnDelete = new Button("Delete");
+        btnDelete.getStyleClass().add("primary-btn");
+        btnDelete.setDisable(true);
+
+        HBox actions = new HBox(10, btnEdit, btnSave, btnDelete);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
         Label status = new Label();
@@ -202,13 +207,24 @@ public class TeacherStudentDetailsPage {
                 btnEdit.setDisable(true);
                 btnSave.setDisable(true);
                 feedbackArea.setEditable(false);
-                status.setText("Only the Mathematics teacher can edit feedback.");
+
+                // Hide delete completely
+                btnDelete.setDisable(true);
+                btnDelete.setVisible(false);
+                btnDelete.setManaged(false);
+
+                status.setText("Only the class teacher can edit feedback.");
             } else {
-                //  Maths teacher should be ready to type immediately
-                btnEdit.setDisable(false);      // keep edit button for later (after save)
-                btnSave.setDisable(false);      // allow saving immediately
-                feedbackArea.setEditable(true); // cursor available
+                // Maths teacher should be ready to type immediately
+                btnEdit.setDisable(false);
+                btnSave.setDisable(false);
+                feedbackArea.setEditable(true);
                 feedbackArea.requestFocus();
+
+                // Enable delete only if there is feedback currently
+                boolean hasFeedback = feedbackArea.getText() != null && !feedbackArea.getText().trim().isEmpty();
+                btnDelete.setDisable(!hasFeedback);
+
                 status.setText("Type feedback and press Save.");
                 status.setTextFill(Color.DARKRED);
             }
@@ -221,7 +237,7 @@ public class TeacherStudentDetailsPage {
         // Edit unlocks again after Save locked it
         btnEdit.setOnAction(e -> {
             if (!canEditFeedback) {
-                status.setText("Only the Mathematics teacher can edit feedback.");
+                status.setText("Only the class teacher can edit feedback.");
                 status.setTextFill(Color.DARKRED);
                 return;
             }
@@ -236,7 +252,7 @@ public class TeacherStudentDetailsPage {
         btnSave.setOnAction(e -> {
             try {
                 if (!canEditFeedback) {
-                    status.setText("Only the Mathematics teacher can save feedback.");
+                    status.setText("Only the class teacher can save feedback.");
                     status.setTextFill(Color.DARKRED);
                     return;
                 }
@@ -261,12 +277,60 @@ public class TeacherStudentDetailsPage {
                 feedbackArea.setEditable(false);
                 btnSave.setDisable(true);
 
+                // Feedback exists now -> allow to delete
+                btnDelete.setDisable(false);
+
                 status.setTextFill(Color.FORESTGREEN);
                 status.setText("Feedback saved successfully. Click Edit to change it later.");
 
             } catch (Exception ex) {
                 status.setTextFill(Color.DARKRED);
                 status.setText("Save error: " + ex.getMessage());
+                System.err.println(ex.getMessage());
+            }
+        });
+
+        // NEW: Delete feedback handler
+        btnDelete.setOnAction(e -> {
+            try {
+                if (!canEditFeedback) {
+                    status.setText("Only the class teacher can delete feedback.");
+                    status.setTextFill(Color.DARKRED);
+                    return;
+                }
+
+                String current = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();
+                if (current.isEmpty()) {
+                    btnDelete.setDisable(true);
+                    status.setText("No feedback to delete.");
+                    status.setTextFill(Color.DARKRED);
+                    return;
+                }
+
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                confirm.setTitle("Delete Feedback");
+                confirm.setHeaderText("Delete this feedback?");
+                confirm.setContentText("This will remove the feedback from the database.");
+
+                var result = confirm.showAndWait();
+                if (result.isEmpty() || result.get() != ButtonType.OK) return;
+
+                controller.deleteFeedback(studentNumber, Session.getUserId());
+
+                // Clear UI and allow typing new feedback immediately
+                feedbackArea.clear();
+                feedbackArea.setEditable(true);
+                feedbackArea.requestFocus();
+
+                btnSave.setDisable(false);
+                btnDelete.setDisable(true);
+
+                status.setTextFill(Color.FORESTGREEN);
+                status.setText("Feedback deleted. You can type a new one and press Save.");
+
+            } catch (Exception ex) {
+                status.setTextFill(Color.DARKRED);
+                status.setText("Delete error: " + ex.getMessage());
                 System.err.println(ex.getMessage());
             }
         });

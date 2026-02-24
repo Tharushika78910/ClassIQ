@@ -54,8 +54,6 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    // Load only marks row
-
     @Override
     public StudentMarks findByStudentId(int studentId) throws SQLException {
 
@@ -73,14 +71,12 @@ public class MarksDaoImpl implements MarksDao {
                 m.setMarksId(rs.getInt("marks_id"));
                 m.setStudentId(rs.getInt("student_id"));
 
-                // Nullable subjects -> use getObject check
                 m.setSubject1(rs.getObject("mathematics") == null ? 0 : rs.getInt("mathematics"));
                 m.setSubject2(rs.getObject("english") == null ? 0 : rs.getInt("english"));
                 m.setSubject3(rs.getObject("science") == null ? 0 : rs.getInt("science"));
                 m.setSubject4(rs.getObject("craft") == null ? 0 : rs.getInt("craft"));
                 m.setSubject5(rs.getObject("languages") == null ? 0 : rs.getInt("languages"));
 
-                // total/average are NOT NULL in DB, but keep safe anyway
                 m.setTotal(rs.getObject("total") == null ? 0 : rs.getInt("total"));
                 m.setAverage(rs.getObject("average") == null ? 0.0 : rs.getDouble("average"));
 
@@ -112,7 +108,6 @@ public class MarksDaoImpl implements MarksDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
 
-                // Student entity
                 Student st = new Student();
                 st.setStudentId(rs.getInt("student_id"));
                 st.setFirstName(rs.getString("first_name"));
@@ -121,7 +116,6 @@ public class MarksDaoImpl implements MarksDao {
                 st.setEmail(rs.getString("email"));
                 st.setUserId(rs.getInt("user_id"));
 
-                // Marks entity
                 StudentMarks mk = new StudentMarks();
                 mk.setStudentId(studentId);
 
@@ -171,8 +165,6 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    // Load only feedback
-
     @Override
     public String findFeedback(int studentId) throws SQLException {
 
@@ -187,6 +179,20 @@ public class MarksDaoImpl implements MarksDao {
                 if (!rs.next()) return null;
                 return rs.getString(FEEDBACK_COL);
             }
+        }
+    }
+
+    // clear feedback in DB (do NOT delete the marks row)
+    @Override
+    public void deleteFeedback(int studentId) throws SQLException {
+
+        String sql = "UPDATE student_marks SET feed_back = '' WHERE student_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+            ps.executeUpdate();
         }
     }
 }

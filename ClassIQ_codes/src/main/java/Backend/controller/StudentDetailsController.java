@@ -28,7 +28,7 @@ public class StudentDetailsController {
         String subject = (teacher.subject == null) ? "" : teacher.subject.trim();
 
         if (!isMathSubject(subject)) {
-            throw new SecurityException("Only the John Smith can save feedback.");
+            throw new SecurityException("Only the class teacher can save feedback.");
         }
 
         int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
@@ -40,11 +40,29 @@ public class StudentDetailsController {
         return service.getFeedback(studentId);
     }
 
+    //  delete feedback with same Maths-only rule
+    public void deleteFeedback(String studentNumber, int teacherUserId) throws Exception {
+
+        var teacher = userProfileDao.findTeacherByUserId(teacherUserId);
+        if (teacher == null) {
+            throw new SecurityException("Teacher profile not found.");
+        }
+
+        String subject = (teacher.subject == null) ? "" : teacher.subject.trim();
+
+        if (!isMathSubject(subject)) {
+            throw new SecurityException("Only the class teacher can delete feedback.");
+        }
+
+        int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
+        service.deleteFeedback(studentId);
+    }
+
     // Accept Mathematics / Math / Maths (and variants)
     private boolean isMathSubject(String subject) {
         if (subject == null) return false;
         String s = subject.trim().toLowerCase();
-        return s.equals("mathematics") || s.equals("math") || s.equals("maths")
+        return s.equals("maths")
                 || s.contains("mathematics") || s.contains("math");
     }
 }

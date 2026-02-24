@@ -19,4 +19,9 @@ public class StudentDetailsService {
     public String getFeedback(int studentId) throws Exception {
         return marksDao.findFeedback(studentId);
     }
+
+
+    public void deleteFeedback(int studentId) throws Exception {
+        marksDao.deleteFeedback(studentId);
+    }
 }
