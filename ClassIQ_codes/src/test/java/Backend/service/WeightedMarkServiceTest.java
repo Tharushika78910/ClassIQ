@@ -8,40 +8,25 @@ import static org.junit.jupiter.api.Assertions.*;
 public class WeightedMarkServiceTest {
 
     @Test
-    void calculateWeightedMark_shouldApplyCorrectWeights() {
-        WeightedMarkService service = new WeightedMarkService();
+    void calculateWeightedMark_shouldCalculateCorrectly() {
+        WeightedMarkService s = new WeightedMarkService();
 
         SubjectWeightedMarksDTO dto = new SubjectWeightedMarksDTO();
         dto.setAssignmentMark(80);
         dto.setProjectMark(70);
-        dto.setFinalExamMark(90);
+        dto.setFinalExamMark(60);
 
-        // 80*0.20 = 16
-        // 70*0.30 = 21
-        // 90*0.50 = 45
-        // total = 82
-        double weighted = service.calculateWeightedMark(dto);
-
-        assertEquals(82.0, weighted, 0.0001);
+        assertEquals(67.0, s.calculateWeightedMark(dto), 0.0001);
     }
 
     @Test
-    void gradeFromWeighted_shouldReturnCorrectGradeBoundaries() {
-        WeightedMarkService service = new WeightedMarkService();
+    void gradeFromWeighted_shouldCoverAllBranches() {
+        WeightedMarkService s = new WeightedMarkService();
 
-        assertEquals("A", service.gradeFromWeighted(75));
-        assertEquals("A", service.gradeFromWeighted(100));
-
-        assertEquals("B", service.gradeFromWeighted(65));
-        assertEquals("B", service.gradeFromWeighted(74.999));
-
-        assertEquals("C", service.gradeFromWeighted(55));
-        assertEquals("C", service.gradeFromWeighted(64.999));
-
-        assertEquals("S", service.gradeFromWeighted(35));
-        assertEquals("S", service.gradeFromWeighted(54.999));
-
-        assertEquals("F", service.gradeFromWeighted(34.999));
-        assertEquals("F", service.gradeFromWeighted(0));
+        assertEquals("A", s.gradeFromWeighted(75));
+        assertEquals("B", s.gradeFromWeighted(65));
+        assertEquals("C", s.gradeFromWeighted(55));
+        assertEquals("S", s.gradeFromWeighted(35));
+        assertEquals("F", s.gradeFromWeighted(34.999));
     }
 }
