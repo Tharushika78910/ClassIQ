@@ -6,16 +6,15 @@ import Backend.service.StudentDetailsService;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class StudentDetailsControllerTest {
-
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {
         Field f = target.getClass().getDeclaredField(fieldName);
         f.setAccessible(true);
 
-        // Use Unsafe to write final fields on Java 17+
         Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
         unsafeField.setAccessible(true);
         sun.misc.Unsafe unsafe = (sun.misc.Unsafe) unsafeField.get(null);
@@ -28,7 +27,7 @@ public class StudentDetailsControllerTest {
         StudentDetailsController c = new StudentDetailsController();
 
         UserProfileDaoImpl fakeProfile = new UserProfileDaoImpl() {
-            @Override public TeacherProfile findTeacherByUserId(int userId) { return null; }
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) { return null; }
         };
 
         setField(c, "userProfileDao", fakeProfile);
@@ -42,8 +41,8 @@ public class StudentDetailsControllerTest {
         StudentDetailsController c = new StudentDetailsController();
 
         UserProfileDaoImpl fakeProfile = new UserProfileDaoImpl() {
-            @Override public TeacherProfile findTeacherByUserId(int userId) {
-                return new TeacherProfile(1, "T", "t@x.com", "English");
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) {
+                return new UserProfileDaoImpl.TeacherProfile(1, "T", "t@x.com", "English");
             }
         };
 
@@ -57,21 +56,20 @@ public class StudentDetailsControllerTest {
     void saveFeedback_shouldWork_whenTeacherIsMath_andSubjectNullAlsoCovered() throws Exception {
         StudentDetailsController c = new StudentDetailsController();
 
-        // 1) subject null branch
+        // subject null branch ->  controller converts null to "" then rejects
         UserProfileDaoImpl fakeProfileNullSubject = new UserProfileDaoImpl() {
-            @Override public TeacherProfile findTeacherByUserId(int userId) {
-                return new TeacherProfile(1, "T", "t@x.com", null);
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) {
+                return new UserProfileDaoImpl.TeacherProfile(1, "T", "t@x.com", null);
             }
         };
 
         setField(c, "userProfileDao", fakeProfileNullSubject);
-
         assertThrows(SecurityException.class, () -> c.saveFeedback("S001", "x", 10));
 
-        // 2) math branch
+        // math branch
         UserProfileDaoImpl fakeProfileMath = new UserProfileDaoImpl() {
-            @Override public TeacherProfile findTeacherByUserId(int userId) {
-                return new TeacherProfile(1, "T", "t@x.com", "Mathematics");
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) {
+                return new UserProfileDaoImpl.TeacherProfile(1, "T", "t@x.com", "Mathematics");
             }
         };
 
@@ -80,6 +78,7 @@ public class StudentDetailsControllerTest {
                 assertEquals("S001", studentNumber);
                 return 10;
             }
+
             // unused
             @Override public void create(Backend.model.entity.Student student) {}
             @Override public Backend.model.entity.Student findById(int studentId) { return null; }
@@ -103,8 +102,97 @@ public class StudentDetailsControllerTest {
         setField(c, "studentDao", fakeStudentDao);
         setField(c, "service", fakeService);
 
-
         c.saveFeedback("S001", "Good", 10);
+    }
+
+    // deleteFeedback coverage
+
+    @Test
+    void deleteFeedback_shouldThrow_whenTeacherProfileNull() throws Exception {
+        StudentDetailsController c = new StudentDetailsController();
+
+        UserProfileDaoImpl fakeProfile = new UserProfileDaoImpl() {
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) { return null; }
+        };
+
+        setField(c, "userProfileDao", fakeProfile);
+
+        assertThrows(SecurityException.class,
+                () -> c.deleteFeedback("S001", 99));
+    }
+
+    @Test
+    void deleteFeedback_shouldThrow_whenTeacherSubjectNull() throws Exception {
+        StudentDetailsController c = new StudentDetailsController();
+
+        UserProfileDaoImpl fakeProfileNullSubject = new UserProfileDaoImpl() {
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) {
+                return new UserProfileDaoImpl.TeacherProfile(1, "T", "t@x.com", null);
+            }
+        };
+
+        setField(c, "userProfileDao", fakeProfileNullSubject);
+
+        assertThrows(SecurityException.class,
+                () -> c.deleteFeedback("S001", 10));
+    }
+
+    @Test
+    void deleteFeedback_shouldThrow_whenTeacherNotMath() throws Exception {
+        StudentDetailsController c = new StudentDetailsController();
+
+        UserProfileDaoImpl fakeProfile = new UserProfileDaoImpl() {
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) {
+                return new UserProfileDaoImpl.TeacherProfile(1, "T", "t@x.com", "English");
+            }
+        };
+
+        setField(c, "userProfileDao", fakeProfile);
+
+        assertThrows(SecurityException.class,
+                () -> c.deleteFeedback("S001", 10));
+    }
+
+    @Test
+    void deleteFeedback_shouldWork_whenTeacherIsMath() throws Exception {
+        StudentDetailsController c = new StudentDetailsController();
+
+        UserProfileDaoImpl fakeProfileMath = new UserProfileDaoImpl() {
+            @Override public UserProfileDaoImpl.TeacherProfile findTeacherByUserId(int userId) {
+                // also works with "Math" or "Maths" because controller checks contains("math")
+                return new UserProfileDaoImpl.TeacherProfile(1, "T", "t@x.com", "Mathematics");
+            }
+        };
+
+        StudentDao fakeStudentDao = new StudentDao() {
+            @Override public int findStudentIdByStudentNumber(String studentNumber) {
+                assertEquals("S001", studentNumber);
+                return 10;
+            }
+
+            // unused
+            @Override public void create(Backend.model.entity.Student student) {}
+            @Override public Backend.model.entity.Student findById(int studentId) { return null; }
+            @Override public java.util.List<Backend.model.entity.Student> findAll() { return java.util.List.of(); }
+            @Override public void update(Backend.model.entity.Student student) {}
+            @Override public void delete(int studentId) {}
+            @Override public boolean existsById(int studentId) { return false; }
+            @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber) { return null; }
+            @Override public Backend.model.entity.Student findFirstStudent() { return null; }
+            @Override public java.util.List<Backend.model.entity.Student> findAllBasic() { return java.util.List.of(); }
+        };
+
+        StudentDetailsService fakeService = new StudentDetailsService() {
+            @Override public void deleteFeedback(int studentId) {
+                assertEquals(10, studentId);
+            }
+        };
+
+        setField(c, "userProfileDao", fakeProfileMath);
+        setField(c, "studentDao", fakeStudentDao);
+        setField(c, "service", fakeService);
+
+        c.deleteFeedback("S001", 10);
     }
 
     @Test

@@ -23,21 +23,32 @@ public class StudentDetailsServiceTest {
     }
 
     @Test
-    void getStudentDetails_saveFeedback_getFeedback_shouldCallDao() throws Exception {
+    void getStudentDetails_saveFeedback_getFeedback_deleteFeedback_shouldCallDao() throws Exception {
         StudentDetailsService s = new StudentDetailsService();
 
         MarksDao fakeDao = new MarksDao() {
-            @Override public StudentDetailsDTO findStudentDetails(int studentId) {
+            @Override
+            public StudentDetailsDTO findStudentDetails(int studentId) {
                 assertEquals(10, studentId);
                 return new StudentDetailsDTO();
             }
-            @Override public void saveOrUpdateFeedback(int studentId, String feedback) {
+
+            @Override
+            public void saveOrUpdateFeedback(int studentId, String feedback) {
                 assertEquals(10, studentId);
                 assertEquals("Nice", feedback);
             }
-            @Override public String findFeedback(int studentId) {
+
+            @Override
+            public String findFeedback(int studentId) {
                 assertEquals(10, studentId);
                 return "Saved";
+            }
+
+            // deleteFeedback
+            @Override
+            public void deleteFeedback(int studentId) {
+                assertEquals(10, studentId);
             }
 
             // unused
@@ -50,5 +61,7 @@ public class StudentDetailsServiceTest {
         assertNotNull(s.getStudentDetails(10));
         s.saveFeedback(10, "Nice");
         assertEquals("Saved", s.getFeedback(10));
+
+        s.deleteFeedback(10);
     }
 }
