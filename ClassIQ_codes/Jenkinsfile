@@ -25,38 +25,51 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean install'
+                dir('ClassIQ_codes') {
+                    bat 'mvn clean install'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                bat 'mvn test'
+                dir('ClassIQ_codes') {
+                    bat 'mvn test'
+                }
             }
         }
 
         stage('JaCoCo Report') {
             steps {
-                bat 'mvn jacoco:report'
+                dir('ClassIQ_codes') {
+                    bat 'mvn jacoco:report'
+                }
             }
         }
 
         stage('Publish Test Results') {
             steps {
-                junit '**/target/surefire-reports/*.xml'
+                junit 'ClassIQ_codes/target/surefire-reports/*.xml'
             }
         }
 
         stage('Publish Coverage Report') {
             steps {
-                jacoco()
+                publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'ClassIQ_codes/target/site/jacoco',
+                        reportFiles: 'index.html',
+                        reportName: 'JaCoCo Coverage Report'
+                ])
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
+                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}", "ClassIQ_codes")
                 }
             }
         }
