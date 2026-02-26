@@ -9,8 +9,9 @@ pipeline {
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
-        DOCKERHUB_REPO = 'poornimj/clasiq'
+        DOCKERHUB_REPO = 'poornimj/classiq'
         DOCKER_IMAGE_TAG = 'latest'
+        PROJECT_DIR = 'ClassIQ_codes'
     }
 
     stages {
