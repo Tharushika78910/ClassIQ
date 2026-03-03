@@ -26,12 +26,11 @@ public class TeacherStudentsInfoPage {
     public Parent getView() {
 
         // ROOT
-
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(18));
         root.getStyleClass().add("page-bg");
 
-        // HEADER BAR (Professional)
+        // HEADER BAR (Logout Removed)
 
         Label headerTitle = new Label("Students");
         headerTitle.getStyleClass().addAll("header-title");
@@ -41,17 +40,11 @@ public class TeacherStudentsInfoPage {
 
         VBox titleBox = new VBox(2, headerTitle, headerSub);
 
-        // REMOVED: back button
-
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-        logoutBtn.setOnAction(e -> dashboard.showPage(new Label("Logged out (placeholder)")));
-
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // backBtn removed from header
-        HBox header = new HBox(12, titleBox, spacer, logoutBtn);
+        // Logout button completely removed here
+        HBox header = new HBox(12, titleBox, spacer);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("header-bar");
 
@@ -78,7 +71,7 @@ public class TeacherStudentsInfoPage {
         table.getColumns().setAll(colNumber, colName);
         table.setPlaceholder(new Label("No students found."));
 
-        // Row hover
+        // Row hover effect
         table.setRowFactory(tv -> {
             TableRow<StudentRow> row = new TableRow<>();
             row.hoverProperty().addListener((obs, wasHover, isHover) -> {
@@ -125,7 +118,6 @@ public class TeacherStudentsInfoPage {
         Button openBtn = new Button("Open Profile");
         openBtn.getStyleClass().add("primary-btn");
 
-        // Disable open when empty
         openBtn.disableProperty().bind(
                 Bindings.createBooleanBinding(() ->
                                 searchField.getText() == null || searchField.getText().trim().isEmpty(),
@@ -135,7 +127,6 @@ public class TeacherStudentsInfoPage {
         HBox searchBar = new HBox(10, searchIcon, searchField, clearBtn, openBtn);
         searchBar.setAlignment(Pos.CENTER_LEFT);
 
-        // live filter while typing (by ID or name)
         searchField.textProperty().addListener((obs, old, text) -> {
             String q = text == null ? "" : text.trim().toLowerCase();
             if (q.isEmpty()) {
@@ -154,7 +145,6 @@ public class TeacherStudentsInfoPage {
             status.setText("");
         });
 
-        // click row fills search
         table.setOnMouseClicked(e -> {
             StudentRow selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -190,8 +180,6 @@ public class TeacherStudentsInfoPage {
 
         openBtn.setOnAction(e -> goNext.run());
         searchField.setOnAction(e -> goNext.run());
-
-        // BUILD CARD
 
         Label sectionTitle = new Label("All Students");
         sectionTitle.getStyleClass().add("section-title");
