@@ -4,22 +4,13 @@
 
 ## Sprint Goal
 
-The goal of this sprint is to implement advanced features in the ClassIQ project, including user authentication, data validation, search functionality, reporting, and system optimization. Additionally, the team aims to integrate Jenkins for automated builds and testing, and prepare the system for local deployment using Docker.
-
----
+The primary goal of Sprint 3 is to enhance the functionality and usability of the Student Grading System by implementing user authentication, role-based access control, data validation, search capabilities, and reporting features. Additionally, the team will focus on fixing bugs identified in the previous sprint and integrating Jenkins for automated build and testing processes.
 
 ## Selected Product Backlog Items
 
 During this sprint, the team will focus on:
 
-- Implementing user authentication with login and logout functionality
-- Adding role-based access control for teachers and students
-- Applying data validation to ensure accurate student information, grades, and assignment records
-- Developing search functionality for efficient retrieval of student and grade data
-- Creating reporting features to generate individual student report cards
-- Fixing bugs identified in the previous sprint
-- Integrating Jenkins for automated build, testing, and code coverage processes
-- Configuring a Docker image for local deployment
+The project includes implementing user authentication with login and logout functionality, as well as adding role-based access control to differentiate permissions between teachers and students. Data validation is applied to ensure the accuracy of student information, grades, and assignment records. Search functionality is developed to enable efficient retrieval of student and grade data, and reporting features are created to generate individual student report cards. In addition, bugs identified in the previous sprint are fixed. The project also involves integrating Jenkins for automated build, testing, and code coverage processes, and configuring a Docker image for local deployment.
 
 ---
 
@@ -27,16 +18,9 @@ During this sprint, the team will focus on:
 
 To achieve these objectives, the team will:
 
-- Develop the user authentication module with secure login and logout features
-- Implement role-based access control mechanisms
-- Apply data validation rules to maintain the integrity of student and grading data
-- Design and implement search functionality for quick access to student records and grades
-- Develop reporting features to generate meaningful student performance summaries
-- Fix issues identified in Sprint 2 to improve system stability
-- Configure Jenkins for automated builds, testing, and code coverage reporting
-- Prepare and configure a Docker image for consistent local deployment and testing
+In this phase of the project, we focused on strengthening both the functionality and reliability of the system. We developed a secure user authentication module that allows users to log in and log out safely, and we introduced role-based access control to ensure that teachers and students have appropriate permissions. To maintain accurate and trustworthy information, we applied data validation rules to student records and grading data.
 
----
+We also improved usability by designing a search feature that makes it quick and easy to find student records and grades. In addition, we created reporting tools that generate clear and meaningful summaries of student performance. To enhance system stability, we addressed and fixed the issues identified in Sprint 2. Finally, we set up Jenkins to automate builds, testing, and code coverage reporting, and prepared a Docker image to ensure smooth and consistent local deployment and testing.
 
 ## Team Capacity & Assumptions
 
@@ -52,7 +36,4 @@ Class activities and project meetings will support sprint tasks, including debug
 
 A task will be considered complete once:
 
-- The feature is implemented and functions as expected
-- Unit tests pass with reported code coverage
-- All changes are committed to GitHub and tracked in Trello
-- Relevant documentation is updated  
+The feature has been successfully implemented and is working as expected. All unit tests have passed, with code coverage properly reported to ensure reliability and quality. The updates and changes have been committed to GitHub and are being tracked in Trello for transparency and project management purposes. Additionally, all relevant documentation has been updated to reflect the latest changes and improvements. 
