@@ -1,4 +1,4 @@
-## Sprint 3 Planning Report (10/02/2025 – 23/02/2025)
+## Sprint 3 Planning Report (10/02/2026 – 03/03/2026)
 
 ---
 
@@ -10,7 +10,22 @@ The primary goal of Sprint 3 is to enhance the functionality and usability of th
 
 During this sprint, the team will focus on:
 
-The project includes implementing user authentication with login and logout functionality, as well as adding role-based access control to differentiate permissions between teachers and students. Data validation is applied to ensure the accuracy of student information, grades, and assignment records. Search functionality is developed to enable efficient retrieval of student and grade data, and reporting features are created to generate individual student report cards. In addition, bugs identified in the previous sprint are fixed. The project also involves integrating Jenkins for automated build, testing, and code coverage processes, and configuring a Docker image for local deployment.
+---
+-Implemented user authentication with login and logout functionality
+
+-Added role-based access control for teachers and students
+
+-Applied data validation to ensure accurate student information, grades, and assignment records
+
+-Developed search functionality for efficient retrieval of student and grade data
+
+-Created reporting features to generate individual student report cards
+
+-Fixed bugs identified in the previous sprint
+
+-Integrated Jenkins for automated build, testing, and code coverage processes
+
+-Configured a Docker image for local deployment
 
 ---
 
