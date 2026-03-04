@@ -9,7 +9,7 @@ pipeline {
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
-        DOCKERHUB_REPO = 'roshinif/classiq'
+        DOCKERHUB_REPO = 'poornimj/classiq'
         DOCKER_IMAGE_TAG = 'latest'
         PROJECT_DIR = 'ClassIQ_codes'
     }
@@ -77,9 +77,8 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS_ID) {
-                        def img = docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
-                        img.push()
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
                     }
                 }
             }
