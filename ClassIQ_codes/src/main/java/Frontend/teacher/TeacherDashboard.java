@@ -29,7 +29,7 @@ public class TeacherDashboard extends BorderPane {
     private static final String BG_IMAGE = "/Homepage.png";
     private static final String MARK_IMAGE = "/images/MarkSheet.png";
     private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
-    private static final String STUDENT_IMAGE = "/images/studentInfo.png";
+    private static final String STUDENT_IMAGE = "/images/StudentInfo.png";
 
     public TeacherDashboard(String name, String email, String profileImagePath) {
 
