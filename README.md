@@ -12,10 +12,11 @@ The goal of this project is to demonstrate software development concepts and mod
 ## Features
 
 * Manage student information
+* Enter marks
 * Display grading criteria
 * View student grades
 * Generate report cards
-* Teacher dashboard interface
+* Display teacher/student dashboard interface
 * Grant feed backs
 
 ---
