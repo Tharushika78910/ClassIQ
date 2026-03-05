@@ -12,7 +12,7 @@ The goal of this project is to demonstrate software development concepts and mod
 ## Features
 
 * Manage student information
-* Enter student marks
+* Enter students marks
 * Display grading criteria
 * View student grades
 * Generate report cards
