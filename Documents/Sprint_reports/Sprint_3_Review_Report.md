@@ -1,10 +1,10 @@
-## Sprint 3 Review Report (10/02/2025 – 23/02/2025)
+## Sprint 3 Review Report (10/02/2026 – 03/03/2026)
 
 ---
 
 ## Sprint Goal
 
-The goal of this sprint was to implement advanced features in the ClassIQ project, including user authentication, data validation, search functionality, reporting, and system optimization. Additionally, Jenkins was integrated for automated builds and testing, and the system was prepared for local deployment using Docker.
+The objective of this sprint was to add advanced features in the ClassIQ project, which include user authentication, validation of data, searching, reporting, and optimization of the system. Additionally, integration with Jenkins for automated builds and tests, and the system is ready for local deployment using Docker.
 
 ---
 
@@ -21,53 +21,31 @@ During the sprint, the team successfully implemented:
 - Jenkins configuration for automated builds, testing, and code coverage reporting
 - Docker image creation and testing for consistent local deployment
 
-All code changes were committed to GitHub, and Trello was updated to reflect the completion of tasks and user stories.
+The code changes were pushed in to GitHub, and the changes were made in the Trello board by marking the completion of the tasks and user stories.
 
 ---
 
 ## Demo Summary
 
-During the sprint review, the team demonstrated:
-
-- The login and authentication system with role-based access control
-- Search functionality for retrieving student records
-- Reporting features generating class summaries and individual performance reports
-- Data validation processes verified through test cases
-- Successful execution of unit tests
-- Jenkins automated build process and code coverage reports
-- Docker-based local deployment of the system
-
-Each team member presented their individual contributions during the demonstration.
+During the sprint review, the team demonstrated several completed features of the system. These included the login and authentication system with role-based access control, the search functionality for locating student records, and the reporting features used to generate class summaries and individual student performance reports. The team also presented the data validation processes that have already been implemented and verified through test cases, along with the successful execution of unit tests. In addition, the Jenkins automated build process and code coverage reports were shown, as well as the Docker-based local deployment of the system. During the demonstration, each team member explained their individual contributions to the completed work.
 
 ---
 
 ## What Went Well
 
-- All planned features were implemented successfully
-- Jenkins integration streamlined build and testing processes
-- Docker ensured reliable and consistent local deployment
-- Effective team coordination throughout the sprint
-- GitHub and Trello were used efficiently to track progress
+All the planned features were successfully implemented during the sprint. The integration of Jenkins was effective in streamlining the build and testing processes, while Docker helped ensure that the deployment process ran smoothly on the local machine. Good team coordination was observed throughout the entire sprint period, which contributed to the timely completion of tasks. Additionally, GitHub and Trello were effectively utilized to track progress and manage the project activities.
 
 ---
 
 ## What Could Be Improved
 
-- Allocate more time to enhance the user interface for reporting and search features
-- Increase unit test coverage to further improve system reliability
-- Plan for potential integration issues earlier in the sprint to reduce unexpected delays
+More time could be allocated to improving the user interface, particularly for the reporting and searching features, to enhance usability and user experience. In addition, unit test coverage could be increased to make the system more reliable and to better detect potential issues in the code. Furthermore, potential integration issues could be identified and planned for at an earlier stage in the sprint to reduce risks and ensure smoother development and integration.
 
 ---
 
 ## Next Sprint Focus
 
-In the next sprint, the team will focus on:
-
-- Improving the user interface for better usability
-- Expanding reporting features with graphical dashboards and export options
-- Optimizing system performance
-- Preparing the system for functional review
-- Completing final project documentation
+The next steps for the project include improving the user interface to make the system easier and more intuitive to use. The reporting feature will also be enhanced to better visualize the data. In addition, efforts will be made to optimize the overall system performance. The team will also prepare the system for the upcoming functional review and complete the final documentation of the project.
 
 ---
 

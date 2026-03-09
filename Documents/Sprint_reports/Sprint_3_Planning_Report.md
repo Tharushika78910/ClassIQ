@@ -11,21 +11,21 @@ The primary goal of Sprint 3 is to enhance the functionality and usability of th
 During this sprint, the team will focus on:
 
 ---
--Implemented user authentication with login and logout functionality
+- Implemented user authentication with login and logout functionality
 
--Added role-based access control for teachers and students
+- Added role-based access control for teachers and students
 
--Applied data validation to ensure accurate student information, grades, and assignment records
+- Applied data validation to ensure accurate student information, grades, and assignment records
 
--Developed search functionality for efficient retrieval of student and grade data
+- Developed search functionality for efficient retrieval of student and grade data
 
--Created reporting features to generate individual student report cards
+- Created reporting features to generate individual student report cards
 
--Fixed bugs identified in the previous sprint
+- Fixed bugs identified in the previous sprint
 
--Integrated Jenkins for automated build, testing, and code coverage processes
+- Integrated Jenkins for automated build, testing, and code coverage processes
 
--Configured a Docker image for local deployment
+- Configured a Docker image for local deployment
 
 ---
 
