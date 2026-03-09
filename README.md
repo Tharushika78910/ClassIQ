@@ -2,20 +2,21 @@
 
 ## Project Overview
 
-ClassIQ is a Java-based application developed to help teachers to manage student academic records.
+ClassIQ is a Java-based application which is developed to help teachers to manage student academic records.
 The system allows teachers to view student information, record marks, and generate report cards and giving feed back according students' perfomances in an organized way.
->Furthermore students can see their grades and how is the base of their grades and download their own report card
- The goal of this project is to demonstrate software development concepts and modern development tools.
+Further more students can see their grades and how is the base of their grades and download their own report cards.
+The goal of this project is to demonstrate software development concepts and modern development tools.
 
 ---
 
 ## Features
 
 * Manage student information
+* Enter students marks
 * Display grading criteria
 * View student grades
 * Generate report cards
-* Teacher dashboard interface
+* Display teacher/student dashboard interface
 * Grant feed backs
 
 ---
@@ -24,11 +25,14 @@ The system allows teachers to view student information, record marks, and genera
 
 
 * **JavaFX** for the user interface
+* **IntelliJ IDEA** Integrated Development Environment
 * **Maven** for project build management
-* **MariaDB / Heidy SQL for Database**
+* **MariaDB** HeidiSQL for Database
 * **JUnit** for testing
+* **JaCoCo** Code coverage reporting 
 * **Jenkins** for Continuous Integration
 * **Docker** for containerization
+* * **VcXsrv/ Xming** – X server for displaying JavaFX GUI from Docker
 * **GitHub** for version control
 
 ---
@@ -42,7 +46,7 @@ ClassIQ
 ├── src/test        → Unit tests
 ├── target          → Compiled project files
 ├── Dockerfile      → Docker configuration
-├── Jenkins file     → Jenkins automation pipeline
+├── Jenkins file    → Jenkins automation pipeline
 ├── pom.xml         → Maven configuration
 └── README.md       → Project documentation
 ```
@@ -55,12 +59,11 @@ This project includes a flowchart that illustrates three software development me
 
 ### Methodology Overview
 
-| Methodology | Description                                                                                                                                                               |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Methodology | Description                                                                                                                            |
+| ----------- |----------------------------------------------------------------------------------------------------------------------------------------|
 | **SDLC**    | The process that step by step moves such as requirement analysis, system design, implementation, testing, deployment, and maintenance. |
-| **Agile**   | An method which work is completed in short cycles called sprints. Each sprint includes planning, development, testing, and review.                  |
-| **DevOps**  | A modern approach that integrates development and operations with continuous integration, testing, delivery, and monitoring.                                              |
-
+| **Agile**   | An method which work is completed in short periods called sprints. Each sprint includes planning, development, testing, and review.    |
+| **DevOps**  | DevOps is a modern method where development and operations work together to automatically build, test, and deliver software.
 ## Use Case Diagram
 The use case diagram shows how users interact with the system.
 ![Use case Diagram](Diagrams/UseCase_Diagram(ClassIQ).jpeg)
@@ -77,35 +80,75 @@ https://trello.com/b/uLfnPk8H/product-description-goal
 
 ---
 
-## How to Run the Project
+## Run ClassIQ Project
 
-1. Clone the repository from GitHub.
-2. Open the project in IntelliJ IDEA.
-3. Build the project using Maven.
+### 1. Clone the Repository
 
-```
-mvn clean install
-```
-
-4. Run the main Java application file.
-
----
-
-## Docker Usage
-
-Build the Docker image:
+Clone the project from GitHub:
 
 ```
-docker build -t classIq-app .
-```
-
-Run the container:
-
-```
-docker run classIq-app
+git clone https://github.com/Tharushika78910/ClassIQ.git
+cd ClassIQ
 ```
 
 ---
+
+### 2. CI/CD Pipeline (Automatic Build)
+
+Push the project to GitHub. Jenkins will automatically run the pipeline and perform the following steps:
+
+* Build the project using **Maven**
+* Run **JUnit unit tests**
+* Generate **JaCoCo code coverage report**
+* Build the **Docker image**
+* Push the Docker image to **Docker Hub**
+
+Docker image repository:
+
+```
+https://hub.docker.com/r/poornimj/classiq
+```
+
+---
+
+### 3. Start Required Services
+
+Before running the application, make sure the following services are running:
+
+**MariaDB**
+
+* Start the MariaDB server.
+* Ensure the database `classiq` exists.
+
+**VcXsrv / Xming (For JavaFX GUI)**
+
+Start **VcXsrv or Xming** to allow the Docker container to display the JavaFX graphical interface on Windows.
+
+---
+
+### 4. Pull Docker Image
+
+Download the latest Docker image from Docker Hub:
+
+```
+docker pull poornimj/classiq:latest
+```
+
+---
+
+### 5. Run the Docker Container
+
+Run the application container :
+
+```
+docker run --rm -e DISPLAY=host.docker.internal:0.0 -e DB_HOST=host.docker.internal -e DB_PORT=3306 -e DB_NAME=classiq -e DB_USER=root -e DB_PASS=root123 poornimj/classiq:latest
+```
+
+---
+
+### 6. Launch Application
+
+After running the container, the **ClassIQ JavaFX application will open on the desktop**.
 
 ## Author
 
