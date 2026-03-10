@@ -6,7 +6,7 @@
 
 ---
 
-The goal of Sprint 4 is to finalize the ClassIQ prototype, containerize the complete application using Docker, publish the Docker image to Docker Hub, and prepare the system for final demonstration
+The goal of Sprint 4 is to finalize the ClassIQ prototype, containerize the complete application using Docker, push the Docker image to Docker Hub, and prepare the system for final demonstration
 
 ## Selected Product Backlog Items
 
