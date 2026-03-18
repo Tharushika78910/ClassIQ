@@ -12,6 +12,7 @@ import java.util.Map;
 public class ReportCardPdfExporter {
 
     public static File export(
+            File outFile,
             String studentNumber,
             String studentName,
             String studentClass,
@@ -20,9 +21,6 @@ public class ReportCardPdfExporter {
             Double average,
             String feedback
     ) throws Exception {
-
-        String fileName = "ReportCard_" + studentNumber + "_" + LocalDate.now() + ".pdf";
-        File outFile = new File(System.getProperty("user.home") + File.separator + "Downloads", fileName);
 
         Document doc = new Document(PageSize.A4, 48, 48, 40, 70);
         PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(outFile));
@@ -33,7 +31,7 @@ public class ReportCardPdfExporter {
         doc.open();
 
         // LOGOLINE
-        try (InputStream lineStream = ReportCardPdfExporter.class.getResourceAsStream("/logoline.png")) {
+        try (InputStream lineStream = ReportCardPdfExporter.class.getResourceAsStream("/Logoline.png")) {
             if (lineStream != null) {
                 Image line = Image.getInstance(lineStream.readAllBytes());
                 line.scaleToFit(430, 130);
@@ -53,7 +51,7 @@ public class ReportCardPdfExporter {
         Font labelFont = new Font(Font.HELVETICA, 12, Font.BOLD);
         Font valFont = new Font(Font.HELVETICA, 12, Font.NORMAL);
 
-        // TOP DETAILS (NO student ID, NO created at)
+        // TOP DETAILS
         PdfPTable info = new PdfPTable(2);
         info.setWidthPercentage(80);
         info.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -63,7 +61,6 @@ public class ReportCardPdfExporter {
         addInfoRow(info, "Student Number", safe(studentNumber), labelFont, valFont);
         addInfoRow(info, "Student Name", safe(studentName), labelFont, valFont);
         addInfoRow(info, "Class", safe(studentClass), labelFont, valFont);
-
         addInfoRow(info, "Total", total == null ? "-" : String.valueOf(total), labelFont, valFont);
         addInfoRow(info, "Average", average == null ? "-" : String.format("%.2f", average), labelFont, valFont);
 
@@ -89,7 +86,7 @@ public class ReportCardPdfExporter {
 
         doc.add(table);
 
-        // FEEDBACK (aligned under table)
+        // FEEDBACK
         PdfPTable fbTable = new PdfPTable(2);
         fbTable.setWidthPercentage(80);
         fbTable.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -113,7 +110,7 @@ public class ReportCardPdfExporter {
 
         doc.add(fbTable);
 
-        // GENERATED ON (BOTTOM RIGHT ONLY)
+        // GENERATED ON
         Font footerFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
         Paragraph generated = new Paragraph("Generated on: " + LocalDate.now(), footerFont);
         generated.setAlignment(Element.ALIGN_RIGHT);
@@ -123,8 +120,6 @@ public class ReportCardPdfExporter {
         doc.close();
         return outFile;
     }
-
-    // helpers
 
     private static String safe(String s) {
         return s == null ? "" : s;
@@ -167,7 +162,6 @@ public class ReportCardPdfExporter {
         }
     }
 
-    // FULL PAGE background image
     private static class FullPageBackground extends PdfPageEventHelper {
         private final String resourcePath;
 
@@ -188,7 +182,8 @@ public class ReportCardPdfExporter {
                 bg.setAbsolutePosition(0, 0);
 
                 writer.getDirectContentUnder().addImage(bg);
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
     }
 }
