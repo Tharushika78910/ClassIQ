@@ -4,6 +4,7 @@ import Backend.controller.StudentDetailsController;
 import Backend.model.dto.StudentDetailsDTO;
 import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
+import Frontend.LoginPage;
 import Frontend.Session;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -12,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class TeacherStudentDetailsPage {
 
@@ -165,17 +167,48 @@ public class TeacherStudentDetailsPage {
         center.setPadding(new Insets(18));
         root.setCenter(center);
 
-        // BOTTOM LEFT BUTTONS
+        // BOTTOM BUTTON BAR
+        String pillNormal =
+                "-fx-background-color: rgba(255,255,255,0.92);" +
+                        "-fx-text-fill: #2E6F62;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+
+        String pillHover =
+                "-fx-background-color: #9AC4B7;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 8 22 8 22;";
+
         Button btnBack = new Button("← Back");
         btnBack.getStyleClass().add("back-pill-btn");
 
         Button btnDashboard = new Button("Dashboard");
         btnDashboard.getStyleClass().add("back-pill-btn");
 
-        HBox bottomBar = new HBox(10, btnBack, btnDashboard);
-        bottomBar.setAlignment(Pos.CENTER_LEFT);
-        bottomBar.setPadding(new Insets(10, 0, 0, 10));
+        Button btnLogout = new Button("Logout");
+        btnLogout.setStyle(pillNormal);
+        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
+        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
 
+        HBox leftButtons = new HBox(10, btnBack, btnDashboard);
+        leftButtons.setAlignment(Pos.CENTER_LEFT);
+
+        AnchorPane bottomBar = new AnchorPane();
+        bottomBar.setPadding(new Insets(15));
+
+        AnchorPane.setLeftAnchor(leftButtons, 20.0);
+        AnchorPane.setBottomAnchor(leftButtons, 10.0);
+
+        AnchorPane.setRightAnchor(btnLogout, 20.0);
+        AnchorPane.setBottomAnchor(btnLogout, 10.0);
+
+        bottomBar.getChildren().addAll(leftButtons, btnLogout);
         root.setBottom(bottomBar);
 
         // LOGIC: allow Mathematics teacher only (tolerant match)
@@ -335,11 +368,15 @@ public class TeacherStudentDetailsPage {
             }
         });
 
-        btnBack.setOnAction(e ->
-                dashboard.showPage(new TeacherStudentsInfoPage(dashboard).getView())
-        );
+        btnBack.setOnAction(e -> dashboard.showTeacherStudentsInfoPage());
 
         btnDashboard.setOnAction(e -> dashboard.showHome());
+
+        btnLogout.setOnAction(e -> {
+            Session.clear();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new LoginPage(stage).getScene());
+        });
 
         return root;
     }

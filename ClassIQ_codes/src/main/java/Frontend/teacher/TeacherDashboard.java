@@ -115,9 +115,7 @@ public class TeacherDashboard extends BorderPane {
         );
 
         // Wrap student feedback page with TeacherDashboard back pill
-        studentBtn.setOnAction(e ->
-                showPage(wrapWithBackPill(new TeacherStudentsInfoPage(this).getView()))
-        );
+        studentBtn.setOnAction(e -> showTeacherStudentsInfoPage());
 
         // Grid: 2 blocks top row, student block centered below spanning 2 columns
         GridPane grid = new GridPane();
@@ -308,5 +306,9 @@ public class TeacherDashboard extends BorderPane {
 
     public void showPage(Node node) {
         contentArea.getChildren().setAll(node);
+    }
+
+    public void showTeacherStudentsInfoPage() {
+        showPage(wrapWithBackPill(new TeacherStudentsInfoPage(this).getView()));
     }
 }
