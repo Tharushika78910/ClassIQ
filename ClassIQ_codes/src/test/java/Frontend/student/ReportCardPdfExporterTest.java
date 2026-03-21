@@ -13,35 +13,27 @@ public class ReportCardPdfExporterTest {
 
     @Test
     void export_shouldCreatePdfFile() throws Exception {
-        String originalHome = System.getProperty("user.home");
+        File tempDir = Files.createTempDirectory("classiq-pdf-test").toFile();
+        File outFile = new File(tempDir, "test-report.pdf");
 
-        File tempHome = Files.createTempDirectory("classiq-home").toFile();
-        File downloads = new File(tempHome, "Downloads");
-        assertTrue(downloads.mkdirs() || downloads.exists(), "Downloads folder should exist");
+        Map<String, ReportCardPdfExporter.SubjectLine> subjects = new LinkedHashMap<>();
+        subjects.put("Mathematics", new ReportCardPdfExporter.SubjectLine(80, "A"));
+        subjects.put("English", new ReportCardPdfExporter.SubjectLine(65, "B"));
 
-        System.setProperty("user.home", tempHome.getAbsolutePath());
+        File pdf = ReportCardPdfExporter.export(
+                outFile,
+                "S001",
+                "John Doe",
+                "Grade 2",
+                subjects,
+                145,
+                72.5,
+                "Keep it up!"
+        );
 
-        try {
-            Map<String, ReportCardPdfExporter.SubjectLine> subjects = new LinkedHashMap<>();
-            subjects.put("Mathematics", new ReportCardPdfExporter.SubjectLine(80, "A"));
-            subjects.put("English", new ReportCardPdfExporter.SubjectLine(65, "B"));
-
-            File pdf = ReportCardPdfExporter.export(
-                    "S001",
-                    "John Doe",
-                    "Grade 2",
-                    subjects,
-                    145,
-                    72.5,
-                    "Keep it up!"
-            );
-
-            assertNotNull(pdf, "Returned file should not be null");
-            assertTrue(pdf.exists(), "PDF file should exist");
-            assertTrue(pdf.length() > 0, "PDF file should not be empty");
-
-        } finally {
-            System.setProperty("user.home", originalHome);
-        }
+        assertNotNull(pdf, "Returned file should not be null");
+        assertEquals(outFile.getAbsolutePath(), pdf.getAbsolutePath(), "Returned file should match requested output file");
+        assertTrue(pdf.exists(), "PDF file should exist");
+        assertTrue(pdf.length() > 0, "PDF file should not be empty");
     }
 }

@@ -5,6 +5,7 @@ import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
 import Frontend.LoginPage;
 import Frontend.Session;
+import javafx.stage.FileChooser;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,20 +33,16 @@ public class StudentReportCardPage {
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("page-bg");
-        
-        // Add CSS stylesheet
+
         root.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
         );
-        
-        root.setPadding(new Insets(30));
 
-        // CENTER WRAPPER
+        root.setPadding(new Insets(30));
 
         StackPane centerWrapper = new StackPane();
         centerWrapper.setPadding(new Insets(20));
 
-        // MAIN CONTENT BOX (CENTERED BLOCK)
         VBox contentBox = new VBox(12);
         contentBox.setAlignment(Pos.TOP_CENTER);
         contentBox.setMaxWidth(700);
@@ -70,8 +66,6 @@ public class StudentReportCardPage {
             return root;
         }
 
-        // Load student_marks row ONLY
-
         StudentMarks marks = null;
         try {
             marks = new MarksDaoImpl().findByStudentId(student.getStudentId());
@@ -83,12 +77,11 @@ public class StudentReportCardPage {
                 ? "No feedback has been added yet."
                 : marks.getFeedback();
 
-        // Mapping from your MarksDaoImpl:
-        Integer math  = (marks == null) ? null : marks.getSubject1(); // mathematics
-        Integer eng   = (marks == null) ? null : marks.getSubject2(); // english
-        Integer sci   = (marks == null) ? null : marks.getSubject3(); // science
-        Integer craft = (marks == null) ? null : marks.getSubject4(); // craft
-        Integer lang  = (marks == null) ? null : marks.getSubject5(); // languages
+        Integer math  = (marks == null) ? null : marks.getSubject1();
+        Integer eng   = (marks == null) ? null : marks.getSubject2();
+        Integer sci   = (marks == null) ? null : marks.getSubject3();
+        Integer craft = (marks == null) ? null : marks.getSubject4();
+        Integer lang  = (marks == null) ? null : marks.getSubject5();
 
         Integer total = (marks == null) ? null : marks.getTotal();
         Double average = (marks == null) ? null : marks.getAverage();
@@ -99,8 +92,6 @@ public class StudentReportCardPage {
         subjectResults.put("Science", new SubjectResult(sci, gradeFromMark(sci)));
         subjectResults.put("Language", new SubjectResult(lang, gradeFromMark(lang)));
         subjectResults.put("Craft", new SubjectResult(craft, gradeFromMark(craft)));
-
-        // GRID (CENTERED)
 
         GridPane grid = new GridPane();
         grid.setVgap(18);
@@ -156,8 +147,6 @@ public class StudentReportCardPage {
         StackPane.setAlignment(contentBox, Pos.TOP_CENTER);
         root.setCenter(centerWrapper);
 
-        // BOTTOM BUTTON BAR
-
         String pillNormal =
                 "-fx-background-color: rgba(255,255,255,0.92);" +
                         "-fx-text-fill: #2E6F62;" +
@@ -189,7 +178,24 @@ public class StudentReportCardPage {
                     pdfSubjects.put(e2.getKey(), new ReportCardPdfExporter.SubjectLine(sr.total, sr.grade));
                 }
 
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save Report Card");
+                fileChooser.setInitialFileName(
+                        "ReportCard_" + student.getStudentNumber() + "_" + java.time.LocalDate.now() + ".pdf"
+                );
+                fileChooser.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+                );
+
+                Stage currentStage = (Stage) root.getScene().getWindow();
+                File selectedFile = fileChooser.showSaveDialog(currentStage);
+
+                if (selectedFile == null) {
+                    return;
+                }
+
                 File pdf = ReportCardPdfExporter.export(
+                        selectedFile,
                         student.getStudentNumber(),
                         student.getFirstName() + " " + student.getLastName(),
                         "10A",
@@ -201,12 +207,8 @@ public class StudentReportCardPage {
 
                 Alert a = new Alert(Alert.AlertType.INFORMATION);
                 a.setHeaderText("PDF Generated");
-                a.setContentText("Saved to: " + pdf.getAbsolutePath());
+                a.setContentText("PDF saved successfully at:\n" + pdf.getAbsolutePath());
                 a.showAndWait();
-
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(pdf);
-                }
 
             } catch (Exception ex) {
                 ex.printStackTrace();
