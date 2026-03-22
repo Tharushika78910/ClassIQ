@@ -267,7 +267,8 @@ public class LoginPage {
         dialog.setTitle(bundle.getString("reset.password.title"));
 
         ButtonType resetBtn = new ButtonType(bundle.getString("reset"), ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(resetBtn, ButtonType.CANCEL);
+        ButtonType cancelBtn = new ButtonType(bundle.getString("cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(resetBtn, cancelBtn);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
