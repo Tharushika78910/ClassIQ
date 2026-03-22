@@ -109,8 +109,8 @@ public class LoginPage {
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
 
         btnBack.setOnAction(e -> {
-            HomePage home = new HomePage();
-            stage.setScene(home.getScene(stage));
+            HomePage home = new HomePage(currentLocale);
+            stage.setScene(home.getScene(stage, currentLocale));
         });
 
         StackPane.setAlignment(btnBack, Pos.BOTTOM_LEFT);

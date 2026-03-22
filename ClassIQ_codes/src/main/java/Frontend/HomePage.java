@@ -33,6 +33,14 @@ public class HomePage {
     // Current locale for localization
     private Locale currentLocale = new Locale("en", "US");
 
+    public HomePage() {
+        // Default constructor - uses English
+    }
+    
+    public HomePage(Locale locale) {
+        this.currentLocale = locale;
+    }
+
     public Scene getScene(Stage stage) {
         return getScene(stage, currentLocale);
     }
