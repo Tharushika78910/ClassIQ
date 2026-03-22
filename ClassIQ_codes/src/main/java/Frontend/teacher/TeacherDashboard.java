@@ -172,9 +172,13 @@ public class TeacherDashboard extends BorderPane {
         btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
         // placeholder
 
-        btnLogout.setOnAction(e ->
-                showPage(simplePlaceholder("Logged out (placeholder)"))
-        );
+        btnLogout.setOnAction(e -> {
+            // Clear session and return to login
+            Session.clear();
+            Stage stage = (Stage) getScene().getWindow();
+            LoginPage loginPage = new LoginPage(stage);
+            stage.getScene().setRoot(loginPage.getView());
+        });
 
         AnchorPane bottomBar = new AnchorPane();
         bottomBar.setPadding(new Insets(15));

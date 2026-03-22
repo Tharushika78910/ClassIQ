@@ -18,6 +18,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.Locale;
 
 public class LoginPage {
 
@@ -30,9 +32,15 @@ public class LoginPage {
     private static final String TEACHER_AVATAR = "/Teacher.png";
 
     private final Stage stage;
+    private Locale currentLocale = new Locale("en", "US");
 
     public LoginPage(Stage stage) {
         this.stage = stage;
+    }
+    
+    public LoginPage(Stage stage, Locale locale) {
+        this.stage = stage;
+        this.currentLocale = locale;
     }
 
     public Scene getScene() {
@@ -40,7 +48,8 @@ public class LoginPage {
     }
 
     public Parent getView() {
-
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", currentLocale);
+        
         StackPane root = new StackPane();
 
         ImageView bg = createBackgroundView();
@@ -69,8 +78,8 @@ public class LoginPage {
         cards.setStyle("-fx-background-color: transparent;");
         cards.setTranslateY(-60); //login panel move it slightly more upward
 
-        VBox teacherCard = buildLoginCard("I am a Teacher", TEACHER_AVATAR, "TEACHER");
-        VBox studentCard = buildLoginCard("I am a Student", STUDENT_AVATAR, "STUDENT");
+        VBox teacherCard = buildLoginCard(bundle.getString("i.am.teacher"), TEACHER_AVATAR, "TEACHER");
+        VBox studentCard = buildLoginCard(bundle.getString("i.am.student"), STUDENT_AVATAR, "STUDENT");
 
         cards.getChildren().addAll(teacherCard, studentCard);
 
@@ -94,7 +103,7 @@ public class LoginPage {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
-        Button btnBack = new Button("← Back");
+        Button btnBack = new Button(bundle.getString("back") + " ←");
         btnBack.setStyle(pillNormal);
         btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
@@ -112,6 +121,7 @@ public class LoginPage {
     }
 
     private VBox buildLoginCard(String titleText, String avatarPath, String roleType) {
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", currentLocale);
 
         VBox card = new VBox(14);
         card.setAlignment(Pos.CENTER);
@@ -135,21 +145,27 @@ public class LoginPage {
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
         TextField tfUser = new TextField();
-        tfUser.setPromptText("Username");
+        tfUser.setPromptText(bundle.getString("username"));
         tfUser.setPrefWidth(240);
 
         PasswordField tfPass = new PasswordField();
-        tfPass.setPromptText("Password");
+        tfPass.setPromptText(bundle.getString("password"));
         tfPass.setPrefWidth(240);
 
-        Hyperlink forgot = new Hyperlink("forgot password?");
+        // Apply RTL layout for Arabic language
+        if (isRTL(currentLocale)) {
+            tfUser.setStyle("-fx-text-alignment: right; -fx-alignment: CENTER_RIGHT;");
+            tfPass.setStyle("-fx-text-alignment: right; -fx-alignment: CENTER_RIGHT;");
+        }
+
+        Hyperlink forgot = new Hyperlink(bundle.getString("forgot.password"));
         forgot.setStyle("-fx-text-fill: #2F6DAA; -fx-font-size: 13px;");
         forgot.setOnAction(e -> showForgotPasswordDialog());
 
         Label error = new Label();
         error.setTextFill(Color.DARKRED);
 
-        Button loginBtn = new Button("Log in");
+        Button loginBtn = new Button(bundle.getString("log.in"));
         loginBtn.setPrefWidth(240);
 
         loginBtn.setOnAction(e -> {
@@ -160,7 +176,7 @@ public class LoginPage {
             String password = tfPass.getText() == null ? "" : tfPass.getText();
 
             if (username.isEmpty() || password.isEmpty()) {
-                error.setText("Enter username and password.");
+                error.setText(bundle.getString("error.credentials.required"));
                 return;
             }
 
@@ -168,12 +184,12 @@ public class LoginPage {
             AppUserDaoImpl.LoginResult result = auth.login(username, password);
 
             if (result == null) {
-                error.setText("Invalid credentials.");
+                error.setText(bundle.getString("error.credentials.invalid"));
                 return;
             }
 
             if (!roleType.equalsIgnoreCase(result.role)) {
-                error.setText("You are not registered as " + roleType + ".");
+                error.setText(bundle.getString("error.role.mismatch"));
                 return;
             }
 
@@ -183,7 +199,7 @@ public class LoginPage {
 
                 var sp = profileDao.findStudentByUserId(result.userId);
                 if (sp == null) {
-                    error.setText("Student profile not found.");
+                    error.setText(bundle.getString("error.student.notfound"));
                     return;
                 }
 
@@ -194,12 +210,12 @@ public class LoginPage {
                     fullStudent = studentDao.findById(sp.studentId);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    error.setText("Failed to load student.");
+                    error.setText(bundle.getString("error.student.load.failed"));
                     return;
                 }
 
                 if (fullStudent == null) {
-                    error.setText("Student not found.");
+                    error.setText(bundle.getString("error.student.missing"));
                     return;
                 }
 
@@ -216,7 +232,7 @@ public class LoginPage {
 
                 var tp = profileDao.findTeacherByUserId(result.userId);
                 if (tp == null) {
-                    error.setText("Teacher profile not found.");
+                    error.setText(bundle.getString("error.teacher.notfound"));
                     return;
                 }
 
@@ -238,13 +254,19 @@ public class LoginPage {
 
         return card;
     }
+    
+    // Helper method to check if locale is RTL
+    private boolean isRTL(Locale locale) {
+        return locale.getLanguage().equals("ar");
+    }
 
     private void showForgotPasswordDialog() {
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", currentLocale);
 
         Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Reset Password");
+        dialog.setTitle(bundle.getString("reset.password.title"));
 
-        ButtonType resetBtn = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
+        ButtonType resetBtn = new ButtonType(bundle.getString("reset"), ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(resetBtn, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -253,27 +275,35 @@ public class LoginPage {
         grid.setPadding(new Insets(20));
 
         TextField username = new TextField();
-        username.setPromptText("Username");
+        username.setPromptText(bundle.getString("username"));
 
         TextField email = new TextField();
-        email.setPromptText("Registered Email");
+        email.setPromptText(bundle.getString("registered.email"));
 
         PasswordField newPass = new PasswordField();
-        newPass.setPromptText("New Password");
+        newPass.setPromptText(bundle.getString("new.password.label"));
 
         PasswordField confirm = new PasswordField();
-        confirm.setPromptText("Confirm Password");
+        confirm.setPromptText(bundle.getString("confirm.password"));
+        
+        // Apply RTL layout for Arabic language in dialog
+        if (isRTL(currentLocale)) {
+            username.setStyle("-fx-text-alignment: right; -fx-alignment: CENTER_RIGHT;");
+            email.setStyle("-fx-text-alignment: right; -fx-alignment: CENTER_RIGHT;");
+            newPass.setStyle("-fx-text-alignment: right; -fx-alignment: CENTER_RIGHT;");
+            confirm.setStyle("-fx-text-alignment: right; -fx-alignment: CENTER_RIGHT;");
+        }
 
         Label msg = new Label();
         msg.setTextFill(Color.RED);
 
-        grid.add(new Label("Username:"), 0, 0);
+        grid.add(new Label(bundle.getString("username.label")), 0, 0);
         grid.add(username, 1, 0);
-        grid.add(new Label("Email:"), 0, 1);
+        grid.add(new Label(bundle.getString("email.label")), 0, 1);
         grid.add(email, 1, 1);
-        grid.add(new Label("New Password:"), 0, 2);
+        grid.add(new Label(bundle.getString("new.password.label")), 0, 2);
         grid.add(newPass, 1, 2);
-        grid.add(new Label("Confirm:"), 0, 3);
+        grid.add(new Label(bundle.getString("confirm.password.label")), 0, 3);
         grid.add(confirm, 1, 3);
         grid.add(msg, 1, 4);
 
@@ -290,13 +320,13 @@ public class LoginPage {
             String p2 = confirm.getText() == null ? "" : confirm.getText();
 
             if (u.isEmpty() || e.isEmpty() || p1.isEmpty() || p2.isEmpty()) {
-                msg.setText("Please fill all fields.");
+                msg.setText(bundle.getString("error.fields.required"));
                 ev.consume();
                 return;
             }
 
             if (!p1.equals(p2)) {
-                msg.setText("Passwords do not match.");
+                msg.setText(bundle.getString("error.password.mismatch"));
                 ev.consume();
                 return;
             }
@@ -305,7 +335,7 @@ public class LoginPage {
             Integer userId = dao.findUserIdByUsernameAndEmail(u, e);
 
             if (userId == null) {
-                msg.setText("Invalid username/email.");
+                msg.setText(bundle.getString("error.username.email.invalid"));
                 ev.consume();
                 return;
             }
@@ -313,12 +343,12 @@ public class LoginPage {
             boolean updated = dao.updatePassword(userId, p1);
 
             if (!updated) {
-                msg.setText("Reset failed.");
+                msg.setText(bundle.getString("error.reset.failed"));
                 ev.consume();
                 return;
             }
 
-            new Alert(Alert.AlertType.INFORMATION, "Password reset successful.").showAndWait();
+            new Alert(Alert.AlertType.INFORMATION, bundle.getString("password.reset.success")).showAndWait();
         });
 
         dialog.showAndWait();
