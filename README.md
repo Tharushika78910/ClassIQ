@@ -2,10 +2,15 @@
 
 ## Project Overview
 
-ClassIQ is a Java-based application which is developed to help teachers to manage student academic records.
-The system allows teachers to view student information, record marks, and generate report cards and giving feed back according students' perfomances in an organized way.
-Further more students can see their grades and how is the base of their grades and download their own report cards.
-The goal of this project is to demonstrate software development concepts and modern development tools.
+ClassIQ is a Java-based application developed to help teachers manage student academic records efficiently.
+The system allows teachers to view student information, record marks, generate report cards, and provide feedback based on student performance in an organized way.
+
+Additionally, students can view their grades, understand how they are calculated, and download their report cards.
+
+The system has been extended with localization support, allowing users to interact with the application in multiple languages, making it suitable for diverse educational environments.
+
+The goal of this project is to demonstrate software development concepts, modern development tools, and internationalization, software quality assurance, and DevOps practices.
+
 
 ---
 
@@ -17,7 +22,11 @@ The goal of this project is to demonstrate software development concepts and mod
 * View student grades
 * Generate report cards
 * Display teacher/student dashboard interface
-* Grant feed backs
+* Provide feedback on performance
+* Multilingual UI support (Localization)
+* Dynamic language switching
+* RTL (Right-to-Left) layout support
+* Localized database content support
 
 ---
 
@@ -34,8 +43,33 @@ The goal of this project is to demonstrate software development concepts and mod
 * **Docker** for containerization
 * * **VcXsrv/ Xming** – X server for displaying JavaFX GUI from Docker
 * **GitHub** for version control
+* **i18n / Localization Framework** – UI translation support
+* **Static Analysis Tools** – Code quality
+
 
 ---
+
+## Localization Support
+
+- The system now supports multiple languages, including non-Latin languages such as Sinhalese and Arabic.
+
+### Features
+
+- Language selector available in UI
+- Dynamic language switching (no restart required)
+- RTL layout support for Arabic 
+- Locale-based formatting (dates, numbers)
+- Externalized UI text using translation files
+
+### How to change the language
+
+1. Open the application.
+2. Select language from the language dropdown
+3. UI updates instantly
+
+
+---
+
 
 ## Project Structure
 
