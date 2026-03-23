@@ -18,6 +18,10 @@ import javafx.stage.Stage;
 import java.util.Locale;
 import java.util.Objects;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+import javafx.geometry.NodeOrientation;
+
 public class TeacherDashboard extends BorderPane {
 
     private final StackPane contentArea = new StackPane();
@@ -63,8 +67,19 @@ public class TeacherDashboard extends BorderPane {
 
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
+        ResourceBundle messages = ResourceBundle.getBundle(
+                "messages",
+                Session.getCurrentLocale() != null ? Session.getCurrentLocale() : new Locale("en")
+        );
+
         // Root with background
         StackPane root = new StackPane();
+        root.setNodeOrientation(
+                Session.getCurrentLocale() != null &&
+                        "ar".equals(Session.getCurrentLocale().getLanguage())
+                        ? NodeOrientation.RIGHT_TO_LEFT
+                        : NodeOrientation.LEFT_TO_RIGHT
+        );
         root.getStyleClass().add("figma-root");
 
         // Background image
@@ -96,9 +111,9 @@ public class TeacherDashboard extends BorderPane {
         layout.setTop(topBar);
 
         // CENTER (3 blocks always centered)
-        VBox markBlock = buildTopicBlock("Mark sheet", MARK_IMAGE);
-        VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
-        VBox studentBlock = buildTopicBlock("Student Feedback", STUDENT_IMAGE);
+        VBox markBlock = buildTopicBlock(messages.getString("teacher.markSheet"), MARK_IMAGE);
+        VBox gradingBlock = buildTopicBlock(messages.getString("teacher.gradingCriteria"), GRADING_IMAGE);
+        VBox studentBlock = buildTopicBlock(messages.getString("teacher.studentFeedback"), STUDENT_IMAGE);
 
         // Button Actions
         Button markBtn = (Button) markBlock.getChildren().get(1);
@@ -154,7 +169,7 @@ public class TeacherDashboard extends BorderPane {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
-        Button btnBack = new Button("← Back");
+        Button btnBack = new Button(messages.getString("common.back"));
         btnBack.setStyle(pillNormal);
         btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
@@ -168,7 +183,7 @@ public class TeacherDashboard extends BorderPane {
             stage.getScene().setRoot(loginPage.getView());
         });
 
-        Button btnLogout = new Button("Logout");
+        Button btnLogout = new Button(messages.getString("common.logout"));
         btnLogout.setStyle(pillNormal);
         btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
         btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
@@ -275,7 +290,18 @@ public class TeacherDashboard extends BorderPane {
     // Back -> showHome for inside pages
     private Node wrapWithBackPill(Node pageContent) {
 
+        ResourceBundle messages = ResourceBundle.getBundle(
+                "messages",
+                Session.getCurrentLocale() != null ? Session.getCurrentLocale() : new Locale("en")
+        );
+
         BorderPane wrapper = new BorderPane();
+        wrapper.setNodeOrientation(
+                Session.getCurrentLocale() != null &&
+                        "ar".equals(Session.getCurrentLocale().getLanguage())
+                        ? NodeOrientation.RIGHT_TO_LEFT
+                        : NodeOrientation.LEFT_TO_RIGHT
+        );
         wrapper.setCenter(pageContent);
 
         String pillNormal =
@@ -295,7 +321,7 @@ public class TeacherDashboard extends BorderPane {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
-        Button btnBack = new Button("← Back");
+        Button btnBack = new Button(messages.getString("common.back"));
         btnBack.setStyle(pillNormal);
         btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
