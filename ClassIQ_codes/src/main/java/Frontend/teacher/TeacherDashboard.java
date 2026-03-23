@@ -15,6 +15,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class TeacherDashboard extends BorderPane {
@@ -160,9 +161,10 @@ public class TeacherDashboard extends BorderPane {
         // Back
 
         btnBack.setOnAction(e -> {
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
-            LoginPage loginPage = new LoginPage(stage);
+            LoginPage loginPage = new LoginPage(stage, savedLocale);
             stage.getScene().setRoot(loginPage.getView());
         });
 
@@ -174,9 +176,10 @@ public class TeacherDashboard extends BorderPane {
 
         btnLogout.setOnAction(e -> {
             // Clear session and return to login
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) getScene().getWindow();
-            LoginPage loginPage = new LoginPage(stage);
+            LoginPage loginPage = new LoginPage(stage, savedLocale);
             stage.getScene().setRoot(loginPage.getView());
         });
 

@@ -41,6 +41,7 @@ public class LoginPage {
     public LoginPage(Stage stage, Locale locale) {
         this.stage = stage;
         this.currentLocale = locale;
+        Session.setCurrentLocale(locale); //important
     }
 
     public Scene getScene() {
@@ -222,6 +223,7 @@ public class LoginPage {
                 Session.setRole(Session.Role.STUDENT);
                 Session.setUserId(result.userId);
                 Session.setCurrentStudent(fullStudent);
+                Session.setCurrentLocale(currentLocale); // ✅ important
 
                 String fullName = fullStudent.getFirstName() + " " + fullStudent.getLastName();
 
@@ -240,6 +242,7 @@ public class LoginPage {
                 Session.setUserId(result.userId);
                 Session.setTeacherId(tp.teacherId);
                 Session.setTeacherSubject(tp.subject);
+                Session.setCurrentLocale(currentLocale); // ✅ important
 
                 TeacherDashboard dash = new TeacherDashboard(tp.name, tp.email, TEACHER_AVATAR);
                 stage.getScene().setRoot(new StackPane(createBackgroundView(), dash));

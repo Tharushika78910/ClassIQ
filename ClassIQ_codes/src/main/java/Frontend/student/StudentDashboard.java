@@ -14,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class StudentDashboard extends BorderPane {
@@ -134,9 +135,10 @@ public class StudentDashboard extends BorderPane {
         // BOTTOM BAR: Back (Sky Blue) + Logout (Green)
         // =========================
         Button btnBack = createStudentBackButton(() -> {
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
-            LoginPage loginPage = new LoginPage(stage);
+            LoginPage loginPage = new LoginPage(stage, savedLocale);
             stage.getScene().setRoot(loginPage.getView());
         });
 
@@ -145,9 +147,10 @@ public class StudentDashboard extends BorderPane {
         logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(LOGOUT_HOVER));
         logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(LOGOUT_NORMAL));
         logoutBtn.setOnAction(e -> {
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new LoginPage(stage).getScene());
+            stage.setScene(new LoginPage(stage, savedLocale).getScene());
         });
 
         AnchorPane bottomBar = new AnchorPane();

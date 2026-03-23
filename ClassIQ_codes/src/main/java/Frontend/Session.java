@@ -1,6 +1,7 @@
 package Frontend;
 
 import Backend.model.entity.Student;
+import java.util.Locale;
 
 public class Session {
     public enum Role { STUDENT, TEACHER }
@@ -8,6 +9,7 @@ public class Session {
     private static Role currentRole;
     private static int currentUserId;
     private static Student currentStudent;
+    private static Locale currentLocale = new Locale("en", "US");
 
     // for teacher
     private static int currentTeacherId;
@@ -29,6 +31,9 @@ public class Session {
     public static void setTeacherSubject(String subject) { currentTeacherSubject = subject; }
     public static String getTeacherSubject() { return currentTeacherSubject; }
 
+    public static void setCurrentLocale(Locale locale) { currentLocale = locale; }
+    public static Locale getCurrentLocale() { return currentLocale; }
+
     public static boolean isStudentLoggedIn() {
         return currentRole == Role.STUDENT && currentStudent != null;
     }
@@ -41,6 +46,7 @@ public class Session {
         currentRole = null;
         currentUserId = 0;
         currentStudent = null;
+        currentLocale = new Locale("en", "US");
 
         currentTeacherId = 0;
         currentTeacherSubject = null;

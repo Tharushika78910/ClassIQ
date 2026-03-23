@@ -137,6 +137,7 @@ public class HomePage {
             } else {
                 newLocale = new Locale("en", "US");
             }
+            Session.setCurrentLocale(newLocale); // ✅ important
             // Refresh the scene to apply new language
             stage.setScene(getScene(stage, newLocale));
         });
@@ -249,7 +250,7 @@ public class HomePage {
         Button backBtn = new Button(bundle.getString("back") + " ←");
         backBtn.setStyle(buttonStyle(SAGE_BUTTON));
         backBtn.setPadding(new Insets(10, 18, 10, 18));
-        backBtn.setOnAction(ev -> stage.setScene(getScene(stage)));
+        backBtn.setOnAction(ev -> stage.setScene(getScene(stage, Session.getCurrentLocale())));
 
         HBox topBar = new HBox(backBtn);
         topBar.setPadding(new Insets(12));
