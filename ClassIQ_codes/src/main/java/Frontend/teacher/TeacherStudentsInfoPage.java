@@ -170,7 +170,7 @@ public class TeacherStudentsInfoPage {
                 }
 
                 status.setText("");
-                dashboard.showPage(new TeacherStudentDetailsPage(dashboard, s.getStudentNumber()).getView());
+                dashboard.showTeacherStudentDetailsPage(s.getStudentNumber());
 
             } catch (Exception ex) {
                 status.setText("Error: " + ex.getMessage());

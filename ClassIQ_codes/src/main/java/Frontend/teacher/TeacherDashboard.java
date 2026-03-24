@@ -121,14 +121,10 @@ public class TeacherDashboard extends BorderPane {
         Button studentBtn = (Button) studentBlock.getChildren().get(1);
 
         // MarkSheet page
-        markBtn.setOnAction(e ->
-                showPage(new TeacherMarkSheetPage(this).getView())
-        );
+        markBtn.setOnAction(e -> showTeacherMarkSheetPage());
 
         // Wrap grading criteria page with TeacherDashboard back pill
-        gradingBtn.setOnAction(e ->
-                showPage(wrapWithBackPill(new TeacherMyGradesPage().getView()))
-        );
+        gradingBtn.setOnAction(e -> showTeacherMyGradesPage());
 
         // Wrap student feedback page with TeacherDashboard back pill
         studentBtn.setOnAction(e -> showTeacherStudentsInfoPage());
@@ -288,7 +284,7 @@ public class TeacherDashboard extends BorderPane {
     }
 
     // Back -> showHome for inside pages
-    private Node wrapWithBackPill(Node pageContent) {
+    private Node wrapWithNavigation(Node pageContent, Runnable onBack) {
 
         ResourceBundle messages = ResourceBundle.getBundle(
                 "messages",
@@ -325,7 +321,7 @@ public class TeacherDashboard extends BorderPane {
         btnBack.setStyle(pillNormal);
         btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
-        btnBack.setOnAction(e -> showHome());
+        btnBack.setOnAction(e -> onBack.run());
 
         AnchorPane bottomBar = new AnchorPane();
         bottomBar.setPadding(new Insets(15));
@@ -341,7 +337,31 @@ public class TeacherDashboard extends BorderPane {
         contentArea.getChildren().setAll(node);
     }
 
+    public void showTeacherMarkSheetPage() {
+        showPage(wrapWithNavigation(
+                new TeacherMarkSheetPage(this).getView(),
+                this::showHome
+        ));
+    }
+
+    public void showTeacherMyGradesPage() {
+        showPage(wrapWithNavigation(
+                new TeacherMyGradesPage().getView(),
+                this::showHome
+        ));
+    }
+
     public void showTeacherStudentsInfoPage() {
-        showPage(wrapWithBackPill(new TeacherStudentsInfoPage(this).getView()));
+        showPage(wrapWithNavigation(
+                new TeacherStudentsInfoPage(this).getView(),
+                this::showHome
+        ));
+    }
+
+    public void showTeacherStudentDetailsPage(String studentNumber) {
+        showPage(wrapWithNavigation(
+                new TeacherStudentDetailsPage(this, studentNumber).getView(),
+                this::showTeacherStudentsInfoPage
+        ));
     }
 }

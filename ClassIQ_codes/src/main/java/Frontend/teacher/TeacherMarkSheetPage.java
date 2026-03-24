@@ -181,51 +181,6 @@ public class TeacherMarkSheetPage {
         centerWrap.setAlignment(Pos.CENTER);
         root.setCenter(centerWrap);
 
-        // BOTTOM BUTTON BAR
-        String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
-
-        String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;";
-
-        Button btnBack = new Button("← Back");
-        btnBack.setStyle(pillNormal);
-        btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
-        btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
-        btnBack.setOnAction(e -> dashboard.showHome());
-
-        Button btnLogout = new Button("Logout");
-        btnLogout.setStyle(pillNormal);
-        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
-        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
-        btnLogout.setOnAction(e -> {
-            Session.clear();
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new LoginPage(stage).getScene());
-        });
-
-        AnchorPane bottomBar = new AnchorPane();
-        bottomBar.setPadding(new Insets(15));
-
-        AnchorPane.setLeftAnchor(btnBack, 20.0);
-        AnchorPane.setBottomAnchor(btnBack, 10.0);
-
-        AnchorPane.setRightAnchor(btnLogout, 20.0);
-        AnchorPane.setBottomAnchor(btnLogout, 10.0);
-
-        bottomBar.getChildren().addAll(btnBack, btnLogout);
-        root.setBottom(bottomBar);
 
         return root;
     }
