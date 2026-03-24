@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 import java.util.Locale;
 import java.util.Objects;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.geometry.NodeOrientation;
 
@@ -323,11 +322,28 @@ public class TeacherDashboard extends BorderPane {
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
         btnBack.setOnAction(e -> onBack.run());
 
+        Button btnLogout = new Button(messages.getString("common.logout"));
+        btnLogout.setStyle(pillNormal);
+        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
+        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
+        btnLogout.setOnAction(e -> {
+            Locale savedLocale = Session.getCurrentLocale();
+            Session.clear();
+            Stage stage = (Stage) getScene().getWindow();
+            LoginPage loginPage = new LoginPage(stage, savedLocale);
+            stage.getScene().setRoot(loginPage.getView());
+        });
+
         AnchorPane bottomBar = new AnchorPane();
         bottomBar.setPadding(new Insets(15));
+
         AnchorPane.setLeftAnchor(btnBack, 20.0);
         AnchorPane.setBottomAnchor(btnBack, 10.0);
-        bottomBar.getChildren().add(btnBack);
+
+        AnchorPane.setRightAnchor(btnLogout, 20.0);
+        AnchorPane.setBottomAnchor(btnLogout, 10.0);
+
+        bottomBar.getChildren().addAll(btnBack, btnLogout);
 
         wrapper.setBottom(bottomBar);
         return wrapper;
