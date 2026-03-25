@@ -219,11 +219,7 @@ public class StudentReportCardPage {
             }
         });
 
-        Button btnLogout = new Button("Logout");
-        btnLogout.setStyle(pillNormal);
-        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
-        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
-        btnLogout.setOnAction(e -> {
+        Button btnLogout = dashboard.createStudentLogoutButton(() -> {
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
             stage.setScene(new LoginPage(stage).getScene());
