@@ -1,173 +1,120 @@
-/* ================================
-   ROOT BACKGROUND
-================================ */
+/* Root background */
 .figma-root {
     -fx-background-color: transparent;
 }
 
-
-/* ================================
-   TOP RIGHT TEACHER INFO CARD
-================================ */
+/* Top right teacher info card */
 .teacher-info {
     -fx-padding: 12 18 12 18;
     -fx-background-color: rgba(255,255,255,0.85);
     -fx-background-radius: 16;
     -fx-border-radius: 16;
-
-    -fx-effect: dropshadow(gaussian,
-    rgba(0,0,0,0.18),
-    10, 0.25, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 10, 0.25, 0, 4);
 }
 
+/* Teacher name */
 .teacher-name {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-text-fill: #1f1f1f;
 }
 
+/* Teacher email */
 .teacher-email {
     -fx-font-size: 12px;
     -fx-text-fill: #555555;
 }
-/* === Table grid lines === */
-.table-view {
-    -fx-border-color: rgba(40,40,40,0.35);
-    -fx-border-width: 1;
-    -fx-table-cell-border-color: rgba(40,40,40,0.35);
-}
 
-.table-view .column-header-background {
-    -fx-border-color: rgba(40,40,40,0.35);
-    -fx-border-width: 0 0 1 0;
-}
-
-.table-view .table-cell {
-    -fx-border-color: rgba(40,40,40,0.35);
-    -fx-border-width: 0 1 1 0; /* right + bottom lines */
-}
-
-
-/* ================================
-   3 MAIN TOPIC BUTTONS (MOSS GREEN EMBOSS)
-================================ */
-.topic-btn {
-    -fx-pref-width: 180px;   /* smaller width */
-    -fx-pref-height: 36px;   /* smaller height */
-
-    -fx-background-color: linear-gradient(to bottom, #9CC3AE, #8FAF9F);
-    -fx-text-fill: white;
-
-    -fx-font-size: 14px;     /* slightly smaller text */
-    -fx-font-weight: bold;
-
-    -fx-background-radius: 10;
-    -fx-border-radius: 10;
-
-    -fx-border-color: #6F8F7E;
-    -fx-border-width: 2px;
-
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.3, 1, 2);
-
-    -fx-cursor: hand;
-}
-
-
-.topic-btn:pressed {
-    -fx-background-color: linear-gradient(to bottom, #7A984C, #7CFC00);
-    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.6), 10, 0.5, 2, 2);
-}
-
-
-/* ================================
-   CIRCLE IMAGE HOLDER
-================================ */
-.circle-holder {
-    -fx-min-width: 180px;
-    -fx-min-height: 180px;
-    -fx-max-width: 180px;
-    -fx-max-height: 180px;
-
-    -fx-background-radius: 1000;
-    -fx-background-color: rgba(255,255,255,0.55);
-
-    -fx-effect: dropshadow(gaussian,
-    rgba(0,0,0,0.25),
-    14, 0.3, 0, 5);
-}
-
-
-/* ================================
-   LOGOUT BUTTON (UPDATED COLOR)
-================================ */
-.logout-btn {
-    -fx-pref-width: 120px;
-    -fx-pref-height: 38px;
-
-    /* Soft sage green like login button */
-    -fx-background-color: #b7f7b7;
-    -fx-background-radius: 10;
-
-    -fx-font-weight: bold;
-    -fx-text-fill:  #b00020;
-/* ================================
-   MARKSHEET GRID TABLE
-================================ */
-
-/* Whole table border */
+/* Table border */
 .table-view {
     -fx-background-color: white;
     -fx-border-color: rgba(40,40,40,0.55);
     -fx-border-width: 1.2;
-    -fx-table-cell-border-color: rgba(40,40,40,0.55); /* grid color */
+    -fx-table-cell-border-color: rgba(40,40,40,0.55);
 }
 
-/* Remove default zebra striping effect */
+/* Table rows */
 .table-row-cell {
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
 
-/* Make every row white (no stripes) */
+/* Table row filled */
 .table-row-cell:filled,
 .table-row-cell:odd:filled,
 .table-row-cell:even:filled {
     -fx-background-color: white;
 }
 
-/* Header background + border */
+/* Table header background */
 .table-view .column-header-background {
     -fx-background-color: #f2f2f2;
     -fx-border-color: rgba(40,40,40,0.55);
-    -fx-border-width: 0 0 1.2 0; /* bottom border */
+    -fx-border-width: 0 0 1.2 0;
 }
 
-/* Header cells border (vertical lines) */
+/* Table header cells */
 .table-view .column-header {
     -fx-border-color: rgba(40,40,40,0.55);
     -fx-border-width: 0 1.2 0 0;
 }
 
-/* Grid cell borders (RIGHT + BOTTOM) */
+/* Table cells */
 .table-view .table-cell {
     -fx-alignment: CENTER;
     -fx-padding: 4 6 4 6;
-
     -fx-border-color: rgba(40,40,40,0.55);
-    -fx-border-width: 0 1.2 1.2 0; /* right + bottom */
+    -fx-border-width: 0 1.2 1.2 0;
 }
 
-/* Add LEFT border for the first visible column */
-.tab
-
-    -fx-border-color: #8edc8e;
+/* Topic buttons */
+.topic-btn {
+    -fx-pref-width: 180px;
+    -fx-pref-height: 36px;
+    -fx-background-color: linear-gradient(to bottom, #9CC3AE, #8FAF9F);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
     -fx-border-radius: 10;
-
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0.3, 1, 2);
-
+    -fx-border-color: #6F8F7E;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.3, 1, 2);
     -fx-cursor: hand;
 }
 
+/* Topic button pressed */
+.topic-btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #7A984C, #7CFC00);
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.6), 10, 0.5, 2, 2);
+}
+
+/* Circle image holder */
+.circle-holder {
+    -fx-min-width: 180px;
+    -fx-min-height: 180px;
+    -fx-max-width: 180px;
+    -fx-max-height: 180px;
+    -fx-background-radius: 1000;
+    -fx-background-color: rgba(255,255,255,0.55);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 14, 0.3, 0, 5);
+}
+
+/* Logout button */
+.logout-btn {
+    -fx-pref-width: 120px;
+    -fx-pref-height: 38px;
+    -fx-background-color: #b7f7b7;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+    -fx-text-fill: #b00020;
+    -fx-border-color: #8edc8e;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0.3, 1, 2);
+    -fx-cursor: hand;
+}
+
+/* Logout button hover */
 .logout-btn:hover {
     -fx-background-color: #9CC3AE;
     -fx-scale-x: 1.05;

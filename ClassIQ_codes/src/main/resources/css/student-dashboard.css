@@ -1,7 +1,4 @@
-
-/* ================================
-   ROOT BACKGROUND
-================================ */
+/* Root background */
 .figma-root, .page-bg {
     -fx-background-image: url("/HomepageS.png");
     -fx-background-size: cover;
@@ -9,150 +6,125 @@
     -fx-background-position: center center;
 }
 
-
-/* ================================
-   TOP RIGHT USER INFO CARD
-================================ */
+/* Top right user info card */
 .teacher-info {
     -fx-padding: 12 18 12 18;
-
     -fx-background-color: rgba(255,255,255,0.88);
     -fx-background-radius: 16;
     -fx-border-radius: 16;
-
-    -fx-effect: dropshadow(gaussian,
-                          rgba(0,0,0,0.15),
-                          10, 0.25, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.25, 0, 4);
 }
 
+/* User name */
 .teacher-name {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-text-fill: #1f1f1f;
 }
 
+/* User email */
 .teacher-email {
     -fx-font-size: 12px;
     -fx-text-fill: #555555;
 }
 
-
-/* ================================
-   MAIN TOPIC BUTTONS (UPDATED COLOR)
-================================ */
+/* Main topic buttons */
 .topic-btn {
-
     -fx-pref-width: 180px;
     -fx-pref-height: 36px;
-
-    /* EXACT requested colour */
     -fx-background-color: #A1C6D0;
     -fx-text-fill: white;
-
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-
     -fx-background-radius: 12;
     -fx-border-radius: 12;
-
     -fx-border-color: rgba(0,0,0,0.25);
     -fx-border-width: 1.2px;
-
-    -fx-effect: dropshadow(gaussian,
-                          rgba(0,0,0,0.25),
-                          6, 0.3, 0, 2);
-
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.3, 0, 2);
     -fx-cursor: hand;
 }
 
+/* Topic button hover */
 .topic-btn:hover {
-    /* Slightly darker for natural hover */
     -fx-background-color: #8FB5C1;
 }
 
+/* Topic button pressed */
 .topic-btn:pressed {
-    /* Deeper press effect */
     -fx-background-color: #7EA6B3;
 }
 
-
-/* ================================
-   CIRCLE HOLDER — EXACT SOFT WHITE RING
-================================ */
+/* Circle holder */
 .circle-holder {
-
     -fx-min-width: 180px;
     -fx-min-height: 180px;
     -fx-max-width: 180px;
     -fx-max-height: 180px;
-
     -fx-background-radius: 1000;
-
     -fx-background-insets: 0, 8;
-    -fx-background-color:
-        rgba(255,255,255,0.95),
-        transparent;
-
-    -fx-effect: dropshadow(gaussian,
-                          rgba(0,0,0,0.18),
-                          18, 0.35, 0, 6);
+    -fx-background-color: rgba(255,255,255,0.95), transparent;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 18, 0.35, 0, 6);
 }
 
-
-/* ================================
-   LOGOUT BUTTON
-================================ */
+/* Logout button */
 .logout-btn {
     -fx-pref-width: 120px;
     -fx-pref-height: 38px;
-
     -fx-background-color: #b7f7b7;
     -fx-background-radius: 10;
-
     -fx-font-weight: bold;
     -fx-text-fill: #b00020;
-
     -fx-border-color: black;
     -fx-border-width: 1px;
     -fx-border-radius: 10;
-
     -fx-cursor: hand;
 }
 
+/* Logout button hover */
 .logout-btn:hover {
     -fx-background-color: #9CC3AE;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 
-
-/* ================================
-   TABLE CLEANUP
-================================ */
+/* Table row cleanup */
 .table-row-cell {
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
 
+/* Table header background */
 .table-view .column-header-background {
     -fx-background-color: #f2f2f2;
     -fx-border-color: rgba(40,40,40,0.55);
     -fx-border-width: 0 0 1.2 0;
 }
 
+/* Table header cells */
 .table-view .column-header {
     -fx-border-color: rgba(40,40,40,0.55);
     -fx-border-width: 0 1.2 0 0;
 }
 
+/* Table cells */
 .table-view .table-cell {
     -fx-alignment: CENTER;
     -fx-padding: 4 6 4 6;
-
     -fx-border-color: rgba(40,40,40,0.55);
     -fx-border-width: 0 1.2 1.2 0;
 }
 
-.table-view .table-cell:first-visible {
+/* Table view border */
+.table-view {
+    -fx-background-color: white;
     -fx-border-color: rgba(40,40,40,0.55);
+    -fx-border-width: 1.2;
+    -fx-table-cell-border-color: rgba(40,40,40,0.55);
+}
+
+/* Filled table rows */
+.table-row-cell:filled,
+.table-row-cell:odd:filled,
+.table-row-cell:even:filled {
+    -fx-background-color: white;
 }
