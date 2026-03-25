@@ -17,13 +17,16 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class StudentMyInfoPage {
 
     private final StudentDashboard dashboard;
+    private final ResourceBundle bundle;
 
     public StudentMyInfoPage(StudentDashboard dashboard) {
         this.dashboard = dashboard;
+        this.bundle = ResourceBundle.getBundle("messages", Session.getCurrentLocale());
     }
 
     public Parent getView() {
@@ -31,19 +34,17 @@ public class StudentMyInfoPage {
         BorderPane root = new BorderPane();
         root.getStyleClass().add("page-bg");
 
-        // Add CSS stylesheet
         root.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
         );
 
         Student s = Session.getCurrentStudent();
 
-        // CENTER CONTENT
         StackPane center = new StackPane();
         center.setAlignment(Pos.CENTER);
 
         if (s == null) {
-            Label err = new Label("No student session found. Please log in again.");
+            Label err = new Label(bundle.getString("student.myinfo.error.noSession"));
             err.setStyle("-fx-font-size: 18px; -fx-text-fill: black;");
             center.getChildren().add(err);
             root.setCenter(center);
@@ -51,11 +52,10 @@ public class StudentMyInfoPage {
 
             String fullName = s.getFirstName() + " " + s.getLastName();
 
-
             VBox leftContent = new VBox(40);
             leftContent.setAlignment(Pos.TOP_LEFT);
 
-            Label title = new Label("My Info");
+            Label title = new Label(bundle.getString("student.myInfo"));
             title.setStyle("-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: black;");
 
             GridPane grid = new GridPane();
@@ -66,108 +66,90 @@ public class StudentMyInfoPage {
             String labelStyle = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: black;";
             String valueStyle = "-fx-font-size: 20px; -fx-text-fill: black;";
 
-            Label lblName = new Label("Full Name"); lblName.setStyle(labelStyle);
-            Label valName = new Label(fullName); valName.setStyle(valueStyle);
+            Label lblName = new Label(bundle.getString("student.myinfo.fullName"));
+            lblName.setStyle(labelStyle);
+            Label valName = new Label(fullName);
+            valName.setStyle(valueStyle);
 
-            Label lblStudentNo = new Label("Student Number"); lblStudentNo.setStyle(labelStyle);
-            Label valStudentNo = new Label(s.getStudentNumber()); valStudentNo.setStyle(valueStyle);
+            Label lblStudentNo = new Label(bundle.getString("student.myinfo.studentNumber"));
+            lblStudentNo.setStyle(labelStyle);
+            Label valStudentNo = new Label(s.getStudentNumber());
+            valStudentNo.setStyle(valueStyle);
 
-            Label lblEmail = new Label("Email"); lblEmail.setStyle(labelStyle);
-            Label valEmail = new Label(s.getEmail()); valEmail.setStyle(valueStyle);
+            Label lblEmail = new Label(bundle.getString("student.myinfo.email"));
+            lblEmail.setStyle(labelStyle);
+            Label valEmail = new Label(s.getEmail());
+            valEmail.setStyle(valueStyle);
 
-            Label lblClass = new Label("Class"); lblClass.setStyle(labelStyle);
-            Label valClass = new Label("10A"); valClass.setStyle(valueStyle);
+            Label lblClass = new Label(bundle.getString("student.myinfo.class"));
+            lblClass.setStyle(labelStyle);
+            Label valClass = new Label("10A");
+            valClass.setStyle(valueStyle);
 
-            grid.add(lblName, 0, 0);       grid.add(valName, 1, 0);
-            grid.add(lblStudentNo, 0, 1);  grid.add(valStudentNo, 1, 1);
-            grid.add(lblEmail, 0, 2);      grid.add(valEmail, 1, 2);
-            grid.add(lblClass, 0, 3);      grid.add(valClass, 1, 3);
+            grid.add(lblName, 0, 0);      grid.add(valName, 1, 0);
+            grid.add(lblStudentNo, 0, 1); grid.add(valStudentNo, 1, 1);
+            grid.add(lblEmail, 0, 2);     grid.add(valEmail, 1, 2);
+            grid.add(lblClass, 0, 3);     grid.add(valClass, 1, 3);
 
             leftContent.getChildren().addAll(title, grid);
 
-            // =========================
-            // MIDDLE DIVIDER
-            // =========================
             Separator divider = new Separator(Orientation.VERTICAL);
             divider.setPrefHeight(540);
             divider.setStyle("-fx-opacity: 0.75;");
 
-            // =========================
-            // RIGHT SIDE CONTENT (SHORT) -> BOX + SCROLL
-            // =========================
             VBox rightContent = new VBox(14);
             rightContent.setAlignment(Pos.TOP_LEFT);
 
             String sectionTitleStyle = "-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: black;";
             String smallTextStyle = "-fx-font-size: 14px; -fx-text-fill: black;";
 
-            // Term Dates
-            Label termTitle = new Label("Term Dates");
+            Label termTitle = new Label(bundle.getString("student.myinfo.termDates"));
             termTitle.setStyle(sectionTitleStyle);
 
-            Label termStart = new Label("Term Start Date: 15.01.2026");
+            Label termStart = new Label(bundle.getString("student.myinfo.termStart"));
             termStart.setStyle(smallTextStyle);
 
-            Label termEnd = new Label("Term End Date: 12.06.2026");
+            Label termEnd = new Label(bundle.getString("student.myinfo.termEnd"));
             termEnd.setStyle(smallTextStyle);
 
             Separator termLine = new Separator();
             termLine.setStyle("-fx-opacity: 0.8;");
 
-            // Holidays
-            Label holidaysTitle = new Label("Holidays");
+            Label holidaysTitle = new Label(bundle.getString("student.myinfo.holidays"));
             holidaysTitle.setStyle(sectionTitleStyle);
 
-            Label hol1 = new Label("01.01.2026 – 14.01.2026 : Starting Holidays");
+            Label hol1 = new Label(bundle.getString("student.myinfo.holiday.1"));
             hol1.setStyle(smallTextStyle);
             hol1.setWrapText(true);
 
-            Label hol2 = new Label("15.02.2026 – 22.02.2026 : Winter Break / Ski Holiday");
+            Label hol2 = new Label(bundle.getString("student.myinfo.holiday.2"));
             hol2.setStyle(smallTextStyle);
             hol2.setWrapText(true);
 
-            Label hol3 = new Label("13.06.2026 – 14.08.2026 : Summer Holiday");
+            Label hol3 = new Label(bundle.getString("student.myinfo.holiday.3"));
             hol3.setStyle(smallTextStyle);
             hol3.setWrapText(true);
 
-            // Rules (4 only)
-            Label rulesTitle = new Label("Rules to Follow");
+            Label rulesTitle = new Label(bundle.getString("student.myinfo.rulesTitle"));
             rulesTitle.setStyle(sectionTitleStyle);
 
-            Text rulesText = new Text(
-                    "1. Be on time and attend regularly.\n" +
-                            "2. Respect teachers and classmates.\n" +
-                            "3. Phones only with teacher permission.\n" +
-                            "4. Submit homework on time."
-            );
+            Text rulesText = new Text(bundle.getString("student.myinfo.rulesText"));
             rulesText.setStyle(smallTextStyle);
             TextFlow rulesFlow = new TextFlow(rulesText);
             rulesFlow.setMaxWidth(460);
 
-            // Clubs
-            Label clubsTitle = new Label("Clubs & Extra Activities");
+            Label clubsTitle = new Label(bundle.getString("student.myinfo.clubsTitle"));
             clubsTitle.setStyle(sectionTitleStyle);
 
-            Text clubsText = new Text(
-                    "• Sports Club\n" +
-                            "• Music Club\n" +
-                            "• Art Club\n" +
-                            "• Coding Club\n" +
-                            "• Science Club"
-            );
+            Text clubsText = new Text(bundle.getString("student.myinfo.clubsText"));
             clubsText.setStyle(smallTextStyle);
             TextFlow clubsFlow = new TextFlow(clubsText);
             clubsFlow.setMaxWidth(460);
 
-            // Summer Camp (short)
-            Label campTitle = new Label("Summer Camp");
+            Label campTitle = new Label(bundle.getString("student.myinfo.campTitle"));
             campTitle.setStyle(sectionTitleStyle);
 
-            Text campText = new Text(
-                    "• July (dates announced later)\n" +
-                            "• Outdoor games and sports\n" +
-                            "• Registration required"
-            );
+            Text campText = new Text(bundle.getString("student.myinfo.campText"));
             campText.setStyle(smallTextStyle);
             TextFlow campFlow = new TextFlow(campText);
             campFlow.setMaxWidth(460);
@@ -180,7 +162,6 @@ public class StudentMyInfoPage {
                     campTitle, campFlow
             );
 
-            // BOX for right side
             VBox rightBox = new VBox();
             rightBox.setPadding(new Insets(18));
             rightBox.getChildren().add(rightContent);
@@ -194,7 +175,6 @@ public class StudentMyInfoPage {
                             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 10, 0.20, 0, 4);"
             );
 
-            // SCROLL for right side
             ScrollPane rightScroll = new ScrollPane(rightBox);
             rightScroll.setFitToWidth(true);
             rightScroll.setPannable(true);
@@ -203,48 +183,22 @@ public class StudentMyInfoPage {
             rightScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
             rightScroll.setPrefViewportHeight(520);
 
-
             HBox main = new HBox(25);
             main.setAlignment(Pos.TOP_LEFT);
-
-
             main.setPadding(new Insets(120, 60, 40, 150));
 
             leftContent.setPrefWidth(520);
             rightScroll.setPrefWidth(520);
 
             main.getChildren().addAll(leftContent, divider, rightScroll);
-           // HBox.setMargin(rightScroll, new Insets(0, 0, 0, 20));
 
             center.getChildren().add(main);
             root.setCenter(center);
         }
 
-
-        String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
-
-        String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;";
-
         Button btnBack = dashboard.createStudentBackButton(() -> dashboard.showHome());
 
-        Button btnLogout = new Button("Logout");
-        btnLogout.setStyle(pillNormal);
-        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
-        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
-        btnLogout.setOnAction(e -> {
+        Button btnLogout = dashboard.createStudentLogoutButton(() -> {
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
             stage.setScene(new LoginPage(stage).getScene());
