@@ -3,6 +3,7 @@ package Frontend.student;
 import Frontend.LoginPage;
 import Frontend.Session;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -28,10 +29,10 @@ public class StudentDashboard extends BorderPane {
     private final ResourceBundle bundle;
 
     // Images
-    private static final String BG_IMAGE      = "/HomepageS.png";
-    private static final String INFO_IMAGE    = "/images/StudentInfoS.png";
+    private static final String BG_IMAGE = "/HomepageS.png";
+    private static final String INFO_IMAGE = "/images/StudentInfoS.png";
     private static final String GRADING_IMAGE = "/images/MarkSheetS.png";
-    private static final String REPORT_IMAGE  = "/images/Report CardS.png";
+    private static final String REPORT_IMAGE = "/images/Report CardS.png";
 
     // Student back button styles
     private static final String STUDENT_BACK_NORMAL =
@@ -51,17 +52,7 @@ public class StudentDashboard extends BorderPane {
                     "-fx-background-radius: 18;" +
                     "-fx-padding: 8 22 8 22;";
 
-
-    public Button createStudentLogoutButton(Runnable action) {
-        Button btn = new Button(bundle.getString("student.dashboard.logout"));
-        btn.setStyle(LOGOUT_NORMAL);
-        btn.setOnMouseEntered(e -> btn.setStyle(LOGOUT_HOVER));
-        btn.setOnMouseExited(e -> btn.setStyle(LOGOUT_NORMAL));
-        btn.setOnAction(e -> action.run());
-        return btn;
-    }
     // Logout button styles
-
     private static final String LOGOUT_NORMAL =
             "-fx-background-color: rgba(210,230,255,0.95);" +
                     "-fx-text-fill: #1E4F9A;" +
@@ -80,17 +71,21 @@ public class StudentDashboard extends BorderPane {
                     "-fx-padding: 8 22 8 22;";
 
     public StudentDashboard(String name, String email, String profileImagePath) {
-
         this.studentName = name;
         this.studentEmail = email;
         this.studentProfileImagePath = profileImagePath;
 
-        // Change "messages" to your actual bundle name if needed
         this.bundle = ResourceBundle.getBundle("messages", Session.getCurrentLocale());
 
         getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
         );
+
+        if ("ar".equals(Session.getCurrentLocale().getLanguage())) {
+            setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+        } else {
+            setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        }
 
         setCenter(contentArea);
         showHome();
@@ -100,16 +95,32 @@ public class StudentDashboard extends BorderPane {
         showPage(buildHomeView(studentName, studentEmail, studentProfileImagePath));
     }
 
+    public Button createStudentBackButton(Runnable action) {
+        Button btn = new Button("← " + bundle.getString("common.back"));
+        btn.setStyle(STUDENT_BACK_NORMAL);
+        btn.setOnMouseEntered(e -> btn.setStyle(STUDENT_BACK_HOVER));
+        btn.setOnMouseExited(e -> btn.setStyle(STUDENT_BACK_NORMAL));
+        btn.setOnAction(e -> action.run());
+        return btn;
+    }
+
+    public Button createStudentLogoutButton(Runnable action) {
+        Button btn = new Button(bundle.getString("student.dashboard.logout"));
+        btn.setStyle(LOGOUT_NORMAL);
+        btn.setOnMouseEntered(e -> btn.setStyle(LOGOUT_HOVER));
+        btn.setOnMouseExited(e -> btn.setStyle(LOGOUT_NORMAL));
+        btn.setOnAction(e -> action.run());
+        return btn;
+    }
+
     private Node buildHomeView(String name, String email, String profileImagePath) {
 
-        // Root (background handled by CSS)
         StackPane root = new StackPane();
         root.getStyleClass().add("figma-root");
 
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(30));
 
-        // Top right student info
         HBox studentBox = buildStudentInfo(name, email, profileImagePath);
 
         Region spacer = new Region();
@@ -119,7 +130,6 @@ public class StudentDashboard extends BorderPane {
         topBar.setAlignment(Pos.CENTER_LEFT);
         layout.setTop(topBar);
 
-        // Center: 3 circles
         VBox infoBlock = buildTopicBlock(bundle.getString("student.myInfo"), INFO_IMAGE);
         VBox gradingBlock = buildTopicBlock(bundle.getString("student.gradingCriteria"), GRADING_IMAGE);
         VBox reportBlock = buildTopicBlock(bundle.getString("student.reportCard"), REPORT_IMAGE);
@@ -146,7 +156,6 @@ public class StudentDashboard extends BorderPane {
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        // Bottom bar
         Button btnBack = createStudentBackButton(() -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
@@ -178,18 +187,7 @@ public class StudentDashboard extends BorderPane {
         return root;
     }
 
-    // Reusable student back button
-    public Button createStudentBackButton(Runnable action) {
-        Button btn = new Button("← " + bundle.getString("common.back"));
-        btn.setStyle(STUDENT_BACK_NORMAL);
-        btn.setOnMouseEntered(e -> btn.setStyle(STUDENT_BACK_HOVER));
-        btn.setOnMouseExited(e -> btn.setStyle(STUDENT_BACK_NORMAL));
-        btn.setOnAction(e -> action.run());
-        return btn;
-    }
-
     private VBox buildTopicBlock(String title, String imagePath) {
-
         VBox box = new VBox(16);
         box.setAlignment(Pos.TOP_CENTER);
 
@@ -220,7 +218,6 @@ public class StudentDashboard extends BorderPane {
     }
 
     private HBox buildStudentInfo(String name, String email, String profileImagePath) {
-
         HBox wrap = new HBox(12);
         wrap.setAlignment(Pos.CENTER_RIGHT);
         wrap.getStyleClass().add("teacher-info");
