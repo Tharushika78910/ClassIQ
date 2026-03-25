@@ -248,17 +248,25 @@ public class HomePage {
 
         // Back button
         Button backBtn = new Button(bundle.getString("back") + " ←");
-        backBtn.setStyle(buttonStyle(SAGE_BUTTON));
-        backBtn.setPadding(new Insets(10, 18, 10, 18));
+        backBtn.setStyle(
+            "-fx-background-color: rgba(255,255,255,0.92);" +
+            "-fx-text-fill: #2E6F62;" +
+            "-fx-font-weight: bold;" +
+            "-fx-font-size: 14px;" +
+            "-fx-background-radius: 18;" +
+            "-fx-padding: 8 22 8 22;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);"
+        );
         backBtn.setOnAction(ev -> stage.setScene(getScene(stage, Session.getCurrentLocale())));
 
-        HBox topBar = new HBox(backBtn);
-        topBar.setPadding(new Insets(12));
-        topBar.setAlignment(Pos.TOP_LEFT);
+        // Bottom bar for back button (like other pages)
+        HBox bottomBar = new HBox(backBtn);
+        bottomBar.setPadding(new Insets(12));
+        bottomBar.setAlignment(Pos.BOTTOM_LEFT);
 
         BorderPane webLayout = new BorderPane();
-        webLayout.setTop(topBar);
         webLayout.setCenter(glassPanel);
+        webLayout.setBottom(bottomBar);
 
         // Background image
         ImageView background = loadImageView("/Homepage.png");
