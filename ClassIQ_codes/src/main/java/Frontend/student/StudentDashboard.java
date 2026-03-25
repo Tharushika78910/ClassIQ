@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class StudentDashboard extends BorderPane {
 
@@ -24,6 +25,7 @@ public class StudentDashboard extends BorderPane {
     private final String studentName;
     private final String studentEmail;
     private final String studentProfileImagePath;
+    private final ResourceBundle bundle;
 
     // Images
     private static final String BG_IMAGE      = "/HomepageS.png";
@@ -31,7 +33,7 @@ public class StudentDashboard extends BorderPane {
     private static final String GRADING_IMAGE = "/images/MarkSheetS.png";
     private static final String REPORT_IMAGE  = "/images/Report CardS.png";
 
-    // ✅ Student back button styles (Sky Blue)
+    // Student back button styles
     private static final String STUDENT_BACK_NORMAL =
             "-fx-background-color: rgba(210,230,255,0.95);" +
                     "-fx-text-fill: #1E4F9A;" +
@@ -49,7 +51,7 @@ public class StudentDashboard extends BorderPane {
                     "-fx-background-radius: 18;" +
                     "-fx-padding: 8 22 8 22;";
 
-    // ✅ Logout button styles (keep your original green)
+    // Logout button styles
     private static final String LOGOUT_NORMAL =
             "-fx-background-color: rgba(255,255,255,0.92);" +
                     "-fx-text-fill: #2E6F62;" +
@@ -73,6 +75,9 @@ public class StudentDashboard extends BorderPane {
         this.studentEmail = email;
         this.studentProfileImagePath = profileImagePath;
 
+        // Change "messages" to your actual bundle name if needed
+        this.bundle = ResourceBundle.getBundle("messages", Session.getCurrentLocale());
+
         getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/css/student-dashboard.css")).toExternalForm()
         );
@@ -94,7 +99,7 @@ public class StudentDashboard extends BorderPane {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(30));
 
-        // TOP RIGHT Student Info
+        // Top right student info
         HBox studentBox = buildStudentInfo(name, email, profileImagePath);
 
         Region spacer = new Region();
@@ -104,10 +109,10 @@ public class StudentDashboard extends BorderPane {
         topBar.setAlignment(Pos.CENTER_LEFT);
         layout.setTop(topBar);
 
-        // CENTER: 3 circles
-        VBox infoBlock = buildTopicBlock("My Info", INFO_IMAGE);
-        VBox gradingBlock = buildTopicBlock("Grading Criteria", GRADING_IMAGE);
-        VBox reportBlock = buildTopicBlock("Report Card", REPORT_IMAGE);
+        // Center: 3 circles
+        VBox infoBlock = buildTopicBlock(bundle.getString("student.myInfo"), INFO_IMAGE);
+        VBox gradingBlock = buildTopicBlock(bundle.getString("student.gradingCriteria"), GRADING_IMAGE);
+        VBox reportBlock = buildTopicBlock(bundle.getString("student.reportCard"), REPORT_IMAGE);
 
         Button infoBtn = (Button) infoBlock.getChildren().get(1);
         Button btnGradingCriteria = (Button) gradingBlock.getChildren().get(1);
@@ -131,9 +136,7 @@ public class StudentDashboard extends BorderPane {
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        // =========================
-        // BOTTOM BAR: Back (Sky Blue) + Logout (Green)
-        // =========================
+        // Bottom bar
         Button btnBack = createStudentBackButton(() -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
@@ -142,7 +145,7 @@ public class StudentDashboard extends BorderPane {
             stage.getScene().setRoot(loginPage.getView());
         });
 
-        Button logoutBtn = new Button("Logout");
+        Button logoutBtn = new Button(bundle.getString("student.dashboard.logout"));
         logoutBtn.setStyle(LOGOUT_NORMAL);
         logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(LOGOUT_HOVER));
         logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(LOGOUT_NORMAL));
@@ -169,9 +172,9 @@ public class StudentDashboard extends BorderPane {
         return root;
     }
 
-    // ✅ Reusable Sky Blue Back button for ALL student pages
+    // Reusable student back button
     public Button createStudentBackButton(Runnable action) {
-        Button btn = new Button("← Back");
+        Button btn = new Button("← " + bundle.getString("common.back"));
         btn.setStyle(STUDENT_BACK_NORMAL);
         btn.setOnMouseEntered(e -> btn.setStyle(STUDENT_BACK_HOVER));
         btn.setOnMouseExited(e -> btn.setStyle(STUDENT_BACK_NORMAL));
@@ -187,7 +190,8 @@ public class StudentDashboard extends BorderPane {
         ImageView iv = new ImageView();
         try {
             iv.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         iv.setFitWidth(140);
         iv.setFitHeight(140);
@@ -220,7 +224,8 @@ public class StudentDashboard extends BorderPane {
             avatar.setImage(new Image(
                     Objects.requireNonNull(getClass().getResourceAsStream(profileImagePath))
             ));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         avatar.setFitWidth(52);
         avatar.setFitHeight(52);
