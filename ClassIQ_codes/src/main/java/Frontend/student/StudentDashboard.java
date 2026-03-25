@@ -51,10 +51,20 @@ public class StudentDashboard extends BorderPane {
                     "-fx-background-radius: 18;" +
                     "-fx-padding: 8 22 8 22;";
 
+
+    public Button createStudentLogoutButton(Runnable action) {
+        Button btn = new Button(bundle.getString("student.dashboard.logout"));
+        btn.setStyle(LOGOUT_NORMAL);
+        btn.setOnMouseEntered(e -> btn.setStyle(LOGOUT_HOVER));
+        btn.setOnMouseExited(e -> btn.setStyle(LOGOUT_NORMAL));
+        btn.setOnAction(e -> action.run());
+        return btn;
+    }
     // Logout button styles
+
     private static final String LOGOUT_NORMAL =
-            "-fx-background-color: rgba(255,255,255,0.92);" +
-                    "-fx-text-fill: #2E6F62;" +
+            "-fx-background-color: rgba(210,230,255,0.95);" +
+                    "-fx-text-fill: #1E4F9A;" +
                     "-fx-font-weight: bold;" +
                     "-fx-font-size: 14px;" +
                     "-fx-background-radius: 18;" +
@@ -62,7 +72,7 @@ public class StudentDashboard extends BorderPane {
                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
     private static final String LOGOUT_HOVER =
-            "-fx-background-color: #9AC4B7;" +
+            "-fx-background-color: #7FB3FF;" +
                     "-fx-text-fill: white;" +
                     "-fx-font-weight: bold;" +
                     "-fx-font-size: 14px;" +
@@ -145,11 +155,7 @@ public class StudentDashboard extends BorderPane {
             stage.getScene().setRoot(loginPage.getView());
         });
 
-        Button logoutBtn = new Button(bundle.getString("student.dashboard.logout"));
-        logoutBtn.setStyle(LOGOUT_NORMAL);
-        logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle(LOGOUT_HOVER));
-        logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle(LOGOUT_NORMAL));
-        logoutBtn.setOnAction(e -> {
+        Button logoutBtn = createStudentLogoutButton(() -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();

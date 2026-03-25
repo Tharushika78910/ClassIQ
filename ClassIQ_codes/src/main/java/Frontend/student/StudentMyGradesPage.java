@@ -141,30 +141,8 @@ public class StudentMyGradesPage {
         BorderPane page = new BorderPane();
         page.setCenter(centeredCard);
 
-        String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
-
-        String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;";
-
         Button btnBack = dashboard.createStudentBackButton(() -> dashboard.showHome());
-
-        Button btnLogout = new Button(bundle.getString("student.dashboard.logout"));
-        btnLogout.setStyle(pillNormal);
-        btnLogout.setOnMouseEntered(e -> btnLogout.setStyle(pillHover));
-        btnLogout.setOnMouseExited(e -> btnLogout.setStyle(pillNormal));
-        btnLogout.setOnAction(e -> {
+        Button btnLogout = dashboard.createStudentLogoutButton(() -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) page.getScene().getWindow();
