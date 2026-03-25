@@ -2,7 +2,6 @@ package Frontend.teacher;
 
 import Frontend.Session;
 import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -47,7 +46,7 @@ public class TeacherMyGradesPage {
 
         VBox content = new VBox(18);
         content.setPadding(new Insets(22));
-        content.setAlignment(rtl ? Pos.TOP_RIGHT : Pos.TOP_LEFT);
+        content.setAlignment(Pos.TOP_LEFT);
 
         Label title = new Label(getText("teacher.mygrades.title", "Students Grades"));
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
@@ -142,11 +141,11 @@ public class TeacherMyGradesPage {
         scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        scroll.setStyle("-fx-background-color: transparent;");
         scroll.setBackground(Background.EMPTY);
 
         StackPane card = new StackPane(scroll);
-        card.setAlignment(rtl ? Pos.TOP_RIGHT : Pos.TOP_LEFT);
+        card.setAlignment(Pos.TOP_LEFT);
         card.setPadding(new Insets(6));
         card.setMaxWidth(860);
         card.setPrefWidth(860);
@@ -169,20 +168,6 @@ public class TeacherMyGradesPage {
         StackPane root = new StackPane(page);
         root.setPadding(new Insets(10));
         root.setStyle("-fx-background-color: transparent;");
-
-        if (rtl) {
-            root.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-            page.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-            content.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-            criteriaText.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-            gradeTable.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        } else {
-            root.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            page.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            content.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            criteriaText.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            gradeTable.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        }
 
         return root;
     }
