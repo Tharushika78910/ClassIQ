@@ -148,17 +148,17 @@ public class StudentReportCardPage {
         root.setCenter(centerWrapper);
 
         String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
+                "-fx-background-color: #CFE8FF;" +
+                        "-fx-text-fill: #0B3D91;" +
                         "-fx-font-weight: bold;" +
                         "-fx-font-size: 14px;" +
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 8,0,0,2);";
 
         String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
+                "-fx-background-color: #B7DBFF;" +
+                        "-fx-text-fill: #082C6C;" +
                         "-fx-font-weight: bold;" +
                         "-fx-font-size: 14px;" +
                         "-fx-background-radius: 18;" +
