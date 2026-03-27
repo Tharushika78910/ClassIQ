@@ -20,6 +20,8 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
+
 
 public class StudentReportCardPage {
 
@@ -31,6 +33,7 @@ public class StudentReportCardPage {
 
     public Parent getView() {
 
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", Session.getCurrentLocale());
         BorderPane root = new BorderPane();
         root.getStyleClass().add("page-bg");
 
@@ -166,7 +169,7 @@ public class StudentReportCardPage {
 
         Button btnBack = dashboard.createStudentBackButton(() -> dashboard.showHome());
 
-        Button btnPdf = new Button("Download PDF");
+        Button btnPdf = new Button(bundle.getString("student.downloadPdf"));
         btnPdf.setStyle(pillNormal);
         btnPdf.setOnMouseEntered(e -> btnPdf.setStyle(pillHover));
         btnPdf.setOnMouseExited(e -> btnPdf.setStyle(pillNormal));
