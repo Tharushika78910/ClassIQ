@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class StudentDetailsServiceTest {
 
@@ -45,13 +46,11 @@ public class StudentDetailsServiceTest {
                 return "Saved";
             }
 
-            // deleteFeedback
             @Override
             public void deleteFeedback(int studentId) {
                 assertEquals(10, studentId);
             }
 
-            // unused
             @Override public void saveMarks(StudentMarks marks) {}
             @Override public StudentMarks findByStudentId(int studentId) { return null; }
         };
@@ -61,7 +60,6 @@ public class StudentDetailsServiceTest {
         assertNotNull(s.getStudentDetails(10));
         s.saveFeedback(10, "Nice");
         assertEquals("Saved", s.getFeedback(10));
-
         s.deleteFeedback(10);
     }
 }
