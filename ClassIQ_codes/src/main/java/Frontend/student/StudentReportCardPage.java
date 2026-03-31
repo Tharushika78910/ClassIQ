@@ -51,7 +51,7 @@ public class StudentReportCardPage {
         contentBox.setMaxWidth(700);
         contentBox.setPrefWidth(700);
 
-        Label title = new Label("Academic Report Card");
+        Label title = new Label(bundle.getString("student.report.title"));
         title.setStyle("-fx-font-size: 34px; -fx-font-weight: 800; -fx-text-fill: #1f2d2a;");
         title.setMaxWidth(Double.MAX_VALUE);
         title.setAlignment(Pos.CENTER);
@@ -61,7 +61,7 @@ public class StudentReportCardPage {
 
         Student student = Session.getCurrentStudent();
         if (student == null) {
-            Label err = new Label("No student session found. Please log in again.");
+            Label err = new Label(bundle.getString("student.report.error.noSession"));
             err.setStyle("-fx-font-size: 16px;");
             contentBox.getChildren().addAll(title, titleGap, err);
             centerWrapper.getChildren().add(contentBox);
@@ -77,7 +77,7 @@ public class StudentReportCardPage {
         }
 
         String feedback = (marks == null || marks.getFeedback() == null || marks.getFeedback().isBlank())
-                ? "No feedback has been added yet."
+                ? bundle.getString("student.report.noFeedback")
                 : marks.getFeedback();
 
         Integer math  = (marks == null) ? null : marks.getSubject1();
@@ -90,11 +90,11 @@ public class StudentReportCardPage {
         Double average = (marks == null) ? null : marks.getAverage();
 
         Map<String, SubjectResult> subjectResults = new LinkedHashMap<>();
-        subjectResults.put("Mathematics", new SubjectResult(math, gradeFromMark(math)));
-        subjectResults.put("English", new SubjectResult(eng, gradeFromMark(eng)));
-        subjectResults.put("Science", new SubjectResult(sci, gradeFromMark(sci)));
-        subjectResults.put("Language", new SubjectResult(lang, gradeFromMark(lang)));
-        subjectResults.put("Craft", new SubjectResult(craft, gradeFromMark(craft)));
+        subjectResults.put(bundle.getString("student.report.subject.mathematics"), new SubjectResult(math, gradeFromMark(math)));
+        subjectResults.put(bundle.getString("student.report.subject.english"), new SubjectResult(eng, gradeFromMark(eng)));
+        subjectResults.put(bundle.getString("student.report.subject.science"), new SubjectResult(sci, gradeFromMark(sci)));
+        subjectResults.put(bundle.getString("student.report.subject.language"), new SubjectResult(lang, gradeFromMark(lang)));
+        subjectResults.put(bundle.getString("student.report.subject.craft"), new SubjectResult(craft, gradeFromMark(craft)));
 
         GridPane grid = new GridPane();
         grid.setVgap(18);
@@ -117,29 +117,29 @@ public class StudentReportCardPage {
 
         int r = 0;
 
-        grid.add(labelLeft("Student Number"), 0, r);
+        grid.add(labelLeft(bundle.getString("student.report.studentNumber")), 0, r);
         grid.add(labelCenter(nullSafe(student.getStudentNumber())), 1, r, 2, 1);
         r++;
 
-        grid.add(labelLeft("Class"), 0, r);
-        grid.add(labelCenter("10A"), 1, r, 2, 1);
+        grid.add(labelLeft(bundle.getString("student.report.class")), 0, r);
+        grid.add(labelCenter(bundle.getString("student.report.defaultClass")), 1, r, 2, 1);
         r++;
 
-        r = addSubjectRow(grid, r, "Mathematics", subjectResults);
-        r = addSubjectRow(grid, r, "English", subjectResults);
-        r = addSubjectRow(grid, r, "Science", subjectResults);
-        r = addSubjectRow(grid, r, "Language", subjectResults);
-        r = addSubjectRow(grid, r, "Craft", subjectResults);
+        r = addSubjectRow(grid, r, bundle.getString("student.report.subject.mathematics"), subjectResults);
+        r = addSubjectRow(grid, r, bundle.getString("student.report.subject.english"), subjectResults);
+        r = addSubjectRow(grid, r, bundle.getString("student.report.subject.science"), subjectResults);
+        r = addSubjectRow(grid, r, bundle.getString("student.report.subject.language"), subjectResults);
+        r = addSubjectRow(grid, r, bundle.getString("student.report.subject.craft"), subjectResults);
 
-        grid.add(labelLeft("Total"), 0, r);
+        grid.add(labelLeft(bundle.getString("student.report.total")), 0, r);
         grid.add(labelCenter(total == null ? "-" : String.valueOf(total)), 1, r, 2, 1);
         r++;
 
-        grid.add(labelLeft("Average"), 0, r);
+        grid.add(labelLeft(bundle.getString("student.report.average")), 0, r);
         grid.add(labelCenter(average == null ? "-" : String.format("%.2f", average)), 1, r, 2, 1);
         r++;
 
-        grid.add(labelLeft("Feedback"), 0, r);
+        grid.add(labelLeft(bundle.getString("student.report.feedback")), 0, r);
         Label fb = labelCenter(feedback);
         fb.setWrapText(true);
         fb.setMaxWidth(420);
@@ -182,12 +182,13 @@ public class StudentReportCardPage {
                 }
 
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Save Report Card");
+                fileChooser.setTitle(bundle.getString("student.report.saveDialog.title"));
                 fileChooser.setInitialFileName(
-                        "ReportCard_" + student.getStudentNumber() + "_" + java.time.LocalDate.now() + ".pdf"
+                        bundle.getString("student.report.saveDialog.filenamePrefix")
+                                + "_" + student.getStudentNumber() + "_" + java.time.LocalDate.now() + ".pdf"
                 );
                 fileChooser.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+                        new FileChooser.ExtensionFilter(bundle.getString("student.report.saveDialog.filterName"), "*.pdf")
                 );
 
                 Stage currentStage = (Stage) root.getScene().getWindow();
@@ -201,7 +202,7 @@ public class StudentReportCardPage {
                         selectedFile,
                         student.getStudentNumber(),
                         student.getFirstName() + " " + student.getLastName(),
-                        "10A",
+                        bundle.getString("student.report.defaultClass"),
                         pdfSubjects,
                         total,
                         average,
@@ -209,14 +210,14 @@ public class StudentReportCardPage {
                 );
 
                 Alert a = new Alert(Alert.AlertType.INFORMATION);
-                a.setHeaderText("PDF Generated");
-                a.setContentText("PDF saved successfully at:\n" + pdf.getAbsolutePath());
+                a.setHeaderText(bundle.getString("student.report.pdf.generated"));
+                a.setContentText(bundle.getString("student.report.pdf.saved") + "\n" + pdf.getAbsolutePath());
                 a.showAndWait();
 
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText("PDF Error");
+                a.setHeaderText(bundle.getString("student.report.pdf.error"));
                 a.setContentText(ex.getMessage());
                 a.showAndWait();
             }
@@ -264,7 +265,7 @@ public class StudentReportCardPage {
         if (m >= 75) return "A";
         if (m >= 65) return "B";
         if (m >= 55) return "C";
-        if (m >= 45) return "S";
+        if (m >= 35) return "S";
         return "F";
     }
 

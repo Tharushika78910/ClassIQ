@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Map;
 
+import Frontend.Session;
+import java.util.ResourceBundle;
+
 public class ReportCardPdfExporter {
 
     public static File export(
@@ -21,6 +24,8 @@ public class ReportCardPdfExporter {
             Double average,
             String feedback
     ) throws Exception {
+
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", Session.getCurrentLocale());
 
         Document doc = new Document(PageSize.A4, 48, 48, 40, 70);
         PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(outFile));
@@ -43,7 +48,7 @@ public class ReportCardPdfExporter {
 
         // TITLE
         Font titleFont = new Font(Font.HELVETICA, 20, Font.BOLD);
-        Paragraph title = new Paragraph("Academic Report Card", titleFont);
+        Paragraph title = new Paragraph(bundle.getString("student.report.title"), titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(14);
         doc.add(title);
@@ -58,12 +63,11 @@ public class ReportCardPdfExporter {
         info.setSpacingAfter(16);
         info.setWidths(new float[]{1.4f, 2.6f});
 
-        addInfoRow(info, "Student Number", safe(studentNumber), labelFont, valFont);
-        addInfoRow(info, "Student Name", safe(studentName), labelFont, valFont);
-        addInfoRow(info, "Class", safe(studentClass), labelFont, valFont);
-        addInfoRow(info, "Total", total == null ? "-" : String.valueOf(total), labelFont, valFont);
-        addInfoRow(info, "Average", average == null ? "-" : String.format("%.2f", average), labelFont, valFont);
-
+        addInfoRow(info, bundle.getString("student.report.studentNumber"), safe(studentNumber), labelFont, valFont);
+        addInfoRow(info, bundle.getString("student.report.studentName"), safe(studentName), labelFont, valFont);
+        addInfoRow(info, bundle.getString("student.report.class"), safe(studentClass), labelFont, valFont);
+        addInfoRow(info, bundle.getString("student.report.total"), total == null ? "-" : String.valueOf(total), labelFont, valFont);
+        addInfoRow(info, bundle.getString("student.report.average"), average == null ? "-" : String.format("%.2f", average), labelFont, valFont);
         doc.add(info);
 
         // SUBJECT TABLE
@@ -73,9 +77,9 @@ public class ReportCardPdfExporter {
         table.setSpacingAfter(14);
         table.setWidths(new float[]{2.4f, 1.0f, 1.0f});
 
-        addHeaderCell(table, "Subject");
-        addHeaderCell(table, "Mark");
-        addHeaderCell(table, "Grade");
+        addHeaderCell(table, bundle.getString("student.report.subject"));
+        addHeaderCell(table, bundle.getString("student.report.mark"));
+        addHeaderCell(table, bundle.getString("student.report.grade"));;
 
         for (Map.Entry<String, SubjectLine> e : subjects.entrySet()) {
             SubjectLine line = e.getValue();
@@ -94,12 +98,12 @@ public class ReportCardPdfExporter {
         fbTable.setSpacingBefore(6);
         fbTable.setSpacingAfter(18);
 
-        PdfPCell fbLabel = new PdfPCell(new Phrase("Feedback", labelFont));
+        PdfPCell fbLabel = new PdfPCell(new Phrase(bundle.getString("student.report.feedback"), labelFont));
         fbLabel.setBorder(Rectangle.NO_BORDER);
         fbLabel.setPadding(5);
 
         PdfPCell fbValue = new PdfPCell(new Phrase(
-                (feedback == null || feedback.isBlank()) ? "No feedback has been added yet." : feedback,
+                (feedback == null || feedback.isBlank()) ? bundle.getString("student.report.noFeedback") : feedback,
                 valFont
         ));
         fbValue.setBorder(Rectangle.NO_BORDER);
@@ -112,7 +116,10 @@ public class ReportCardPdfExporter {
 
         // GENERATED ON
         Font footerFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
-        Paragraph generated = new Paragraph("Generated on: " + LocalDate.now(), footerFont);
+        Paragraph generated = new Paragraph(
+                bundle.getString("student.report.generatedOn") + " " + LocalDate.now(),
+                footerFont
+        );
         generated.setAlignment(Element.ALIGN_RIGHT);
         generated.setSpacingBefore(10);
         doc.add(generated);
