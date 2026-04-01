@@ -137,7 +137,7 @@ public class HomePage {
             } else {
                 newLocale = new Locale("en", "US");
             }
-            Session.setCurrentLocale(newLocale); // ✅ important
+            Session.setCurrentLocale(newLocale); // important
             // Refresh the scene to apply new language
             stage.setScene(getScene(stage, newLocale));
         });
@@ -219,8 +219,24 @@ public class HomePage {
         // Replace placeholder keys with localized text using automatic loop
         for (String key : bundle.keySet()) {
             if (key.startsWith("html.")) {
-                htmlContent = htmlContent.replace(key, bundle.getString(key));
+                try {
+                    String value = bundle.getString(key);
+                    htmlContent = htmlContent.replace(key, value);
+                } catch (Exception e) {
+                    System.err.println("Error replacing key: " + key + " - " + e.getMessage());
+                }
             }
+        }
+
+
+        htmlContent = htmlContent.replaceAll("html\\.[a-zA-Z0-9.]+", "");
+        // try to catch any remaining partial patterns
+        htmlContent = htmlContent.replaceAll("\\.title", "");
+        htmlContent = htmlContent.replaceAll("\\.content", "");
+
+        // Add RTL direction attribute for Arabic language
+        if (isRTL(currentLocale)) {
+            htmlContent = htmlContent.replace("<html lang=\"en\">", "<html lang=\"ar\" dir=\"rtl\">");
         }
 
         // WebView
@@ -247,7 +263,8 @@ public class HomePage {
         )));
 
         // Back button
-        Button backBtn = new Button(bundle.getString("back") + " ←");
+        String backArrow = isRTL(currentLocale) ? " →" : " ←";
+        Button backBtn = new Button(bundle.getString("back") + backArrow);
         backBtn.setStyle(
             "-fx-background-color: rgba(255,255,255,0.92);" +
             "-fx-text-fill: #2E6F62;" +
@@ -262,7 +279,7 @@ public class HomePage {
         // Bottom bar for back button (like other pages)
         HBox bottomBar = new HBox(backBtn);
         bottomBar.setPadding(new Insets(12));
-        bottomBar.setAlignment(Pos.BOTTOM_LEFT);
+        bottomBar.setAlignment(isRTL(currentLocale) ? Pos.BOTTOM_RIGHT : Pos.BOTTOM_LEFT);
 
         BorderPane webLayout = new BorderPane();
         webLayout.setCenter(glassPanel);

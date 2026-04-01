@@ -104,7 +104,7 @@ public class LoginPage {
                         "-fx-background-radius: 18;" +
                         "-fx-padding: 8 22 8 22;";
 
-        Button btnBack = new Button(bundle.getString("back") + " ←");
+        Button btnBack = new Button(bundle.getString("back") + (isRTL(currentLocale) ? " →" : " ←"));
         btnBack.setStyle(pillNormal);
         btnBack.setOnMouseEntered(e -> btnBack.setStyle(pillHover));
         btnBack.setOnMouseExited(e -> btnBack.setStyle(pillNormal));
@@ -114,8 +114,14 @@ public class LoginPage {
             stage.setScene(home.getScene(stage, currentLocale));
         });
 
-        StackPane.setAlignment(btnBack, Pos.BOTTOM_LEFT);
-        StackPane.setMargin(btnBack, new Insets(0, 0, 25, 25));
+        // Apply RTL layout for back button
+        if (isRTL(currentLocale)) {
+            StackPane.setAlignment(btnBack, Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(btnBack, new Insets(0, 25, 25, 0));
+        } else {
+            StackPane.setAlignment(btnBack, Pos.BOTTOM_LEFT);
+            StackPane.setMargin(btnBack, new Insets(0, 0, 25, 25));
+        }
         root.getChildren().add(btnBack);
 
         return root;
@@ -242,7 +248,7 @@ public class LoginPage {
                 Session.setUserId(result.userId);
                 Session.setTeacherId(tp.teacherId);
                 Session.setTeacherSubject(tp.subject);
-                Session.setCurrentLocale(currentLocale); // ✅ important
+                Session.setCurrentLocale(currentLocale); // important
 
                 TeacherDashboard dash = new TeacherDashboard(tp.name, tp.email, TEACHER_AVATAR);
                 stage.getScene().setRoot(new StackPane(createBackgroundView(), dash));

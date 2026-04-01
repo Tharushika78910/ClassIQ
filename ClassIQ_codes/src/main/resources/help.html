@@ -28,6 +28,28 @@
         ul {
             padding-left: 20px;
         }
+
+        /* RTL styles for Arabic */
+        html[dir="rtl"] body {
+            direction: rtl;
+            text-align: right;
+        }
+
+        html[dir="rtl"] ul {
+            padding-left: 0;
+            padding-right: 20px;
+        }
+
+        html[dir="rtl"] h1, 
+        html[dir="rtl"] h2, 
+        html[dir="rtl"] p {
+            text-align: right;
+        }
+
+        /* RTL button styles */
+        html[dir="rtl"] .back-button {
+            transform: scaleX(-1);
+        }
     </style>
 </head>
 <body>
