@@ -278,14 +278,14 @@ public class TeacherMarkSheetPage {
         colGrade.setPrefWidth(75);
 
         // Alignment: name left, numbers centered
-        colNo.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6;");
-        colName.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6;");
+        colNo.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6; -fx-text-fill: black;");
+        colName.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6; -fx-text-fill: black;");
 
-        colAssignment.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
-        colProject.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
-        colFinal.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
-        colTotal.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
-        colGrade.setStyle("-fx-alignment: CENTER; -fx-padding: 0 0 0 0;");
+        colAssignment.setStyle("-fx-alignment: CENTER; -fx-padding: 0; -fx-text-fill: black;");
+        colProject.setStyle("-fx-alignment: CENTER; -fx-padding: 0; -fx-text-fill: black;");
+        colFinal.setStyle("-fx-alignment: CENTER; -fx-padding: 0; -fx-text-fill: black;");
+        colTotal.setStyle("-fx-alignment: CENTER; -fx-padding: 0; -fx-text-fill: black;");
+        colGrade.setStyle("-fx-alignment: CENTER; -fx-padding: 0; -fx-text-fill: black;");
 
         table.getColumns().setAll(
                 colNo, colName,
@@ -337,6 +337,7 @@ public class TeacherMarkSheetPage {
 
             setter.accept(ev.getRowValue(), val);
             status.setText("");
+            table.refresh();
         });
 
         return col;
