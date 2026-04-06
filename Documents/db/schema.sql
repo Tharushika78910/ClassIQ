@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `app_user` (
   `role` varchar(20) NOT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_name` (`user_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -32,7 +32,19 @@ CREATE TABLE IF NOT EXISTS `gradecategory` (
   `category_name` varchar(50) NOT NULL,
   `weight` int(11) NOT NULL,
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.gradecategory_translation
+CREATE TABLE IF NOT EXISTS `gradecategory_translation` (
+  `category_id` int(11) NOT NULL,
+  `language_code` varchar(5) NOT NULL,
+  `category_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`category_id`,`language_code`),
+  KEY `idx_gradecategory_translation_lang` (`language_code`),
+  CONSTRAINT `fk_gradecategory_translation` FOREIGN KEY (`category_id`) REFERENCES `gradecategory` (`category_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -43,7 +55,18 @@ CREATE TABLE IF NOT EXISTS `grade_scale` (
   `max_mark` int(11) NOT NULL,
   `grade_letter` varchar(2) NOT NULL,
   PRIMARY KEY (`scale_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.role_translation
+CREATE TABLE IF NOT EXISTS `role_translation` (
+  `role_code` varchar(20) NOT NULL,
+  `language_code` varchar(5) NOT NULL,
+  `role_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`role_code`,`language_code`),
+  KEY `idx_role_translation_lang` (`language_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -58,9 +81,10 @@ CREATE TABLE IF NOT EXISTS `student` (
   PRIMARY KEY (`student_id`),
   UNIQUE KEY `student_number` (`student_number`),
   UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `email_2` (`email`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `student_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -68,19 +92,43 @@ CREATE TABLE IF NOT EXISTS `student` (
 CREATE TABLE IF NOT EXISTS `student_marks` (
   `marks_id` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` int(11) NOT NULL,
-  `mathematics` int(11) DEFAULT NULL,
-  `english` int(11) DEFAULT NULL,
-  `science` int(11) DEFAULT NULL,
-  `craft` int(11) DEFAULT NULL,
-  `languages` int(11) DEFAULT NULL,
-  `total` int(11) NOT NULL,
-  `average` double NOT NULL,
+  `mathematics` int(11) DEFAULT 0,
+  `english` int(11) DEFAULT 0,
+  `science` int(11) DEFAULT 0,
+  `craft` int(11) DEFAULT 0,
+  `languages` int(11) DEFAULT 0,
+  `total` int(11) DEFAULT 0,
+  `average` decimal(10,2) DEFAULT 0.00,
   `feed_back` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`marks_id`),
   UNIQUE KEY `uq_student_marks` (`student_id`),
   CONSTRAINT `fk_student_marks_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.student_translation
+CREATE TABLE IF NOT EXISTS `student_translation` (
+  `student_id` int(11) NOT NULL,
+  `language_code` varchar(5) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`student_id`,`language_code`),
+  KEY `idx_student_translation_lang` (`language_code`),
+  CONSTRAINT `fk_student_translation_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.subject_translation
+CREATE TABLE IF NOT EXISTS `subject_translation` (
+  `subject_code` varchar(50) NOT NULL,
+  `language_code` varchar(5) NOT NULL,
+  `subject_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`subject_code`,`language_code`),
+  KEY `idx_subject_translation_lang` (`language_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -94,9 +142,10 @@ CREATE TABLE IF NOT EXISTS `teacher` (
   `subject` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`teacher_id`),
   UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `email_2` (`email`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `teacher_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -114,11 +163,24 @@ CREATE TABLE IF NOT EXISTS `teacher_marksheet` (
   `teacher_id` int(11) NOT NULL,
   `subject` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_teacher_marksheet_student` (`student_id`),
+  UNIQUE KEY `uq_tms` (`student_id`,`teacher_id`,`subject`),
   KEY `fk_tms_teacher` (`teacher_id`),
   CONSTRAINT `fk_teacher_marksheet_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`),
   CONSTRAINT `fk_tms_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table classiq.teacher_translation
+CREATE TABLE IF NOT EXISTS `teacher_translation` (
+  `teacher_id` int(11) NOT NULL,
+  `language_code` varchar(5) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`teacher_id`,`language_code`),
+  KEY `idx_teacher_translation_lang` (`language_code`),
+  CONSTRAINT `fk_teacher_translation_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
