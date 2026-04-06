@@ -50,7 +50,7 @@ public class StudentMyInfoPage {
             root.setCenter(center);
         } else {
 
-            String fullName = s.getFirstName() + " " + s.getLastName();
+            String fullName = s.getFullName();
 
             VBox leftContent = new VBox(40);
             leftContent.setAlignment(Pos.TOP_LEFT);

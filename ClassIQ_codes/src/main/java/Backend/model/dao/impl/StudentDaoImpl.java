@@ -10,6 +10,34 @@ import java.util.List;
 
 public class StudentDaoImpl implements StudentDao {
 
+    private static final String DEFAULT_LANGUAGE = "en";
+
+    private String normalizeLanguage(String languageCode) {
+        if (languageCode == null || languageCode.isBlank()) {
+            return DEFAULT_LANGUAGE;
+        }
+        return languageCode.trim().toLowerCase();
+    }
+
+    private String localizedStudentSelect() {
+        return """
+        SELECT
+            s.student_id,
+            COALESCE(tr_req.first_name, tr_en.first_name, s.first_name) AS first_name,
+            COALESCE(tr_req.last_name, tr_en.last_name, s.last_name) AS last_name,
+            s.student_number,
+            s.email,
+            s.user_id
+        FROM student s
+        LEFT JOIN student_translation tr_req
+            ON s.student_id = tr_req.student_id
+           AND tr_req.language_code = ?
+        LEFT JOIN student_translation tr_en
+            ON s.student_id = tr_en.student_id
+           AND tr_en.language_code = 'en'
+    """;
+    }
+
     // CREATE
     @Override
     public void create(Student s) throws SQLException {
@@ -35,17 +63,19 @@ public class StudentDaoImpl implements StudentDao {
     // FIND BY ID  FIXED
     @Override
     public Student findById(int studentId) throws SQLException {
+        return findById(studentId, DEFAULT_LANGUAGE);
+    }
 
-        String sql = """
-            SELECT student_id, first_name, last_name, student_number, email, user_id
-            FROM student
-            WHERE student_id = ?
-        """;
+    @Override
+    public Student findById(int studentId, String languageCode) throws SQLException {
+
+        String sql = localizedStudentSelect() + " WHERE s.student_id = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, studentId);
+            ps.setString(1, normalizeLanguage(languageCode));
+            ps.setInt(2, studentId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
@@ -57,20 +87,25 @@ public class StudentDaoImpl implements StudentDao {
     // FIND ALL
     @Override
     public List<Student> findAll() throws SQLException {
+        return findAll(DEFAULT_LANGUAGE);
+    }
 
-        String sql = """
-            SELECT student_id, first_name, last_name, student_number, email, user_id
-            FROM student
-        """;
+    @Override
+    public List<Student> findAll(String languageCode) throws SQLException {
+
+        String sql = localizedStudentSelect() + " ORDER BY s.student_id";
 
         List<Student> list = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                list.add(mapRow(rs));
+            ps.setString(1, normalizeLanguage(languageCode));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
             }
         }
         return list;
@@ -134,17 +169,19 @@ public class StudentDaoImpl implements StudentDao {
     // FIND BY STUDENT NUMBER
     @Override
     public Student findByStudentNumber(String studentNumber) throws SQLException {
+        return findByStudentNumber(studentNumber, DEFAULT_LANGUAGE);
+    }
 
-        String sql = """
-            SELECT student_id, first_name, last_name, student_number, email, user_id
-            FROM student
-            WHERE student_number = ?
-        """;
+    @Override
+    public Student findByStudentNumber(String studentNumber, String languageCode) throws SQLException {
+
+        String sql = localizedStudentSelect() + " WHERE s.student_number = ?";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, studentNumber);
+            ps.setString(1, normalizeLanguage(languageCode));
+            ps.setString(2, studentNumber);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
@@ -176,46 +213,67 @@ public class StudentDaoImpl implements StudentDao {
     // FIND FIRST STUDENT
     @Override
     public Student findFirstStudent() throws SQLException {
+        return findFirstStudent(DEFAULT_LANGUAGE);
+    }
 
-        String sql = """
-            SELECT student_id, first_name, last_name, student_number, email, user_id
-            FROM student
-            ORDER BY student_id ASC
-            LIMIT 1
-        """;
+    @Override
+    public Student findFirstStudent(String languageCode) throws SQLException {
+
+        String sql = localizedStudentSelect() + " ORDER BY s.student_id ASC LIMIT 1";
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            if (!rs.next()) return null;
-            return mapRow(rs);
+            ps.setString(1, normalizeLanguage(languageCode));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                return mapRow(rs);
+            }
         }
     }
 
     // FIND ALL BASIC
     @Override
     public List<Student> findAllBasic() throws SQLException {
+        return findAllBasic(DEFAULT_LANGUAGE);
+    }
+
+    @Override
+    public List<Student> findAllBasic(String languageCode) throws SQLException {
 
         String sql = """
-            SELECT student_id, first_name, last_name, student_number
-            FROM student
-            ORDER BY student_number
-        """;
+        SELECT
+            s.student_id,
+            COALESCE(tr_req.first_name, tr_en.first_name, s.first_name) AS first_name,
+            COALESCE(tr_req.last_name, tr_en.last_name, s.last_name) AS last_name,
+            s.student_number
+        FROM student s
+        LEFT JOIN student_translation tr_req
+            ON s.student_id = tr_req.student_id
+           AND tr_req.language_code = ?
+        LEFT JOIN student_translation tr_en
+            ON s.student_id = tr_en.student_id
+           AND tr_en.language_code = 'en'
+        ORDER BY s.student_number
+    """;
 
         List<Student> list = new ArrayList<>();
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                Student s = new Student();
-                s.setStudentId(rs.getInt("student_id"));
-                s.setFirstName(rs.getString("first_name"));
-                s.setLastName(rs.getString("last_name"));
-                s.setStudentNumber(rs.getString("student_number"));
-                list.add(s);
+            ps.setString(1, normalizeLanguage(languageCode));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Student s = new Student();
+                    s.setStudentId(rs.getInt("student_id"));
+                    s.setFirstName(rs.getString("first_name"));
+                    s.setLastName(rs.getString("last_name"));
+                    s.setStudentNumber(rs.getString("student_number"));
+                    list.add(s);
+                }
             }
         }
 

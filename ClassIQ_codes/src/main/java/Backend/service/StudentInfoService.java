@@ -11,23 +11,18 @@ public class StudentInfoService {
 
     private final StudentDao studentDao = new StudentDaoImpl();
 
-    //  INITIAL DISPLAY
-    public Student loadFirstStudent() throws SQLException {
-        return studentDao.findFirstStudent();
+    public Student loadFirstStudent(String languageCode) throws SQLException {
+        return studentDao.findFirstStudent(languageCode);
     }
 
-    //  SEARCH BY STUDENT NUMBER
-    public Student searchByStudentNumber(String studentNumber) throws SQLException {
-
+    public Student searchByStudentNumber(String studentNumber, String languageCode) throws SQLException {
         if (studentNumber == null || studentNumber.trim().isEmpty()) {
             throw new IllegalArgumentException("Student number is required.");
         }
-
-        return studentDao.findByStudentNumber(studentNumber.trim());
+        return studentDao.findByStudentNumber(studentNumber.trim(), languageCode);
     }
 
-    //  LOAD ALL STUDENTS (FOR TABLE REFERENCE)
-    public List<Student> loadAllStudentsBasic() throws SQLException {
-        return studentDao.findAllBasic();
+    public List<Student> loadAllStudentsBasic(String languageCode) throws SQLException {
+        return studentDao.findAllBasic(languageCode);
     }
 }

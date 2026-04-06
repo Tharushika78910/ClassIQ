@@ -26,6 +26,7 @@ public class TeacherStudentsInfoPage {
     public Parent getView() {
 
         // ROOT
+        String languageCode = Frontend.Session.getCurrentLocale().getLanguage();
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(18));
         root.getStyleClass().add("page-bg");
@@ -89,12 +90,10 @@ public class TeacherStudentsInfoPage {
         status.setTextFill(Color.DARKRED);
 
         try {
-            for (Student s : controller.getAllStudentsBasic()) {
-                String fullName = (s.getFirstName() == null ? "" : s.getFirstName()) + " " +
-                        (s.getLastName() == null ? "" : s.getLastName());
+            for (Student s : controller.getAllStudentsBasic(languageCode)) {
                 rows.add(new StudentRow(
                         s.getStudentNumber(),
-                        fullName.trim()
+                        s.getFullName().trim()
                 ));
             }
         } catch (Exception ex) {
@@ -163,7 +162,7 @@ public class TeacherStudentsInfoPage {
             String studentNumberToOpen = selected != null ? selected.getStudentNumber() : input;
 
             try {
-                Student s = controller.findStudentByNumber(studentNumberToOpen);
+                Student s = controller.findStudentByNumber(studentNumberToOpen, languageCode);
                 if (s == null) {
                     status.setText("Student not found: " + studentNumberToOpen);
                     return;

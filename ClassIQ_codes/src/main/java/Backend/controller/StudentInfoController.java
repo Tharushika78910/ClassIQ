@@ -10,18 +10,15 @@ public class StudentInfoController {
 
     private final StudentInfoService service = new StudentInfoService();
 
-    // INITIAL DISPLAY
-    public Student getInitialStudent() throws SQLException {
-        return service.loadFirstStudent();
+    public Student getInitialStudent(String languageCode) throws SQLException {
+        return service.loadFirstStudent(languageCode);
     }
 
-    //  SEARCH BY STUDENT NUMBER
-    public Student findStudentByNumber(String studentNumber) throws SQLException {
-        return service.searchByStudentNumber(studentNumber);
+    public Student findStudentByNumber(String studentNumber, String languageCode) throws SQLException {
+        return service.searchByStudentNumber(studentNumber, languageCode);
     }
 
-    //  LOAD ALL STUDENTS (FOR TABLE VIEW)
-    public List<Student> getAllStudentsBasic() throws SQLException {
-        return service.loadAllStudentsBasic();
+    public List<Student> getAllStudentsBasic(String languageCode) throws SQLException {
+        return service.loadAllStudentsBasic(languageCode);
     }
 }

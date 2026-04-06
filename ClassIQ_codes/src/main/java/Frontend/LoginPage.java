@@ -214,7 +214,7 @@ public class LoginPage {
                 Student fullStudent;
 
                 try {
-                    fullStudent = studentDao.findById(sp.studentId);
+                    fullStudent = studentDao.findById(sp.studentId, currentLocale.getLanguage());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     error.setText(bundle.getString("error.student.load.failed"));
@@ -229,7 +229,7 @@ public class LoginPage {
                 Session.setRole(Session.Role.STUDENT);
                 Session.setUserId(result.userId);
                 Session.setCurrentStudent(fullStudent);
-                Session.setCurrentLocale(currentLocale); // ✅ important
+                Session.setCurrentLocale(currentLocale);
 
                 String fullName = fullStudent.getFirstName() + " " + fullStudent.getLastName();
 

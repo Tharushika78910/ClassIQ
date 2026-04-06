@@ -7,12 +7,13 @@ import java.util.List;
 
 public interface StudentDao {
 
-    // Basic CRUD
     void create(Student student) throws SQLException;
 
     Student findById(int studentId) throws SQLException;
+    Student findById(int studentId, String languageCode) throws SQLException;
 
     List<Student> findAll() throws SQLException;
+    List<Student> findAll(String languageCode) throws SQLException;
 
     void update(Student student) throws SQLException;
 
@@ -20,15 +21,14 @@ public interface StudentDao {
 
     boolean existsById(int studentId) throws SQLException;
 
-    // Search by student_number
     Student findByStudentNumber(String studentNumber) throws SQLException;
+    Student findByStudentNumber(String studentNumber, String languageCode) throws SQLException;
 
-    //  Needed by StudentDetailsController
     int findStudentIdByStudentNumber(String studentNumber) throws SQLException;
 
-    // For initial display when page opens
     Student findFirstStudent() throws SQLException;
+    Student findFirstStudent(String languageCode) throws SQLException;
 
-    // For the reference table (Student Number + Full Name)
     List<Student> findAllBasic() throws SQLException;
+    List<Student> findAllBasic(String languageCode) throws SQLException;
 }
