@@ -8,8 +8,8 @@ public class StudentDetailsService {
 
     private final MarksDao marksDao = new MarksDaoImpl();
 
-    public StudentDetailsDTO getStudentDetails(int studentId) throws Exception {
-        return marksDao.findStudentDetails(studentId);
+    public StudentDetailsDTO getStudentDetails(int studentId, String languageCode) throws Exception {
+        return marksDao.findStudentDetails(studentId, languageCode);
     }
 
     public void saveFeedback(int studentId, String feedback) throws Exception {
@@ -19,7 +19,6 @@ public class StudentDetailsService {
     public String getFeedback(int studentId) throws Exception {
         return marksDao.findFeedback(studentId);
     }
-
 
     public void deleteFeedback(int studentId) throws Exception {
         marksDao.deleteFeedback(studentId);

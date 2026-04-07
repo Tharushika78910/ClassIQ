@@ -4,16 +4,18 @@ import Backend.controller.StudentDetailsController;
 import Backend.model.dto.StudentDetailsDTO;
 import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
-import Frontend.LoginPage;
 import Frontend.Session;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class TeacherStudentDetailsPage {
 
@@ -29,16 +31,20 @@ public class TeacherStudentDetailsPage {
 
     public Parent getView() {
 
-        // ROOT
+        String languageCode = Session.getCurrentLocale().getLanguage();
+        Locale locale = Session.getCurrentLocale();
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+        boolean isArabic = "ar".equalsIgnoreCase(languageCode);
+
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(16));
         root.getStyleClass().add("page-bg");
+        root.setNodeOrientation(isArabic ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
 
-        // HEADER
-        Label headerTitle = new Label("Student Details");
+        Label headerTitle = new Label(bundle.getString("teacher.studentDetails.title"));
         headerTitle.getStyleClass().add("header-title");
 
-        Label headerSub = new Label("View marks and write feedback");
+        Label headerSub = new Label(bundle.getString("teacher.studentDetails.subtitle"));
         headerSub.getStyleClass().add("subtitle");
 
         VBox titleBox = new VBox(2, headerTitle, headerSub);
@@ -50,33 +56,31 @@ public class TeacherStudentDetailsPage {
 
         root.setTop(header);
 
-        // MAIN CARD
         HBox card = new HBox(18);
         card.setPadding(new Insets(18));
         card.setMaxWidth(900);
         card.getStyleClass().add("details-card");
 
-        // LEFT COLUMN
         VBox left = new VBox(10);
         left.getStyleClass().add("details-left");
         left.setPrefWidth(300);
 
-        Label profileTitle = new Label("Student Profile");
+        Label profileTitle = new Label(bundle.getString("teacher.studentDetails.profile"));
         profileTitle.getStyleClass().add("section-title");
 
-        Label lblStudentNo = new Label("Student Number: " + studentNumber);
+        Label lblStudentNo = new Label(bundle.getString("teacher.studentDetails.studentNumber") + ": " + studentNumber);
         lblStudentNo.getStyleClass().add("info-text");
 
-        Label lblName = new Label("Name: ");
+        Label lblName = new Label(bundle.getString("teacher.studentDetails.name") + ": ");
         lblName.getStyleClass().add("info-text");
 
-        Label lblEmail = new Label("Email: ");
+        Label lblEmail = new Label(bundle.getString("teacher.studentDetails.email") + ": ");
         lblEmail.getStyleClass().add("info-text");
 
-        Label totalChip = new Label("Total: 0");
+        Label totalChip = new Label(bundle.getString("teacher.studentDetails.total") + ": 0");
         totalChip.getStyleClass().add("info-chip");
 
-        Label avgChip = new Label("Average: 0.00");
+        Label avgChip = new Label(bundle.getString("teacher.studentDetails.average") + ": 0.00");
         avgChip.getStyleClass().add("info-chip");
 
         VBox chips = new VBox(8, totalChip, avgChip);
@@ -84,12 +88,11 @@ public class TeacherStudentDetailsPage {
 
         left.getChildren().addAll(profileTitle, lblStudentNo, lblName, lblEmail, new Separator(), chips);
 
-        // RIGHT COLUMN
         VBox right = new VBox(14);
         right.getStyleClass().add("details-right");
         right.setFillWidth(true);
 
-        Label marksTitle = new Label("Marks");
+        Label marksTitle = new Label(bundle.getString("teacher.studentDetails.marks"));
         marksTitle.getStyleClass().add("section-title");
 
         GridPane grid = new GridPane();
@@ -97,10 +100,10 @@ public class TeacherStudentDetailsPage {
         grid.setHgap(30);
         grid.setVgap(10);
 
-        Label subHead = new Label("Subject");
+        Label subHead = new Label(bundle.getString("teacher.studentDetails.subject"));
         subHead.getStyleClass().add("table-head");
 
-        Label markHead = new Label("Marks");
+        Label markHead = new Label(bundle.getString("teacher.studentDetails.marks"));
         markHead.getStyleClass().add("table-head");
 
         grid.add(subHead, 0, 0);
@@ -112,32 +115,29 @@ public class TeacherStudentDetailsPage {
         Label m4 = new Label("0");
         Label m5 = new Label("0");
 
-        addRow(grid, 1, "Mathematics", m1);
-        addRow(grid, 2, "English", m2);
-        addRow(grid, 3, "Science", m3);
-        addRow(grid, 4, "Craft", m4);
-        addRow(grid, 5, "Language", m5);
+        addRow(grid, 1, bundle.getString("teacher.studentDetails.subject.mathematics"), m1);
+        addRow(grid, 2, bundle.getString("teacher.studentDetails.subject.english"), m2);
+        addRow(grid, 3, bundle.getString("teacher.studentDetails.subject.science"), m3);
+        addRow(grid, 4, bundle.getString("teacher.studentDetails.subject.craft"), m4);
+        addRow(grid, 5, bundle.getString("teacher.studentDetails.subject.language"), m5);
 
-        Label fbLbl = new Label("Feedback");
+        Label fbLbl = new Label(bundle.getString("teacher.studentDetails.feedback"));
         fbLbl.getStyleClass().add("section-title");
 
         TextArea feedbackArea = new TextArea();
         feedbackArea.setPrefRowCount(4);
         feedbackArea.setWrapText(true);
         feedbackArea.getStyleClass().add("feedback-area");
-
-        // Default state (will be set after checking canEditFeedback)
         feedbackArea.setEditable(false);
 
-        Button btnSave = new Button("Save");
+        Button btnSave = new Button(bundle.getString("teacher.studentDetails.save"));
         btnSave.getStyleClass().add("primary-btn");
         btnSave.setDisable(true);
 
-        Button btnEdit = new Button("Edit");
+        Button btnEdit = new Button(bundle.getString("teacher.studentDetails.edit"));
         btnEdit.getStyleClass().add("primary-btn");
 
-        // NEW: Delete button
-        Button btnDelete = new Button("Delete");
+        Button btnDelete = new Button(bundle.getString("teacher.studentDetails.delete"));
         btnDelete.getStyleClass().add("primary-btn");
         btnDelete.setDisable(true);
 
@@ -167,17 +167,18 @@ public class TeacherStudentDetailsPage {
         center.setPadding(new Insets(18));
         root.setCenter(center);
 
-
-        // LOGIC: allow Mathematics teacher only (tolerant match)
         final boolean canEditFeedback = isMathSubject(Session.getTeacherSubject());
 
         try {
-            StudentDetailsDTO dto = controller.getDetails(studentNumber);
+            StudentDetailsDTO dto = controller.getDetails(studentNumber, languageCode);
             Student s = dto.getStudent();
             StudentMarks mk = dto.getMarks();
 
-            lblName.setText("Name: " + s.getFirstName() + " " + s.getLastName());
-            lblEmail.setText("Email: " + (s.getEmail() == null ? "" : s.getEmail()));
+            lblName.setText(bundle.getString("teacher.studentDetails.name") + ": "
+                    + safe(s.getFirstName()) + " " + safe(s.getLastName()));
+
+            lblEmail.setText(bundle.getString("teacher.studentDetails.email") + ": "
+                    + safe(s.getEmail()));
 
             m1.setText(String.valueOf(mk.getSubject1()));
             m2.setText(String.valueOf(mk.getSubject2()));
@@ -185,49 +186,47 @@ public class TeacherStudentDetailsPage {
             m4.setText(String.valueOf(mk.getSubject4()));
             m5.setText(String.valueOf(mk.getSubject5()));
 
-            totalChip.setText("Total: " + mk.getTotal());
-            avgChip.setText(String.format("Average: %.2f", mk.getAverage()));
+            totalChip.setText(bundle.getString("teacher.studentDetails.total") + ": " + mk.getTotal());
+            avgChip.setText(String.format(locale, "%s: %.2f",
+                    bundle.getString("teacher.studentDetails.average"),
+                    mk.getAverage()));
 
-            // Load feedback for everyone
             String fb = controller.loadFeedback(studentNumber);
             feedbackArea.setText(fb == null ? "" : fb);
 
             if (!canEditFeedback) {
-                // Other teachers: view only
                 btnEdit.setDisable(true);
                 btnSave.setDisable(true);
                 feedbackArea.setEditable(false);
 
-                // Hide delete completely
                 btnDelete.setDisable(true);
                 btnDelete.setVisible(false);
                 btnDelete.setManaged(false);
 
-                status.setText("Only the class teacher can edit feedback.");
+                status.setText(bundle.getString("teacher.studentDetails.status.onlyClassTeacherEdit"));
+                status.setTextFill(Color.DARKRED);
             } else {
-                // Maths teacher should be ready to type immediately
                 btnEdit.setDisable(false);
                 btnSave.setDisable(false);
                 feedbackArea.setEditable(true);
                 feedbackArea.requestFocus();
 
-                // Enable delete only if there is feedback currently
                 boolean hasFeedback = feedbackArea.getText() != null && !feedbackArea.getText().trim().isEmpty();
                 btnDelete.setDisable(!hasFeedback);
 
-                status.setText("Type feedback and press Save.");
+                status.setText(bundle.getString("teacher.studentDetails.status.typeAndSave"));
                 status.setTextFill(Color.DARKRED);
             }
 
         } catch (Exception ex) {
-            status.setText("Load error: " + ex.getMessage());
+            status.setText(bundle.getString("teacher.studentDetails.error.load") + ": " + ex.getMessage());
+            status.setTextFill(Color.DARKRED);
             System.err.println(ex.getMessage());
         }
 
-        // Edit unlocks again after Save locked it
         btnEdit.setOnAction(e -> {
             if (!canEditFeedback) {
-                status.setText("Only the class teacher can edit feedback.");
+                status.setText(bundle.getString("teacher.studentDetails.status.onlyClassTeacherEdit"));
                 status.setTextFill(Color.DARKRED);
                 return;
             }
@@ -235,14 +234,14 @@ public class TeacherStudentDetailsPage {
             feedbackArea.setEditable(true);
             btnSave.setDisable(false);
             feedbackArea.requestFocus();
-            status.setText("Edit the feedback and press Save.");
+            status.setText(bundle.getString("teacher.studentDetails.status.editAndSave"));
             status.setTextFill(Color.DARKRED);
         });
 
         btnSave.setOnAction(e -> {
             try {
                 if (!canEditFeedback) {
-                    status.setText("Only the class teacher can save feedback.");
+                    status.setText(bundle.getString("teacher.studentDetails.error.onlyClassTeacherSave"));
                     status.setTextFill(Color.DARKRED);
                     return;
                 }
@@ -250,41 +249,37 @@ public class TeacherStudentDetailsPage {
                 String newFb = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();
 
                 if (newFb.isEmpty()) {
-                    status.setText("Please type feedback before saving.");
+                    status.setText(bundle.getString("teacher.studentDetails.error.emptyFeedback"));
                     status.setTextFill(Color.DARKRED);
                     return;
                 }
 
                 if (newFb.length() > 255) {
-                    status.setText("Feedback is too long (max 255 characters).");
+                    status.setText(bundle.getString("teacher.studentDetails.error.feedbackTooLong"));
                     status.setTextFill(Color.DARKRED);
                     return;
                 }
 
-                controller.saveFeedback(studentNumber, newFb, Session.getUserId());
+                controller.saveFeedback(studentNumber, newFb, Session.getUserId(), languageCode);
 
-                // After saving, lock again. (Then Edit button can unlock later)
                 feedbackArea.setEditable(false);
                 btnSave.setDisable(true);
-
-                // Feedback exists now -> allow to delete
                 btnDelete.setDisable(false);
 
                 status.setTextFill(Color.FORESTGREEN);
-                status.setText("Feedback saved successfully. Click Edit to change it later.");
+                status.setText(bundle.getString("teacher.studentDetails.status.saved"));
 
             } catch (Exception ex) {
                 status.setTextFill(Color.DARKRED);
-                status.setText("Save error: " + ex.getMessage());
+                status.setText(bundle.getString("teacher.studentDetails.error.save") + ": " + ex.getMessage());
                 System.err.println(ex.getMessage());
             }
         });
 
-        // NEW: Delete feedback handler
         btnDelete.setOnAction(e -> {
             try {
                 if (!canEditFeedback) {
-                    status.setText("Only the class teacher can delete feedback.");
+                    status.setText(bundle.getString("teacher.studentDetails.error.onlyClassTeacherDelete"));
                     status.setTextFill(Color.DARKRED);
                     return;
                 }
@@ -292,22 +287,23 @@ public class TeacherStudentDetailsPage {
                 String current = feedbackArea.getText() == null ? "" : feedbackArea.getText().trim();
                 if (current.isEmpty()) {
                     btnDelete.setDisable(true);
-                    status.setText("No feedback to delete.");
+                    status.setText(bundle.getString("teacher.studentDetails.status.noFeedbackToDelete"));
                     status.setTextFill(Color.DARKRED);
                     return;
                 }
 
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                confirm.setTitle("Delete Feedback");
-                confirm.setHeaderText("Delete this feedback?");
-                confirm.setContentText("This will remove the feedback from the database.");
+                confirm.setTitle(bundle.getString("teacher.studentDetails.deleteDialog.title"));
+                confirm.setHeaderText(bundle.getString("teacher.studentDetails.deleteDialog.header"));
+                confirm.setContentText(bundle.getString("teacher.studentDetails.deleteDialog.content"));
 
                 var result = confirm.showAndWait();
-                if (result.isEmpty() || result.get() != ButtonType.OK) return;
+                if (result.isEmpty() || result.get() != ButtonType.OK) {
+                    return;
+                }
 
-                controller.deleteFeedback(studentNumber, Session.getUserId());
+                controller.deleteFeedback(studentNumber, Session.getUserId(), languageCode);
 
-                // Clear UI and allow typing new feedback immediately
                 feedbackArea.clear();
                 feedbackArea.setEditable(true);
                 feedbackArea.requestFocus();
@@ -316,11 +312,11 @@ public class TeacherStudentDetailsPage {
                 btnDelete.setDisable(true);
 
                 status.setTextFill(Color.FORESTGREEN);
-                status.setText("Feedback deleted. You can type a new one and press Save.");
+                status.setText(bundle.getString("teacher.studentDetails.status.deleted"));
 
             } catch (Exception ex) {
                 status.setTextFill(Color.DARKRED);
-                status.setText("Delete error: " + ex.getMessage());
+                status.setText(bundle.getString("teacher.studentDetails.error.delete") + ": " + ex.getMessage());
                 System.err.println(ex.getMessage());
             }
         });
@@ -338,11 +334,15 @@ public class TeacherStudentDetailsPage {
         grid.add(markLabel, 1, row);
     }
 
-    // Tolerant check: "Mathematics" / "Math" / "Maths" / variants
     private boolean isMathSubject(String subject) {
         if (subject == null) return false;
         String s = subject.trim().toLowerCase();
         return s.equals("maths")
-                || s.contains("mathematics") || s.contains("math");
+                || s.contains("mathematics")
+                || s.contains("math");
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value.trim();
     }
 }

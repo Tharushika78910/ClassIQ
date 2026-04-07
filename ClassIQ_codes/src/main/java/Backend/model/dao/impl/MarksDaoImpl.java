@@ -14,6 +14,14 @@ import java.sql.SQLException;
 public class MarksDaoImpl implements MarksDao {
 
     private static final String FEEDBACK_COL = "feed_back";
+    private static final String DEFAULT_LANGUAGE = "en";
+
+    private String normalizeLanguage(String languageCode) {
+        if (languageCode == null || languageCode.isBlank()) {
+            return DEFAULT_LANGUAGE;
+        }
+        return languageCode.trim().toLowerCase();
+    }
 
     @Override
     public void saveMarks(StudentMarks marks) throws SQLException {
@@ -38,12 +46,11 @@ public class MarksDaoImpl implements MarksDao {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, marks.getStudentId());
-            ps.setInt(2, marks.getSubject1()); // mathematics
-            ps.setInt(3, marks.getSubject2()); // english
-            ps.setInt(4, marks.getSubject3()); // science
-            ps.setInt(5, marks.getSubject4()); // craft
-            ps.setInt(6, marks.getSubject5()); // languages
-
+            ps.setInt(2, marks.getSubject1());
+            ps.setInt(3, marks.getSubject2());
+            ps.setInt(4, marks.getSubject3());
+            ps.setInt(5, marks.getSubject4());
+            ps.setInt(6, marks.getSubject5());
             ps.setInt(7, marks.getTotal());
             ps.setDouble(8, marks.getAverage());
 
@@ -79,7 +86,6 @@ public class MarksDaoImpl implements MarksDao {
 
                 m.setTotal(rs.getObject("total") == null ? 0 : rs.getInt("total"));
                 m.setAverage(rs.getObject("average") == null ? 0.0 : rs.getDouble("average"));
-
                 m.setFeedback(rs.getString(FEEDBACK_COL));
 
                 return m;
@@ -88,22 +94,42 @@ public class MarksDaoImpl implements MarksDao {
     }
 
     @Override
-    public StudentDetailsDTO findStudentDetails(int studentId) throws SQLException {
+    public StudentDetailsDTO findStudentDetails(int studentId, String languageCode) throws SQLException {
 
         String sql = """
             SELECT
-                s.student_id, s.first_name, s.last_name, s.student_number, s.email, s.user_id,
-                sm.marks_id, sm.mathematics, sm.english, sm.science, sm.craft, sm.languages,
-                sm.total, sm.average, sm.feed_back
+                s.student_id,
+                COALESCE(tr_req.first_name, tr_en.first_name, s.first_name) AS first_name,
+                COALESCE(tr_req.last_name, tr_en.last_name, s.last_name) AS last_name,
+                s.student_number,
+                s.email,
+                s.user_id,
+                sm.marks_id,
+                sm.mathematics,
+                sm.english,
+                sm.science,
+                sm.craft,
+                sm.languages,
+                sm.total,
+                sm.average,
+                sm.feed_back
             FROM student s
-            LEFT JOIN student_marks sm ON sm.student_id = s.student_id
+            LEFT JOIN student_translation tr_req
+                ON s.student_id = tr_req.student_id
+               AND tr_req.language_code = ?
+            LEFT JOIN student_translation tr_en
+                ON s.student_id = tr_en.student_id
+               AND tr_en.language_code = 'en'
+            LEFT JOIN student_marks sm
+                ON sm.student_id = s.student_id
             WHERE s.student_id = ?
         """;
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, studentId);
+            ps.setString(1, normalizeLanguage(languageCode));
+            ps.setInt(2, studentId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
@@ -120,7 +146,9 @@ public class MarksDaoImpl implements MarksDao {
                 mk.setStudentId(studentId);
 
                 Integer marksId = (Integer) rs.getObject("marks_id");
-                if (marksId != null) mk.setMarksId(marksId);
+                if (marksId != null) {
+                    mk.setMarksId(marksId);
+                }
 
                 mk.setSubject1(rs.getObject("mathematics") == null ? 0 : rs.getInt("mathematics"));
                 mk.setSubject2(rs.getObject("english") == null ? 0 : rs.getInt("english"));
@@ -130,7 +158,6 @@ public class MarksDaoImpl implements MarksDao {
 
                 mk.setTotal(rs.getObject("total") == null ? 0 : rs.getInt("total"));
                 mk.setAverage(rs.getObject("average") == null ? 0.0 : rs.getDouble("average"));
-
                 mk.setFeedback(rs.getString(FEEDBACK_COL));
 
                 StudentDetailsDTO dto = new StudentDetailsDTO();
@@ -182,7 +209,6 @@ public class MarksDaoImpl implements MarksDao {
         }
     }
 
-    // clear feedback in DB (do NOT delete the marks row)
     @Override
     public void deleteFeedback(int studentId) throws SQLException {
 
