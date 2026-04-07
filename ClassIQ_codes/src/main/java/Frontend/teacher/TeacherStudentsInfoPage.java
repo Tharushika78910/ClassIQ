@@ -2,17 +2,22 @@ package Frontend.teacher;
 
 import Backend.controller.StudentInfoController;
 import Backend.model.entity.Student;
+import Frontend.Session;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class TeacherStudentsInfoPage {
 
@@ -25,18 +30,20 @@ public class TeacherStudentsInfoPage {
 
     public Parent getView() {
 
-        // ROOT
-        String languageCode = Frontend.Session.getCurrentLocale().getLanguage();
+        String languageCode = Session.getCurrentLocale().getLanguage();
+        Locale locale = Session.getCurrentLocale();
+        ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
+        boolean isArabic = "ar".equalsIgnoreCase(languageCode);
+
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(18));
         root.getStyleClass().add("page-bg");
+        root.setNodeOrientation(isArabic ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
 
-        // HEADER BAR (Logout Removed)
-
-        Label headerTitle = new Label("Students");
+        Label headerTitle = new Label(bundle.getString("teacher.students.title"));
         headerTitle.getStyleClass().addAll("header-title");
 
-        Label headerSub = new Label("Search and open a student profile");
+        Label headerSub = new Label(bundle.getString("teacher.students.subtitle"));
         headerSub.getStyleClass().add("subtitle");
 
         VBox titleBox = new VBox(2, headerTitle, headerSub);
@@ -44,7 +51,6 @@ public class TeacherStudentsInfoPage {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Logout button completely removed here
         HBox header = new HBox(12, titleBox, spacer);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("header-bar");
@@ -56,48 +62,53 @@ public class TeacherStudentsInfoPage {
         card.setMaxWidth(760);
         card.getStyleClass().add("card");
 
+        Label sectionTitle = new Label(bundle.getString("teacher.students.sectionTitle"));
+        sectionTitle.getStyleClass().add("section-title");
+
         TableView<StudentRow> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         table.setPrefHeight(420);
         table.getStyleClass().add("app-table");
 
-        TableColumn<StudentRow, String> colNumber = new TableColumn<>("Student Number");
+        TableColumn<StudentRow, String> colNumber =
+                new TableColumn<>(bundle.getString("teacher.students.col.studentNumber"));
         colNumber.setCellValueFactory(new PropertyValueFactory<>("studentNumber"));
         colNumber.setMinWidth(180);
 
-        TableColumn<StudentRow, String> colName = new TableColumn<>("Full Name");
+        TableColumn<StudentRow, String> colName =
+                new TableColumn<>(bundle.getString("teacher.students.col.fullName"));
         colName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         colName.setMinWidth(380);
 
         table.getColumns().setAll(colNumber, colName);
-        table.setPlaceholder(new Label("No students found."));
+        table.setPlaceholder(new Label(bundle.getString("teacher.students.noStudents")));
 
-        // Row hover effect
         table.setRowFactory(tv -> {
             TableRow<StudentRow> row = new TableRow<>();
+
             row.hoverProperty().addListener((obs, wasHover, isHover) -> {
-                if (!row.isEmpty()) {
+                if (!row.isEmpty() && !row.isSelected()) {
                     row.setStyle(isHover
                             ? "-fx-background-color: rgba(156,195,174,0.25);"
                             : "");
                 }
             });
+
             return row;
         });
 
         ObservableList<StudentRow> rows = FXCollections.observableArrayList();
+
         Label status = new Label();
         status.setTextFill(Color.DARKRED);
 
         try {
             for (Student s : controller.getAllStudentsBasic(languageCode)) {
-                rows.add(new StudentRow(
-                        s.getStudentNumber(),
-                        s.getFullName().trim()
-                ));
+                String fullName = s.getFullName() == null ? "" : s.getFullName().trim();
+                rows.add(new StudentRow(s.getStudentNumber(), fullName));
             }
         } catch (Exception ex) {
-            status.setText("Error loading student list.");
+            status.setText(bundle.getString("teacher.students.error.load"));
             ex.printStackTrace();
         }
 
@@ -108,19 +119,21 @@ public class TeacherStudentsInfoPage {
         searchIcon.getStyleClass().add("muted-text");
 
         TextField searchField = new TextField();
-        searchField.setPromptText("Search by Student Number (e.g., S1001) or Name");
+        searchField.setPromptText(bundle.getString("teacher.students.searchPrompt"));
         searchField.getStyleClass().add("input");
 
-        Button clearBtn = new Button("Clear");
+        Button clearBtn = new Button(bundle.getString("teacher.students.clear"));
         clearBtn.getStyleClass().add("secondary-btn");
 
-        Button openBtn = new Button("Open Profile");
+        Button openBtn = new Button(bundle.getString("teacher.students.openProfile"));
         openBtn.getStyleClass().add("primary-btn");
 
         openBtn.disableProperty().bind(
                 Bindings.createBooleanBinding(() ->
-                                searchField.getText() == null || searchField.getText().trim().isEmpty(),
-                        searchField.textProperty())
+                                table.getSelectionModel().getSelectedItem() == null &&
+                                        (searchField.getText() == null || searchField.getText().trim().isEmpty()),
+                        searchField.textProperty(),
+                        table.getSelectionModel().selectedItemProperty())
         );
 
         HBox searchBar = new HBox(10, searchIcon, searchField, clearBtn, openBtn);
@@ -128,6 +141,7 @@ public class TeacherStudentsInfoPage {
 
         searchField.textProperty().addListener((obs, old, text) -> {
             String q = text == null ? "" : text.trim().toLowerCase();
+
             if (q.isEmpty()) {
                 filtered.setPredicate(r -> true);
             } else {
@@ -136,35 +150,39 @@ public class TeacherStudentsInfoPage {
                                 r.getFullName().toLowerCase().contains(q)
                 );
             }
+
+            if (!q.isEmpty()) {
+                table.getSelectionModel().clearSelection();
+            }
         });
 
         clearBtn.setOnAction(e -> {
             searchField.clear();
             table.getSelectionModel().clearSelection();
+            filtered.setPredicate(r -> true);
             status.setText("");
         });
 
-        table.setOnMouseClicked(e -> {
-            StudentRow selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                searchField.setText(selected.getStudentNumber());
-            }
-        });
+        table.setOnMouseClicked(e -> status.setText(""));
 
         Runnable goNext = () -> {
+            StudentRow selected = table.getSelectionModel().getSelectedItem();
             String input = searchField.getText() == null ? "" : searchField.getText().trim();
-            if (input.isEmpty()) {
-                status.setText("Please enter a student number or name.");
+
+            String studentNumberToOpen;
+            if (selected != null) {
+                studentNumberToOpen = selected.getStudentNumber();
+            } else if (!input.isEmpty()) {
+                studentNumberToOpen = input;
+            } else {
+                status.setText(bundle.getString("teacher.students.error.enterStudent"));
                 return;
             }
-
-            StudentRow selected = table.getSelectionModel().getSelectedItem();
-            String studentNumberToOpen = selected != null ? selected.getStudentNumber() : input;
 
             try {
                 Student s = controller.findStudentByNumber(studentNumberToOpen, languageCode);
                 if (s == null) {
-                    status.setText("Student not found: " + studentNumberToOpen);
+                    status.setText(bundle.getString("teacher.students.error.notFound") + " " + studentNumberToOpen);
                     return;
                 }
 
@@ -172,16 +190,15 @@ public class TeacherStudentsInfoPage {
                 dashboard.showTeacherStudentDetailsPage(s.getStudentNumber());
 
             } catch (Exception ex) {
-                status.setText("Error: " + ex.getMessage());
+                status.setText(ex.getMessage() == null
+                        ? bundle.getString("teacher.students.error.load")
+                        : ex.getMessage());
                 ex.printStackTrace();
             }
         };
 
         openBtn.setOnAction(e -> goNext.run());
         searchField.setOnAction(e -> goNext.run());
-
-        Label sectionTitle = new Label("All Students");
-        sectionTitle.getStyleClass().add("section-title");
 
         card.getChildren().addAll(sectionTitle, table, searchBar, status);
 
