@@ -1,9 +1,11 @@
 package Backend.model.dao.impl;
 
 import Backend.db.DBConnection;
+import Backend.model.entity.StudentMarks;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class StudentMarksDaoImpl {
@@ -29,6 +31,39 @@ public class StudentMarksDaoImpl {
         recalcTotals(studentId);
     }
 
+    // load one student's marks row for report card
+    public StudentMarks findByStudentId(int studentId) throws SQLException {
+        String sql = "SELECT * FROM student_marks WHERE student_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    StudentMarks marks = new StudentMarks();
+
+                    marks.setMarksId(rs.getInt("marks_id"));
+                    marks.setStudentId(rs.getInt("student_id"));
+
+                    marks.setSubject1(getNullableInt(rs, "mathematics"));
+                    marks.setSubject2(getNullableInt(rs, "english"));
+                    marks.setSubject3(getNullableInt(rs, "science"));
+                    marks.setSubject4(getNullableInt(rs, "craft"));
+                    marks.setSubject5(getNullableInt(rs, "languages"));
+
+                    marks.setTotal(getNullableInt(rs, "total"));
+                    marks.setAverage(getNullableDouble(rs, "average"));
+
+                    return marks;
+                }
+            }
+        }
+
+        return null;
+    }
+
     // clear subject for ALL students (when teacher clicks Clear)
     public int clearSubjectForAllStudents(String subject) throws SQLException {
         String col = mapSubjectToColumn(subject);
@@ -45,8 +80,6 @@ public class StudentMarksDaoImpl {
         recalcTotalsForAllStudents();
         return updated;
     }
-
-    // helpers
 
     private void recalcTotals(int studentId) throws SQLException {
         String sql =
@@ -87,5 +120,15 @@ public class StudentMarksDaoImpl {
         if (s.contains("lang")) return "languages";
 
         return "mathematics";
+    }
+
+    private Integer getNullableInt(ResultSet rs, String column) throws SQLException {
+        int value = rs.getInt(column);
+        return rs.wasNull() ? null : value;
+    }
+
+    private Double getNullableDouble(ResultSet rs, String column) throws SQLException {
+        double value = rs.getDouble(column);
+        return rs.wasNull() ? null : value;
     }
 }

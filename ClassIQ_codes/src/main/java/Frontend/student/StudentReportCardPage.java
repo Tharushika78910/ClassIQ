@@ -1,6 +1,6 @@
 package Frontend.student;
 
-import Backend.model.dao.impl.MarksDaoImpl;
+import Backend.model.dao.impl.StudentMarksDaoImpl;
 import Backend.model.entity.Student;
 import Backend.model.entity.StudentMarks;
 import Frontend.LoginPage;
@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
+import java.util.Locale;
 
 public class StudentReportCardPage {
 
@@ -71,7 +71,7 @@ public class StudentReportCardPage {
 
         StudentMarks marks = null;
         try {
-            marks = new MarksDaoImpl().findByStudentId(student.getStudentId());
+            marks = new StudentMarksDaoImpl().findByStudentId(student.getStudentId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -224,9 +224,10 @@ public class StudentReportCardPage {
         });
 
         Button btnLogout = dashboard.createStudentLogoutButton(() -> {
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new LoginPage(stage).getScene());
+            stage.setScene(new LoginPage(stage, savedLocale).getScene());
         });
 
         AnchorPane bottomBar = new AnchorPane();
