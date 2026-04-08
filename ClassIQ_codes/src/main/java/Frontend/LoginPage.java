@@ -238,7 +238,8 @@ public class LoginPage {
 
             } else {
 
-                var tp = profileDao.findTeacherByUserId(result.userId);
+                String languageCode = currentLocale != null ? currentLocale.getLanguage() : null;
+                var tp = profileDao.findTeacherByUserId(result.userId, languageCode);
                 if (tp == null) {
                     error.setText(bundle.getString("error.teacher.notfound"));
                     return;

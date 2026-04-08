@@ -60,27 +60,54 @@ public class UserProfileDaoImpl {
     }
 
     public TeacherProfile findTeacherByUserId(int userId) {
-        String sql = """
-                SELECT teacher_id, first_name, last_name, email, subject
-                FROM teacher
-                WHERE user_id = ?
-                """;
+        return findTeacherByUserId(userId, null);
+    }
+
+    public TeacherProfile findTeacherByUserId(int userId, String languageCode) {
+        String sql;
+        boolean useTranslation = languageCode != null && !languageCode.equals("en");
+        
+        if (useTranslation) {
+            sql = """
+                    SELECT t.teacher_id, 
+                           COALESCE(tt.first_name, t.first_name) as first_name,
+                           COALESCE(tt.last_name, t.last_name) as last_name,
+                           t.email, t.subject
+                    FROM teacher t
+                    LEFT JOIN teacher_translation tt ON t.teacher_id = tt.teacher_id AND tt.language_code = ?
+                    WHERE t.user_id = ?
+                    """;
+        } else {
+            sql = """
+                    SELECT teacher_id, first_name, last_name, email, subject
+                    FROM teacher
+                    WHERE user_id = ?
+                    """;
+        }
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, userId);
+            if (useTranslation) {
+                ps.setString(1, languageCode);
+                ps.setInt(2, userId);
+            } else {
+                ps.setInt(1, userId);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
 
-                String name = rs.getString("first_name") + " " + rs.getString("last_name");
-                return new TeacherProfile(
-                        rs.getInt("teacher_id"),
-                        name,
-                        rs.getString("email"),
-                        rs.getString("subject") //
-                );
+                // Add explicit variable assignments
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String name = firstName + " " + lastName;
+                String email = rs.getString("email");
+                String subject = rs.getString("subject");
+                int teacherId = rs.getInt("teacher_id");
+ 
+                // Simplify constructor call
+                return new TeacherProfile(teacherId, name, email, subject);
             }
 
         } catch (Exception e) {
