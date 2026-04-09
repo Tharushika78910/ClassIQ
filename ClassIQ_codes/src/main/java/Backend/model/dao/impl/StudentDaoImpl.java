@@ -60,7 +60,7 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    // FIND BY ID  FIXED
+    // FIND BY ID
     @Override
     public Student findById(int studentId) throws SQLException {
         return findById(studentId, DEFAULT_LANGUAGE);
@@ -109,6 +109,44 @@ public class StudentDaoImpl implements StudentDao {
             }
         }
         return list;
+    }
+
+    // Get translated full name for marksheet page
+    public String getTranslatedStudentName(int studentId, String languageCode) throws SQLException {
+        String sql = """
+            SELECT
+                COALESCE(tr_req.first_name, tr_en.first_name, s.first_name) AS first_name,
+                COALESCE(tr_req.last_name, tr_en.last_name, s.last_name) AS last_name
+            FROM student s
+            LEFT JOIN student_translation tr_req
+                ON s.student_id = tr_req.student_id
+               AND tr_req.language_code = ?
+            LEFT JOIN student_translation tr_en
+                ON s.student_id = tr_en.student_id
+               AND tr_en.language_code = 'en'
+            WHERE s.student_id = ?
+        """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, normalizeLanguage(languageCode));
+            ps.setInt(2, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+
+                    if (firstName == null) firstName = "";
+                    if (lastName == null) lastName = "";
+
+                    return (firstName + " " + lastName).trim();
+                }
+            }
+        }
+
+        return "";
     }
 
     // UPDATE

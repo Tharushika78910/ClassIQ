@@ -9,30 +9,96 @@ public class Session {
     private static Role currentRole;
     private static int currentUserId;
     private static Student currentStudent;
+
+    // language / locale
     private static Locale currentLocale = new Locale("en", "US");
+    private static String languageCode = "en";
 
     // for teacher
     private static int currentTeacherId;
     private static String currentTeacherSubject;
 
-    public static void setRole(Role role) { currentRole = role; }
-    public static Role getRole() { return currentRole; }
+    public static void setRole(Role role) {
+        currentRole = role;
+    }
 
-    public static void setUserId(int userId) { currentUserId = userId; }
-    public static int getUserId() { return currentUserId; }
+    public static Role getRole() {
+        return currentRole;
+    }
 
-    public static void setCurrentStudent(Student s) { currentStudent = s; }
-    public static Student getCurrentStudent() { return currentStudent; }
+    public static void setUserId(int userId) {
+        currentUserId = userId;
+    }
 
-    // getters/setters for teacher
-    public static void setTeacherId(int teacherId) { currentTeacherId = teacherId; }
-    public static int getTeacherId() { return currentTeacherId; }
+    public static int getUserId() {
+        return currentUserId;
+    }
 
-    public static void setTeacherSubject(String subject) { currentTeacherSubject = subject; }
-    public static String getTeacherSubject() { return currentTeacherSubject; }
+    public static void setCurrentStudent(Student s) {
+        currentStudent = s;
+    }
 
-    public static void setCurrentLocale(Locale locale) { currentLocale = locale; }
-    public static Locale getCurrentLocale() { return currentLocale; }
+    public static Student getCurrentStudent() {
+        return currentStudent;
+    }
+
+    // teacher session
+    public static void setTeacherId(int teacherId) {
+        currentTeacherId = teacherId;
+    }
+
+    public static int getTeacherId() {
+        return currentTeacherId;
+    }
+
+    public static void setTeacherSubject(String subject) {
+        currentTeacherSubject = subject;
+    }
+
+    public static String getTeacherSubject() {
+        return currentTeacherSubject;
+    }
+
+    // locale
+    public static void setCurrentLocale(Locale locale) {
+        currentLocale = locale;
+
+        if (locale != null) {
+            languageCode = locale.getLanguage();
+        }
+    }
+
+    public static Locale getCurrentLocale() {
+        return currentLocale;
+    }
+
+    // language code
+    public static void setLanguageCode(String code) {
+        if (code == null || code.isBlank()) {
+            languageCode = "en";
+            currentLocale = new Locale("en", "US");
+            return;
+        }
+
+        languageCode = code.toLowerCase();
+
+        switch (languageCode) {
+            case "si":
+                currentLocale = new Locale("si", "LK");
+                break;
+            case "ar":
+                currentLocale = new Locale("ar", "SA");
+                break;
+            default:
+                languageCode = "en";
+                currentLocale = new Locale("en", "US");
+                break;
+        }
+    }
+
+    public static String getLanguageCode() {
+        return languageCode;
+    }
 
     public static boolean isStudentLoggedIn() {
         return currentRole == Role.STUDENT && currentStudent != null;
@@ -46,7 +112,9 @@ public class Session {
         currentRole = null;
         currentUserId = 0;
         currentStudent = null;
+
         currentLocale = new Locale("en", "US");
+        languageCode = "en";
 
         currentTeacherId = 0;
         currentTeacherSubject = null;

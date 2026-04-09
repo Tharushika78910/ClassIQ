@@ -1,25 +1,28 @@
 package Frontend.teacher;
 
+import Backend.db.DBConnection;
 import Backend.model.dao.impl.StudentDaoImpl;
-import Backend.model.dao.impl.TeacherMarkSheetDaoImpl;
 import Backend.model.dao.impl.StudentMarksDaoImpl;
+import Backend.model.dao.impl.TeacherMarkSheetDaoImpl;
 import Backend.model.entity.Student;
 import Backend.service.WeightedMarkService;
-import Frontend.LoginPage;
 import Frontend.Session;
 
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
@@ -29,28 +32,42 @@ public class TeacherMarkSheetPage {
 
     private final TableView<MarkRow> table = new TableView<>();
     private final Label status = new Label("");
-
     private final TeacherDashboard dashboard;
+
+    private BorderPane root;
+    private Label subjectTitle;
+    private Button btnSave;
+    private Button btnClear;
+
+    private TableColumn<MarkRow, String> colNo;
+    private TableColumn<MarkRow, String> colName;
+    private TableColumn<MarkRow, Integer> colAssignment;
+    private TableColumn<MarkRow, Integer> colProject;
+    private TableColumn<MarkRow, Integer> colFinal;
+    private TableColumn<MarkRow, Integer> colTotal;
+    private TableColumn<MarkRow, String> colGrade;
 
     public TeacherMarkSheetPage(TeacherDashboard dashboard) {
         this.dashboard = dashboard;
     }
 
+    private enum MarkType {
+        ASSIGNMENT,
+        PROJECT,
+        FINAL_EXAM
+    }
+
     public Parent getView() {
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
         root.setPadding(new Insets(20));
         root.getStyleClass().add("page-bg");
 
-        // Main centered content
         VBox centerBox = new VBox(16);
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setFillWidth(false);
 
-        String subject = Session.getTeacherSubject();
-        if (subject == null || subject.isBlank()) subject = "Mathematics";
-
-        Label subjectTitle = new Label(subject);
+        subjectTitle = new Label();
         subjectTitle.setStyle("-fx-font-size: 28px; -fx-font-weight: 800; -fx-text-fill: #1f2d2a;");
 
         buildTable();
@@ -60,114 +77,22 @@ public class TeacherMarkSheetPage {
         card.setAlignment(Pos.CENTER);
         card.setFillWidth(false);
 
-        // center table
         card.setPrefWidth(table.getPrefWidth() + 40);
         card.setMaxWidth(Region.USE_PREF_SIZE);
 
-        Button btnSave = new Button("Save");
+        btnSave = new Button();
         btnSave.getStyleClass().add("primary-btn");
 
-        Button btnClear = new Button("Clear");
+        btnClear = new Button();
         btnClear.getStyleClass().add("secondary-btn");
 
         status.getStyleClass().add("muted-text");
 
+        applyTranslations();
         loadStudentsAndMarks();
 
-        // SAVE BUTTON (FIXED)
-
-        btnSave.setOnAction(e -> {
-            status.setText("");
-
-            if (!Session.isTeacherLoggedIn()) {
-                status.setText("Teacher session not found.");
-                return;
-            }
-
-            if (!allInputsValid()) {
-                status.setText("Please enter valid marks before saving.");
-                return;
-            }
-
-            int teacherId = Session.getTeacherId();
-            String subj = Session.getTeacherSubject();
-            if (subj == null || subj.isBlank()) subj = "Mathematics";
-
-            try {
-                TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
-                StudentMarksDaoImpl studentMarksDao = new StudentMarksDaoImpl();
-
-                int savedCount = 0;
-
-                for (MarkRow r : table.getItems()) {
-                    if (r.getAssignment() == 0 && r.getProject() == 0 && r.getFinalExam() == 0) continue;
-
-                    // Save to teacher_marksheet
-                    dao.saveTeacherMarkSheetRow(
-                            r.getStudentDbId(),
-                            r.getStudentName(),
-                            r.getAssignment(),
-                            r.getProject(),
-                            r.getFinalExam(),
-                            r.getTotal(),
-                            r.getGrade(),
-                            teacherId,
-                            subj
-                    );
-
-                    // Save subject total to student_marks
-                    studentMarksDao.upsertSubjectTotal(
-                            r.getStudentDbId(),
-                            subj,
-                            r.getTotal()
-                    );
-
-                    savedCount++;
-                }
-
-                status.setText("Saved " + savedCount + " record(s).");
-                loadStudentsAndMarks();
-
-            } catch (Exception ex) {
-                status.setText("Database error: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-        });
-
-        // CLEAR BUTTON
-
-        btnClear.setOnAction(e -> {
-            status.setText("");
-
-            if (!Session.isTeacherLoggedIn()) {
-                status.setText("Teacher session not found.");
-                return;
-            }
-
-            int teacherId = Session.getTeacherId();
-            String subj = Session.getTeacherSubject();
-            if (subj == null || subj.isBlank()) subj = "Mathematics";
-
-            try {
-                TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
-                StudentMarksDaoImpl studentMarksDao = new StudentMarksDaoImpl();
-
-                // 1) Delete teacher_marksheet rows for this teacher + subject
-                int deleted = dao.deleteMarksForTeacherSubject(teacherId, subj);
-
-                // 2) Clear subject totals in student_marks and recalc total/average
-                int updated = studentMarksDao.clearSubjectForAllStudents(subj);
-
-                status.setText("All marks cleared. Deleted " + deleted +
-                        " teacher record(s). Reset " + updated + " student_marks row(s).");
-
-                loadStudentsAndMarks();
-
-            } catch (Exception ex) {
-                status.setText("Database error: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-        });
+        btnSave.setOnAction(e -> handleSave());
+        btnClear.setOnAction(e -> handleClear());
 
         HBox actions = new HBox(10, btnSave, btnClear, status);
         actions.setAlignment(Pos.CENTER_LEFT);
@@ -176,13 +101,127 @@ public class TeacherMarkSheetPage {
         card.getChildren().addAll(table, actions);
         centerBox.getChildren().addAll(subjectTitle, card);
 
-        // CENTER in the BorderPane
         StackPane centerWrap = new StackPane(centerBox);
         centerWrap.setAlignment(Pos.CENTER);
         root.setCenter(centerWrap);
 
-
         return root;
+    }
+
+    private void applyTranslations() {
+        String lang = Session.getLanguageCode();
+
+        btnSave.setText(getMarksheetText("button.save"));
+        btnClear.setText(getMarksheetText("button.clear"));
+
+        colNo.setText(getMarksheetText("table.student_no"));
+        colName.setText(getMarksheetText("table.student_name"));
+        colTotal.setText(getMarksheetText("table.total"));
+        colGrade.setText(getMarksheetText("table.grade"));
+
+        colAssignment.setText(getTranslatedCategoryName(1, lang));
+        colProject.setText(getTranslatedCategoryName(2, lang));
+        colFinal.setText(getTranslatedCategoryName(3, lang));
+
+        String subject = Session.getTeacherSubject();
+        if (subject == null || subject.isBlank()) {
+            subject = "Mathematics";
+        }
+        subjectTitle.setText(getTranslatedSubjectName(subject, lang));
+
+        applyOrientation(lang);
+    }
+
+    private void applyOrientation(String lang) {
+        if ("ar".equalsIgnoreCase(lang)) {
+            root.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+        } else {
+            root.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        }
+    }
+
+    private void handleSave() {
+        status.setText("");
+
+        if (!Session.isTeacherLoggedIn()) {
+            status.setText(getMarksheetText("status.teacher_session_not_found"));
+            return;
+        }
+
+        if (!allInputsValid()) {
+            status.setText(getMarksheetText("status.invalid_marks"));
+            return;
+        }
+
+        int teacherId = Session.getTeacherId();
+        String subj = Session.getTeacherSubject();
+        if (subj == null || subj.isBlank()) subj = "Mathematics";
+
+        try {
+            TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
+            StudentMarksDaoImpl studentMarksDao = new StudentMarksDaoImpl();
+
+            int savedCount = 0;
+
+            for (MarkRow r : table.getItems()) {
+                if (r.getAssignment() == 0 && r.getProject() == 0 && r.getFinalExam() == 0) continue;
+
+                dao.saveTeacherMarkSheetRow(
+                        r.getStudentDbId(),
+                        r.getStudentName(),
+                        r.getAssignment(),
+                        r.getProject(),
+                        r.getFinalExam(),
+                        r.getTotal(),
+                        r.getGrade(),
+                        teacherId,
+                        subj
+                );
+
+                studentMarksDao.upsertSubjectTotal(
+                        r.getStudentDbId(),
+                        subj,
+                        r.getTotal()
+                );
+
+                savedCount++;
+            }
+
+            status.setText(String.format(getMarksheetText("status.saved_records"), savedCount));
+            loadStudentsAndMarks();
+
+        } catch (Exception ex) {
+            status.setText(getMarksheetText("status.db_error") + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private void handleClear() {
+        status.setText("");
+
+        if (!Session.isTeacherLoggedIn()) {
+            status.setText(getMarksheetText("status.teacher_session_not_found"));
+            return;
+        }
+
+        int teacherId = Session.getTeacherId();
+        String subj = Session.getTeacherSubject();
+        if (subj == null || subj.isBlank()) subj = "Mathematics";
+
+        try {
+            TeacherMarkSheetDaoImpl dao = new TeacherMarkSheetDaoImpl();
+            StudentMarksDaoImpl studentMarksDao = new StudentMarksDaoImpl();
+
+            int deleted = dao.deleteMarksForTeacherSubject(teacherId, subj);
+            int updated = studentMarksDao.clearSubjectForAllStudents(subj);
+
+            status.setText(String.format(getMarksheetText("status.clear_success"), deleted, updated));
+            loadStudentsAndMarks();
+
+        } catch (Exception ex) {
+            status.setText(getMarksheetText("status.db_error") + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     private void loadStudentsAndMarks() {
@@ -195,12 +234,17 @@ public class TeacherMarkSheetPage {
 
         try {
             StudentDaoImpl studentDao = new StudentDaoImpl();
-            List<Student> students = studentDao.findAll();
+            String lang = Session.getLanguageCode();
+            List<Student> students = studentDao.findAll(lang);
 
             ObservableList<MarkRow> rows = FXCollections.observableArrayList();
 
             for (Student s : students) {
-                String fullName = s.getFirstName() + " " + s.getLastName();
+                String fullName = studentDao.getTranslatedStudentName(s.getStudentId(), lang);
+                if (fullName == null || fullName.isBlank()) {
+                    fullName = s.getFirstName() + " " + s.getLastName();
+                }
+
                 rows.add(new MarkRow(
                         s.getStudentId(),
                         s.getStudentNumber(),
@@ -227,7 +271,7 @@ public class TeacherMarkSheetPage {
             table.setItems(rows);
 
         } catch (Exception ex) {
-            status.setText("Load error: " + ex.getMessage());
+            status.setText(getMarksheetText("status.load_error") + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -236,8 +280,6 @@ public class TeacherMarkSheetPage {
 
         table.setEditable(true);
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-
-        // Row height
         table.setFixedCellSize(42);
 
         table.setRowFactory(tv -> {
@@ -246,38 +288,30 @@ public class TeacherMarkSheetPage {
             return row;
         });
 
-        TableColumn<MarkRow, String> colNo = new TableColumn<>("Student No");
+        colNo = new TableColumn<>();
         colNo.setCellValueFactory(c -> c.getValue().studentNumberProperty());
 
-        TableColumn<MarkRow, String> colName = new TableColumn<>("Student Name");
+        colName = new TableColumn<>();
         colName.setCellValueFactory(c -> c.getValue().studentNameProperty());
 
-        TableColumn<MarkRow, Integer> colAssignment =
-                editableMarkColumn("Assignment", 20, MarkRow::setAssignment);
+        colAssignment = editableMarkColumn(MarkType.ASSIGNMENT, 20);
+        colProject = editableMarkColumn(MarkType.PROJECT, 30);
+        colFinal = editableMarkColumn(MarkType.FINAL_EXAM, 50);
 
-        TableColumn<MarkRow, Integer> colProject =
-                editableMarkColumn("Project", 30, MarkRow::setProject);
-
-        TableColumn<MarkRow, Integer> colFinal =
-                editableMarkColumn("Final Exam", 50, MarkRow::setFinalExam);
-
-        TableColumn<MarkRow, Integer> colTotal = new TableColumn<>("Total");
+        colTotal = new TableColumn<>();
         colTotal.setCellValueFactory(c -> c.getValue().totalProperty().asObject());
 
-        TableColumn<MarkRow, String> colGrade = new TableColumn<>("Grade");
+        colGrade = new TableColumn<>();
         colGrade.setCellValueFactory(c -> c.getValue().gradeProperty());
 
         colNo.setPrefWidth(110);
         colName.setPrefWidth(280);
-
-        // Tight numeric columns
         colAssignment.setPrefWidth(95);
         colProject.setPrefWidth(85);
         colFinal.setPrefWidth(110);
         colTotal.setPrefWidth(70);
         colGrade.setPrefWidth(75);
 
-        // Alignment: name left, numbers centered
         colNo.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6; -fx-text-fill: black;");
         colName.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6; -fx-text-fill: black;");
 
@@ -293,7 +327,6 @@ public class TeacherMarkSheetPage {
                 colTotal, colGrade
         );
 
-        // Table width = sum of columns
         double tableW =
                 colNo.getPrefWidth()
                         + colName.getPrefWidth()
@@ -302,27 +335,21 @@ public class TeacherMarkSheetPage {
                         + colFinal.getPrefWidth()
                         + colTotal.getPrefWidth()
                         + colGrade.getPrefWidth()
-                        + 22; // borders/scrollbar safety
+                        + 22;
 
         table.setPrefWidth(tableW);
         table.setMaxWidth(tableW);
 
-        // Professional height: show 10 rows then scroll
         int visibleRows = 10;
-        double tableH = visibleRows * table.getFixedCellSize() + 40; // + header
+        double tableH = visibleRows * table.getFixedCellSize() + 40;
         table.setPrefHeight(tableH);
         table.setMaxHeight(tableH);
     }
 
-    private TableColumn<MarkRow, Integer> editableMarkColumn(
-            String title,
-            int max,
-            java.util.function.BiConsumer<MarkRow, Integer> setter
-    ) {
-        TableColumn<MarkRow, Integer> col = new TableColumn<>(title);
-        col.setCellValueFactory(c -> c.getValue().getPropertyFor(title).asObject());
+    private TableColumn<MarkRow, Integer> editableMarkColumn(MarkType type, int max) {
+        TableColumn<MarkRow, Integer> col = new TableColumn<>();
+        col.setCellValueFactory(c -> c.getValue().getPropertyFor(type).asObject());
 
-        // Editable numeric cell
         col.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
 
         col.setOnEditCommit(ev -> {
@@ -330,17 +357,30 @@ public class TeacherMarkSheetPage {
             if (val == null) val = 0;
 
             if (val < 0 || val > max) {
-                status.setText(title + " must be between 0 and " + max);
+                status.setText(getRangeMessage(type, max));
                 table.refresh();
                 return;
             }
 
-            setter.accept(ev.getRowValue(), val);
+            switch (type) {
+                case ASSIGNMENT -> ev.getRowValue().setAssignment(val);
+                case PROJECT -> ev.getRowValue().setProject(val);
+                case FINAL_EXAM -> ev.getRowValue().setFinalExam(val);
+            }
+
             status.setText("");
             table.refresh();
         });
 
         return col;
+    }
+
+    private String getRangeMessage(MarkType type, int max) {
+        return switch (type) {
+            case ASSIGNMENT -> String.format(getMarksheetText("status.assignment_range"), max);
+            case PROJECT -> String.format(getMarksheetText("status.project_range"), max);
+            case FINAL_EXAM -> String.format(getMarksheetText("status.final_exam_range"), max);
+        };
     }
 
     private boolean allInputsValid() {
@@ -350,6 +390,77 @@ public class TeacherMarkSheetPage {
             if (r.getFinalExam() < 0 || r.getFinalExam() > 50) return false;
         }
         return true;
+    }
+
+    private String getMarksheetText(String key) {
+        String sql = "SELECT translated_text FROM marksheet_translation WHERE translation_key = ? AND language_code = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, key);
+            stmt.setString(2, Session.getLanguageCode());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("translated_text");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return key;
+    }
+
+    private String getTranslatedSubjectName(String subjectCode, String languageCode) {
+        String sql = "SELECT subject_name FROM subject_translation WHERE subject_code = ? AND language_code = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, subjectCode);
+            stmt.setString(2, languageCode);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("subject_name");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return subjectCode;
+    }
+
+    private String getTranslatedCategoryName(int categoryId, String languageCode) {
+        String sql = "SELECT category_name FROM gradecategory_translation WHERE category_id = ? AND language_code = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, categoryId);
+            stmt.setString(2, languageCode);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("category_name");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public void refreshTranslations() {
+        applyTranslations();
+        loadStudentsAndMarks();
     }
 
     public static class MarkRow {
@@ -401,21 +512,28 @@ public class TeacherMarkSheetPage {
         public int getTotal() { return total.get(); }
         public String getGrade() { return grade.get(); }
 
-        public IntegerProperty getPropertyFor(String title) {
-            return switch (title) {
-                case "Assignment" -> assignment;
-                case "Project" -> project;
-                case "Final Exam" -> finalExam;
-                default -> new SimpleIntegerProperty(0);
+        public IntegerProperty getPropertyFor(MarkType type) {
+            return switch (type) {
+                case ASSIGNMENT -> assignment;
+                case PROJECT -> project;
+                case FINAL_EXAM -> finalExam;
             };
         }
     }
 
     public static class IntegerStringConverter extends StringConverter<Integer> {
-        @Override public String toString(Integer v) { return v == null ? "0" : v.toString(); }
-        @Override public Integer fromString(String s) {
-            try { return Integer.parseInt(s.trim()); }
-            catch (Exception e) { return 0; }
+        @Override
+        public String toString(Integer v) {
+            return v == null ? "0" : v.toString();
+        }
+
+        @Override
+        public Integer fromString(String s) {
+            try {
+                return Integer.parseInt(s.trim());
+            } catch (Exception e) {
+                return 0;
+            }
         }
     }
 }
