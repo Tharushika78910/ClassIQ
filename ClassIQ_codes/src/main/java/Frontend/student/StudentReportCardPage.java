@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import java.util.Locale;
+
 
 public class StudentReportCardPage {
 
@@ -224,9 +226,10 @@ public class StudentReportCardPage {
         });
 
         Button btnLogout = dashboard.createStudentLogoutButton(() -> {
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new LoginPage(stage).getScene());
+            stage.setScene(new LoginPage(stage, savedLocale).getScene());
         });
 
         AnchorPane bottomBar = new AnchorPane();

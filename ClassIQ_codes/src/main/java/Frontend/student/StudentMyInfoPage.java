@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import java.util.Locale;
+
 public class StudentMyInfoPage {
 
     private final StudentDashboard dashboard;
@@ -199,9 +201,10 @@ public class StudentMyInfoPage {
         Button btnBack = dashboard.createStudentBackButton(() -> dashboard.showHome());
 
         Button btnLogout = dashboard.createStudentLogoutButton(() -> {
+            Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
             Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new LoginPage(stage).getScene());
+            stage.setScene(new LoginPage(stage, savedLocale).getScene());
         });
 
         AnchorPane bottomBar = new AnchorPane();
