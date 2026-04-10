@@ -26,9 +26,9 @@ public class StudentInfoServiceTest {
     void searchByStudentNumber_shouldThrowOnNullOrBlank() {
         StudentInfoService s = new StudentInfoService();
 
-        assertThrows(IllegalArgumentException.class, () -> s.searchByStudentNumber(null));
-        assertThrows(IllegalArgumentException.class, () -> s.searchByStudentNumber(""));
-        assertThrows(IllegalArgumentException.class, () -> s.searchByStudentNumber("   "));
+        assertThrows(IllegalArgumentException.class, () -> s.searchByStudentNumber(null, "en"));
+        assertThrows(IllegalArgumentException.class, () -> s.searchByStudentNumber("", "en"));
+        assertThrows(IllegalArgumentException.class, () -> s.searchByStudentNumber("   ", "en"));
     }
 
     @Test
@@ -37,25 +37,31 @@ public class StudentInfoServiceTest {
 
         StudentDao fakeDao = new StudentDao() {
             @Override
-            public Student findByStudentNumber(String studentNumber) {
+            public Student findByStudentNumber(String studentNumber, String languageCode) {
                 assertEquals("S001", studentNumber);
+                assertEquals("en", languageCode);
                 return new Student();
             }
 
-            @Override public Student findFirstStudent() { return new Student(); }
-            @Override public List<Student> findAllBasic() { return List.of(new Student()); }
+            @Override public Student findFirstStudent() { return null; }
+            @Override public Student findFirstStudent(String languageCode) { return null; }
+            @Override public List<Student> findAllBasic() { return List.of(); }
+            @Override public List<Student> findAllBasic(String languageCode) { return List.of(); }
             @Override public void create(Student student) {}
             @Override public Student findById(int studentId) { return null; }
+            @Override public Student findById(int studentId, String languageCode) { return null; }
             @Override public List<Student> findAll() { return List.of(); }
+            @Override public List<Student> findAll(String languageCode) { return List.of(); }
             @Override public void update(Student student) {}
             @Override public void delete(int studentId) {}
             @Override public boolean existsById(int studentId) { return false; }
+            @Override public Student findByStudentNumber(String studentNumber) { return null; }
             @Override public int findStudentIdByStudentNumber(String studentNumber) { return 0; }
         };
 
         setFinalField(s, "studentDao", fakeDao);
 
-        assertNotNull(s.searchByStudentNumber("  S001  "));
+        assertNotNull(s.searchByStudentNumber("  S001  ", "en"));
     }
 
     @Test
@@ -63,22 +69,36 @@ public class StudentInfoServiceTest {
         StudentInfoService s = new StudentInfoService();
 
         StudentDao fakeDao = new StudentDao() {
-            @Override public Student findFirstStudent() { return new Student(); }
-            @Override public List<Student> findAllBasic() { return List.of(new Student(), new Student()); }
+            @Override
+            public Student findFirstStudent(String languageCode) {
+                assertEquals("en", languageCode);
+                return new Student();
+            }
+
+            @Override
+            public List<Student> findAllBasic(String languageCode) {
+                assertEquals("en", languageCode);
+                return List.of(new Student(), new Student());
+            }
 
             @Override public Student findByStudentNumber(String studentNumber) { return null; }
+            @Override public Student findByStudentNumber(String studentNumber, String languageCode) { return null; }
             @Override public void create(Student student) {}
             @Override public Student findById(int studentId) { return null; }
+            @Override public Student findById(int studentId, String languageCode) { return null; }
             @Override public List<Student> findAll() { return List.of(); }
+            @Override public List<Student> findAll(String languageCode) { return List.of(); }
             @Override public void update(Student student) {}
             @Override public void delete(int studentId) {}
             @Override public boolean existsById(int studentId) { return false; }
             @Override public int findStudentIdByStudentNumber(String studentNumber) { return 0; }
+            @Override public Student findFirstStudent() { return null; }
+            @Override public List<Student> findAllBasic() { return List.of(); }
         };
 
         setFinalField(s, "studentDao", fakeDao);
 
-        assertNotNull(s.loadFirstStudent());
-        assertEquals(2, s.loadAllStudentsBasic().size());
+        assertNotNull(s.loadFirstStudent("en"));
+        assertEquals(2, s.loadAllStudentsBasic("en").size());
     }
 }

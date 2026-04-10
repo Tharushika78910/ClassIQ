@@ -28,15 +28,30 @@ public class StudentInfoControllerTest {
         StudentInfoController c = new StudentInfoController();
 
         StudentInfoService fakeService = new StudentInfoService() {
-            @Override public Student loadFirstStudent() { return new Student(); }
-            @Override public Student searchByStudentNumber(String studentNumber) { return new Student(); }
-            @Override public List<Student> loadAllStudentsBasic() { return List.of(new Student()); }
+            @Override
+            public Student loadFirstStudent(String languageCode) {
+                assertEquals("en", languageCode);
+                return new Student();
+            }
+
+            @Override
+            public Student searchByStudentNumber(String studentNumber, String languageCode) {
+                assertEquals("S001", studentNumber);
+                assertEquals("en", languageCode);
+                return new Student();
+            }
+
+            @Override
+            public List<Student> loadAllStudentsBasic(String languageCode) {
+                assertEquals("en", languageCode);
+                return List.of(new Student());
+            }
         };
 
         setFinalField(c, "service", fakeService);
 
-        assertNotNull(c.getInitialStudent());
-        assertNotNull(c.findStudentByNumber("S001"));
-        assertEquals(1, c.getAllStudentsBasic().size());
+        assertNotNull(c.getInitialStudent("en"));
+        assertNotNull(c.findStudentByNumber("S001", "en"));
+        assertEquals(1, c.getAllStudentsBasic("en").size());
     }
 }

@@ -2,6 +2,7 @@ package Backend.controller;
 
 import Backend.model.dao.StudentDao;
 import Backend.model.dao.impl.UserProfileDaoImpl;
+import Backend.model.dao.impl.UserProfileDaoImpl.TeacherProfile;
 import Backend.service.StudentDetailsService;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +37,7 @@ public class StudentDetailsControllerTest {
         setField(c, "userProfileDao", fakeProfile);
 
         SecurityException ex = assertThrows(SecurityException.class,
-                () -> c.saveFeedback("S001", "x", 99));
+                () -> c.saveFeedback("S001", "x", 99, "en"));
         assertEquals("Teacher profile not found.", ex.getMessage());
     }
 
@@ -54,7 +55,7 @@ public class StudentDetailsControllerTest {
         setField(c, "userProfileDao", fakeProfile);
 
         SecurityException ex = assertThrows(SecurityException.class,
-                () -> c.saveFeedback("S001", "x", 10));
+                () -> c.saveFeedback("S001", "x", 10, "en"));
         assertEquals("Only the class teacher can save feedback.", ex.getMessage());
     }
 
@@ -72,7 +73,7 @@ public class StudentDetailsControllerTest {
         setField(c, "userProfileDao", fakeProfile);
 
         SecurityException ex = assertThrows(SecurityException.class,
-                () -> c.saveFeedback("S001", "x", 10));
+                () -> c.saveFeedback("S001", "x", 10, "en"));
         assertEquals("Only the class teacher can save feedback.", ex.getMessage());
     }
 
@@ -96,13 +97,18 @@ public class StudentDetailsControllerTest {
 
             @Override public void create(Backend.model.entity.Student student) {}
             @Override public Backend.model.entity.Student findById(int studentId) { return null; }
+            @Override public Backend.model.entity.Student findById(int studentId, String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAll() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAll(String languageCode) { return java.util.List.of(); }
             @Override public void update(Backend.model.entity.Student student) {}
             @Override public void delete(int studentId) {}
             @Override public boolean existsById(int studentId) { return false; }
             @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber) { return null; }
+            @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber, String languageCode) { return null; }
             @Override public Backend.model.entity.Student findFirstStudent() { return null; }
+            @Override public Backend.model.entity.Student findFirstStudent(String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAllBasic() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAllBasic(String languageCode) { return java.util.List.of(); }
         };
 
         StudentDetailsService fakeService = new StudentDetailsService() {
@@ -117,7 +123,7 @@ public class StudentDetailsControllerTest {
         setField(c, "studentDao", fakeStudentDao);
         setField(c, "service", fakeService);
 
-        c.saveFeedback("S001", "Good", 10);
+        c.saveFeedback("S001", "Good", 10, "en");
     }
 
     @Test
@@ -134,24 +140,31 @@ public class StudentDetailsControllerTest {
         StudentDao fakeStudentDao = new StudentDao() {
             @Override
             public int findStudentIdByStudentNumber(String studentNumber) {
+                assertEquals("S001", studentNumber);
                 return 20;
             }
 
             @Override public void create(Backend.model.entity.Student student) {}
             @Override public Backend.model.entity.Student findById(int studentId) { return null; }
+            @Override public Backend.model.entity.Student findById(int studentId, String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAll() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAll(String languageCode) { return java.util.List.of(); }
             @Override public void update(Backend.model.entity.Student student) {}
             @Override public void delete(int studentId) {}
             @Override public boolean existsById(int studentId) { return false; }
             @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber) { return null; }
+            @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber, String languageCode) { return null; }
             @Override public Backend.model.entity.Student findFirstStudent() { return null; }
+            @Override public Backend.model.entity.Student findFirstStudent(String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAllBasic() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAllBasic(String languageCode) { return java.util.List.of(); }
         };
 
         StudentDetailsService fakeService = new StudentDetailsService() {
             @Override
             public void saveFeedback(int studentId, String feedback) {
                 assertEquals(20, studentId);
+                assertEquals("Good", feedback);
             }
         };
 
@@ -159,7 +172,7 @@ public class StudentDetailsControllerTest {
         setField(c, "studentDao", fakeStudentDao);
         setField(c, "service", fakeService);
 
-        c.saveFeedback("S001", "Good", 10);
+        c.saveFeedback("S001", "Good", 10, "en");
     }
 
     @Test
@@ -176,7 +189,7 @@ public class StudentDetailsControllerTest {
         setField(c, "userProfileDao", fakeProfile);
 
         SecurityException ex = assertThrows(SecurityException.class,
-                () -> c.deleteFeedback("S001", 99));
+                () -> c.deleteFeedback("S001", 99, "en"));
         assertEquals("Teacher profile not found.", ex.getMessage());
     }
 
@@ -194,7 +207,7 @@ public class StudentDetailsControllerTest {
         setField(c, "userProfileDao", fakeProfile);
 
         SecurityException ex = assertThrows(SecurityException.class,
-                () -> c.deleteFeedback("S001", 10));
+                () -> c.deleteFeedback("S001", 10, "en"));
         assertEquals("Only the class teacher can delete feedback.", ex.getMessage());
     }
 
@@ -212,7 +225,7 @@ public class StudentDetailsControllerTest {
         setField(c, "userProfileDao", fakeProfile);
 
         SecurityException ex = assertThrows(SecurityException.class,
-                () -> c.deleteFeedback("S001", 10));
+                () -> c.deleteFeedback("S001", 10, "en"));
         assertEquals("Only the class teacher can delete feedback.", ex.getMessage());
     }
 
@@ -236,13 +249,18 @@ public class StudentDetailsControllerTest {
 
             @Override public void create(Backend.model.entity.Student student) {}
             @Override public Backend.model.entity.Student findById(int studentId) { return null; }
+            @Override public Backend.model.entity.Student findById(int studentId, String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAll() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAll(String languageCode) { return java.util.List.of(); }
             @Override public void update(Backend.model.entity.Student student) {}
             @Override public void delete(int studentId) {}
             @Override public boolean existsById(int studentId) { return false; }
             @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber) { return null; }
+            @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber, String languageCode) { return null; }
             @Override public Backend.model.entity.Student findFirstStudent() { return null; }
+            @Override public Backend.model.entity.Student findFirstStudent(String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAllBasic() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAllBasic(String languageCode) { return java.util.List.of(); }
         };
 
         StudentDetailsService fakeService = new StudentDetailsService() {
@@ -256,7 +274,7 @@ public class StudentDetailsControllerTest {
         setField(c, "studentDao", fakeStudentDao);
         setField(c, "service", fakeService);
 
-        c.deleteFeedback("S001", 10);
+        c.deleteFeedback("S001", 10, "en");
     }
 
     @Test
@@ -266,24 +284,31 @@ public class StudentDetailsControllerTest {
         StudentDao fakeStudentDao = new StudentDao() {
             @Override
             public int findStudentIdByStudentNumber(String studentNumber) {
+                assertEquals("S001", studentNumber);
                 return 10;
             }
 
             @Override public void create(Backend.model.entity.Student student) {}
             @Override public Backend.model.entity.Student findById(int studentId) { return null; }
+            @Override public Backend.model.entity.Student findById(int studentId, String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAll() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAll(String languageCode) { return java.util.List.of(); }
             @Override public void update(Backend.model.entity.Student student) {}
             @Override public void delete(int studentId) {}
             @Override public boolean existsById(int studentId) { return false; }
             @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber) { return null; }
+            @Override public Backend.model.entity.Student findByStudentNumber(String studentNumber, String languageCode) { return null; }
             @Override public Backend.model.entity.Student findFirstStudent() { return null; }
+            @Override public Backend.model.entity.Student findFirstStudent(String languageCode) { return null; }
             @Override public java.util.List<Backend.model.entity.Student> findAllBasic() { return java.util.List.of(); }
+            @Override public java.util.List<Backend.model.entity.Student> findAllBasic(String languageCode) { return java.util.List.of(); }
         };
 
         StudentDetailsService fakeService = new StudentDetailsService() {
             @Override
-            public Backend.model.dto.StudentDetailsDTO getStudentDetails(int studentId) {
+            public Backend.model.dto.StudentDetailsDTO getStudentDetails(int studentId, String languageCode) {
                 assertEquals(10, studentId);
+                assertEquals("si", languageCode);
                 return new Backend.model.dto.StudentDetailsDTO();
             }
 
@@ -297,7 +322,7 @@ public class StudentDetailsControllerTest {
         setField(c, "studentDao", fakeStudentDao);
         setField(c, "service", fakeService);
 
-        assertNotNull(c.getDetails("S001"));
+        assertNotNull(c.getDetails("S001", "si"));
         assertEquals("OK", c.loadFeedback("S001"));
     }
 }

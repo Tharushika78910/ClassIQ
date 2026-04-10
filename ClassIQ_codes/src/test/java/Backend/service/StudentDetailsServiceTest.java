@@ -29,8 +29,9 @@ public class StudentDetailsServiceTest {
 
         MarksDao fakeDao = new MarksDao() {
             @Override
-            public StudentDetailsDTO findStudentDetails(int studentId) {
+            public StudentDetailsDTO findStudentDetails(int studentId, String languageCode) {
                 assertEquals(10, studentId);
+                assertEquals("en", languageCode);
                 return new StudentDetailsDTO();
             }
 
@@ -57,7 +58,7 @@ public class StudentDetailsServiceTest {
 
         setFinalField(s, "marksDao", fakeDao);
 
-        assertNotNull(s.getStudentDetails(10));
+        assertNotNull(s.getStudentDetails(10, "en"));
         s.saveFeedback(10, "Nice");
         assertEquals("Saved", s.getFeedback(10));
         s.deleteFeedback(10);
