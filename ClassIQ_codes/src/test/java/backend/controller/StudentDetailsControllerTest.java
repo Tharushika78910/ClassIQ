@@ -108,21 +108,80 @@ class StudentDetailsControllerTest {
         StudentDetailsController controller = new StudentDetailsController(
                 new StudentDetailsService(),
                 new StudentDao() {
-                    @Override public int findStudentIdByStudentNumber(String studentNumber) { return 0; }
-                    @Override public void create(Student student) { throw new UnsupportedOperationException("Not needed for this test"); }
-                    @Override public Student findById(int studentId) { return null; }
-                    @Override public Student findById(int studentId, String languageCode) { return null; }
-                    @Override public List<Student> findAll() { return List.of(); }
-                    @Override public List<Student> findAll(String languageCode) { return List.of(); }
-                    @Override public void update(Student student) { throw new UnsupportedOperationException("Not needed for this test"); }
-                    @Override public void delete(int studentId) { throw new UnsupportedOperationException("Not needed for this test"); }
-                    @Override public boolean existsById(int studentId) { return false; }
-                    @Override public Student findByStudentNumber(String studentNumber) { return null; }
-                    @Override public Student findByStudentNumber(String studentNumber, String languageCode) { return null; }
-                    @Override public Student findFirstStudent() { return null; }
-                    @Override public Student findFirstStudent(String languageCode) { return null; }
-                    @Override public List<Student> findAllBasic() { return List.of(); }
-                    @Override public List<Student> findAllBasic(String languageCode) { return List.of(); }
+                    @Override
+                    public int findStudentIdByStudentNumber(String studentNumber) {
+                        return 0;
+                    }
+
+                    @Override
+                    public void create(Student student) {
+                        throw new UnsupportedOperationException("Not needed for this test");
+                    }
+
+                    @Override
+                    public Student findById(int studentId) {
+                        return null;
+                    }
+
+                    @Override
+                    public Student findById(int studentId, String languageCode) {
+                        return null;
+                    }
+
+                    @Override
+                    public List<Student> findAll() {
+                        return List.of();
+                    }
+
+                    @Override
+                    public List<Student> findAll(String languageCode) {
+                        return List.of();
+                    }
+
+                    @Override
+                    public void update(Student student) {
+                        throw new UnsupportedOperationException("Not needed for this test");
+                    }
+
+                    @Override
+                    public void delete(int studentId) {
+                        throw new UnsupportedOperationException("Not needed for this test");
+                    }
+
+                    @Override
+                    public boolean existsById(int studentId) {
+                        return false;
+                    }
+
+                    @Override
+                    public Student findByStudentNumber(String studentNumber) {
+                        return null;
+                    }
+
+                    @Override
+                    public Student findByStudentNumber(String studentNumber, String languageCode) {
+                        return null;
+                    }
+
+                    @Override
+                    public Student findFirstStudent() {
+                        return null;
+                    }
+
+                    @Override
+                    public Student findFirstStudent(String languageCode) {
+                        return null;
+                    }
+
+                    @Override
+                    public List<Student> findAllBasic() {
+                        return List.of();
+                    }
+
+                    @Override
+                    public List<Student> findAllBasic(String languageCode) {
+                        return List.of();
+                    }
                 },
                 fakeProfileDao
         );
@@ -238,6 +297,107 @@ class StudentDetailsControllerTest {
     }
 
     @Test
+    void saveFeedback_shouldWrapException_whenStudentLookupFails() {
+        UserProfileDaoImpl fakeProfileDao = new UserProfileDaoImpl() {
+            @Override
+            public TeacherProfile findTeacherByUserId(int userId) {
+                return new TeacherProfile(1, "Teacher", "teacher@test.com", "Math");
+            }
+        };
+
+        StudentDao fakeStudentDao = new StudentDao() {
+            @Override
+            public int findStudentIdByStudentNumber(String studentNumber) {
+                throw new RuntimeException("Lookup failed");
+            }
+
+            @Override
+            public void create(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public Student findById(int studentId) {
+                return null;
+            }
+
+            @Override
+            public Student findById(int studentId, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAll(String languageCode) {
+                return List.of();
+            }
+
+            @Override
+            public void update(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public void delete(int studentId) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public boolean existsById(int studentId) {
+                return false;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber) {
+                return null;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent() {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent(String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAllBasic() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAllBasic(String languageCode) {
+                return List.of();
+            }
+        };
+
+        StudentDetailsController controller = new StudentDetailsController(
+                new StudentDetailsService(),
+                fakeStudentDao,
+                fakeProfileDao
+        );
+
+        StudentDetailsControllerException exception = assertThrows(
+                StudentDetailsControllerException.class,
+                () -> controller.saveFeedback("S001", "Good", 10, "en")
+        );
+
+        assertEquals("Failed to save feedback.", exception.getMessage());
+        assertNotNull(exception.getCause());
+    }
+
+    @Test
     void deleteFeedback_shouldThrow_whenTeacherProfileNull() {
         UserProfileDaoImpl fakeProfileDao = new UserProfileDaoImpl() {
             @Override
@@ -334,6 +494,107 @@ class StudentDetailsControllerTest {
     }
 
     @Test
+    void deleteFeedback_shouldWrapException_whenStudentLookupFails() {
+        UserProfileDaoImpl fakeProfileDao = new UserProfileDaoImpl() {
+            @Override
+            public TeacherProfile findTeacherByUserId(int userId) {
+                return new TeacherProfile(1, "Teacher", "teacher@test.com", "Math");
+            }
+        };
+
+        StudentDao fakeStudentDao = new StudentDao() {
+            @Override
+            public int findStudentIdByStudentNumber(String studentNumber) {
+                throw new RuntimeException("Lookup failed");
+            }
+
+            @Override
+            public void create(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public Student findById(int studentId) {
+                return null;
+            }
+
+            @Override
+            public Student findById(int studentId, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAll(String languageCode) {
+                return List.of();
+            }
+
+            @Override
+            public void update(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public void delete(int studentId) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public boolean existsById(int studentId) {
+                return false;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber) {
+                return null;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent() {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent(String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAllBasic() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAllBasic(String languageCode) {
+                return List.of();
+            }
+        };
+
+        StudentDetailsController controller = new StudentDetailsController(
+                new StudentDetailsService(),
+                fakeStudentDao,
+                fakeProfileDao
+        );
+
+        StudentDetailsControllerException exception = assertThrows(
+                StudentDetailsControllerException.class,
+                () -> controller.deleteFeedback("S001", 10, "en")
+        );
+
+        assertEquals("Failed to delete feedback.", exception.getMessage());
+        assertNotNull(exception.getCause());
+    }
+
+    @Test
     void getDetails_and_loadFeedback_shouldCallService() throws Exception {
         StudentDao fakeStudentDao = createFakeStudentDao(40);
 
@@ -360,5 +621,193 @@ class StudentDetailsControllerTest {
 
         assertNotNull(controller.getDetails("S001", "si"));
         assertEquals("OK", controller.loadFeedback("S001"));
+    }
+
+    @Test
+    void getDetails_shouldWrapException_whenStudentLookupFails() {
+        StudentDao fakeStudentDao = new StudentDao() {
+            @Override
+            public int findStudentIdByStudentNumber(String studentNumber) {
+                throw new RuntimeException("Lookup failed");
+            }
+
+            @Override
+            public void create(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public Student findById(int studentId) {
+                return null;
+            }
+
+            @Override
+            public Student findById(int studentId, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAll(String languageCode) {
+                return List.of();
+            }
+
+            @Override
+            public void update(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public void delete(int studentId) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public boolean existsById(int studentId) {
+                return false;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber) {
+                return null;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent() {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent(String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAllBasic() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAllBasic(String languageCode) {
+                return List.of();
+            }
+        };
+
+        StudentDetailsController controller = new StudentDetailsController(
+                new StudentDetailsService(),
+                fakeStudentDao,
+                new UserProfileDaoImpl()
+        );
+
+        StudentDetailsControllerException exception = assertThrows(
+                StudentDetailsControllerException.class,
+                () -> controller.getDetails("S001", "en")
+        );
+
+        assertEquals("Failed to get student details.", exception.getMessage());
+        assertNotNull(exception.getCause());
+    }
+
+    @Test
+    void loadFeedback_shouldWrapException_whenStudentLookupFails() {
+        StudentDao fakeStudentDao = new StudentDao() {
+            @Override
+            public int findStudentIdByStudentNumber(String studentNumber) {
+                throw new RuntimeException("Lookup failed");
+            }
+
+            @Override
+            public void create(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public Student findById(int studentId) {
+                return null;
+            }
+
+            @Override
+            public Student findById(int studentId, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAll(String languageCode) {
+                return List.of();
+            }
+
+            @Override
+            public void update(Student student) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public void delete(int studentId) {
+                throw new UnsupportedOperationException("Not needed for this test");
+            }
+
+            @Override
+            public boolean existsById(int studentId) {
+                return false;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber) {
+                return null;
+            }
+
+            @Override
+            public Student findByStudentNumber(String studentNumber, String languageCode) {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent() {
+                return null;
+            }
+
+            @Override
+            public Student findFirstStudent(String languageCode) {
+                return null;
+            }
+
+            @Override
+            public List<Student> findAllBasic() {
+                return List.of();
+            }
+
+            @Override
+            public List<Student> findAllBasic(String languageCode) {
+                return List.of();
+            }
+        };
+
+        StudentDetailsController controller = new StudentDetailsController(
+                new StudentDetailsService(),
+                fakeStudentDao,
+                new UserProfileDaoImpl()
+        );
+
+        StudentDetailsControllerException exception = assertThrows(
+                StudentDetailsControllerException.class,
+                () -> controller.loadFeedback("S001")
+        );
+
+        assertEquals("Failed to load feedback.", exception.getMessage());
+        assertNotNull(exception.getCause());
     }
 }
