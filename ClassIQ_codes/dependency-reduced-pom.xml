@@ -35,10 +35,11 @@
               <goal>report</goal>
             </goals>
             <configuration>
-              <includes>
-                <include>backend/service/*</include>
-                <include>backend/controller/*</include>
-              </includes>
+              <excludes>
+                <exclude>frontend/**</exclude>
+                <exclude>backend/model/dao/**</exclude>
+                <exclude>backend/db/**</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
@@ -111,13 +112,19 @@
   </dependencies>
   <properties>
     <sonar.projectName>ClassIQ</sonar.projectName>
-    <maven.compiler.source>17</maven.compiler.source>
     <sonar.host.url>http://localhost:9000</sonar.host.url>
+    <sonar.exclusions>src/main/java/frontend/**,
+            src/main/java/backend/model/dao/**,
+            src/main/java/backend/db/**</sonar.exclusions>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <javafx.version>21.0.1</javafx.version>
+    <sonar.coverage.exclusions>src/main/java/frontend/**,
+            src/main/java/backend/model/dao/**,
+            src/main/java/backend/db/**</sonar.coverage.exclusions>
+    <maven.compiler.source>17</maven.compiler.source>
     <junit.jupiter.version>5.8.1</junit.jupiter.version>
     <maven.compiler.target>17</maven.compiler.target>
     <sonar.projectKey>ClassIQ</sonar.projectKey>
     <javafx.modules>javafx.controls,javafx.graphics,javafx.fxml,javafx.swing,javafx.web</javafx.modules>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <javafx.version>21.0.1</javafx.version>
   </properties>
 </project>

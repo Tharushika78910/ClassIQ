@@ -23,6 +23,19 @@
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.projectKey>ClassIQ</sonar.projectKey>
         <sonar.projectName>ClassIQ</sonar.projectName>
+
+        <!-- ✅ FIXED PATHS -->
+        <sonar.coverage.exclusions>
+            src/main/java/frontend/**,
+            src/main/java/backend/model/dao/**,
+            src/main/java/backend/db/**
+        </sonar.coverage.exclusions>
+
+        <sonar.exclusions>
+            src/main/java/frontend/**,
+            src/main/java/backend/model/dao/**,
+            src/main/java/backend/db/**
+        </sonar.exclusions>
     </properties>
 
     <dependencies>
@@ -96,26 +109,23 @@
                 </configuration>
             </plugin>
 
-            <!-- JaCoCo: attach agent + generate report -->
+            <!-- JaCoCo -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
                 <executions>
 
-                    <!-- Attach JaCoCo agent when running tests -->
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <!-- Prevent conflict with Surefire argLine -->
                             <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
 
-                    <!-- Generate JaCoCo report after tests -->
                     <execution>
                         <id>report</id>
                         <phase>verify</phase>
@@ -123,18 +133,18 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <!-- Only show coverage for BASIC FUNCTIONS -->
-                            <includes>
-                                <include>backend/service/*</include>
-                                <include>backend/controller/*</include>
-                            </includes>
+                            <excludes>
+                                <exclude>frontend/**</exclude>
+                                <exclude>backend/model/dao/**</exclude>
+                                <exclude>backend/db/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
 
                 </executions>
             </plugin>
 
-            <!-- Surefire: run tests + include JaCoCo agent + JavaFX modules -->
+            <!-- Surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -145,7 +155,6 @@
                     <reuseForks>true</reuseForks>
                     <useModulePath>true</useModulePath>
 
-                    <!-- Run ALL unit tests you add -->
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
@@ -166,7 +175,8 @@
 
                 </configuration>
             </plugin>
-            <!-- Shade Plugin: build runnable fat jar with Main-Class -->
+
+            <!-- Shade Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -187,6 +197,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

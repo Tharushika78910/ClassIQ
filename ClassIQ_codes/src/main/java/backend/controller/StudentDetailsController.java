@@ -36,12 +36,17 @@ public class StudentDetailsController {
         return ResourceBundle.getBundle("messages", locale);
     }
 
-    public StudentDetailsDTO getDetails(String studentNumber, String languageCode) throws Exception {
-        int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
-        return service.getStudentDetails(studentId, languageCode);
+    public StudentDetailsDTO getDetails(String studentNumber, String languageCode) throws StudentDetailsControllerException {
+        try {
+            int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
+            return service.getStudentDetails(studentId, languageCode);
+        } catch (Exception exception) {
+            throw new StudentDetailsControllerException("Failed to get student details.", exception);
+        }
     }
 
-    public void saveFeedback(String studentNumber, String feedback, int teacherUserId, String languageCode) throws Exception {
+    public void saveFeedback(String studentNumber, String feedback, int teacherUserId, String languageCode)
+            throws StudentDetailsControllerException {
         ResourceBundle bundle = getBundle(languageCode);
 
         var teacher = userProfileDao.findTeacherByUserId(teacherUserId);
@@ -55,16 +60,25 @@ public class StudentDetailsController {
             throw new SecurityException(bundle.getString("teacher.studentDetails.error.onlyClassTeacherSave"));
         }
 
-        int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
-        service.saveFeedback(studentId, feedback);
+        try {
+            int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
+            service.saveFeedback(studentId, feedback);
+        } catch (Exception exception) {
+            throw new StudentDetailsControllerException("Failed to save feedback.", exception);
+        }
     }
 
-    public String loadFeedback(String studentNumber) throws Exception {
-        int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
-        return service.getFeedback(studentId);
+    public String loadFeedback(String studentNumber) throws StudentDetailsControllerException {
+        try {
+            int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
+            return service.getFeedback(studentId);
+        } catch (Exception exception) {
+            throw new StudentDetailsControllerException("Failed to load feedback.", exception);
+        }
     }
 
-    public void deleteFeedback(String studentNumber, int teacherUserId, String languageCode) throws Exception {
+    public void deleteFeedback(String studentNumber, int teacherUserId, String languageCode)
+            throws StudentDetailsControllerException {
         ResourceBundle bundle = getBundle(languageCode);
 
         var teacher = userProfileDao.findTeacherByUserId(teacherUserId);
@@ -78,8 +92,12 @@ public class StudentDetailsController {
             throw new SecurityException(bundle.getString("teacher.studentDetails.error.onlyClassTeacherDelete"));
         }
 
-        int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
-        service.deleteFeedback(studentId);
+        try {
+            int studentId = studentDao.findStudentIdByStudentNumber(studentNumber);
+            service.deleteFeedback(studentId);
+        } catch (Exception exception) {
+            throw new StudentDetailsControllerException("Failed to delete feedback.", exception);
+        }
     }
 
     private boolean isMathSubject(String subject) {

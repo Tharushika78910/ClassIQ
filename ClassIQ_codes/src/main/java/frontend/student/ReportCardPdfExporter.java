@@ -57,27 +57,24 @@ public final class ReportCardPdfExporter {
                 PAGE_MARGIN_TOP,
                 PAGE_MARGIN_BOTTOM
         );
-        FileOutputStream outputStream = null;
 
-        try {
-            outputStream = new FileOutputStream(outFile);
-
+        try (FileOutputStream outputStream = new FileOutputStream(outFile)) {
             PdfWriter writer = PdfWriter.getInstance(document, outputStream);
             writer.setPageEvent(new FullPageBackground(BACKGROUND_IMAGE));
 
-            document.open();
-            addHeaderImage(document);
-            addTitle(document, bundle, fonts.titleFont);
-            addStudentInfo(document, bundle, fonts, data, isArabic);
-            addMarksTable(document, bundle, fonts, data.subjects(), isArabic);
-            addFeedbackSection(document, bundle, fonts, data.feedback(), isArabic);
-            addGeneratedDate(document, bundle, fonts.footerFont, isArabic);
-
-            document.close();
-            outputStream.close();
-
-            document = null;
-            outputStream = null;
+            try {
+                document.open();
+                addHeaderImage(document);
+                addTitle(document, bundle, fonts.titleFont);
+                addStudentInfo(document, bundle, fonts, data, isArabic);
+                addMarksTable(document, bundle, fonts, data.subjects(), isArabic);
+                addFeedbackSection(document, bundle, fonts, data.feedback(), isArabic);
+                addGeneratedDate(document, bundle, fonts.footerFont, isArabic);
+            } finally {
+                if (document.isOpen()) {
+                    document.close();
+                }
+            }
 
             return outFile;
         } catch (IOException | DocumentException exception) {
@@ -85,18 +82,6 @@ public final class ReportCardPdfExporter {
                     "Failed to export report card PDF: " + outFile.getAbsolutePath(),
                     exception
             );
-        } finally {
-            if (document != null && document.isOpen()) {
-                document.close();
-            }
-
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException ignored) {
-                    // Ignore close failure
-                }
-            }
         }
     }
 

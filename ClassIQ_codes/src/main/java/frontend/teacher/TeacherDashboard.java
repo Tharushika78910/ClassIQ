@@ -40,6 +40,27 @@ public class TeacherDashboard extends BorderPane {
     private static final String GRADING_IMAGE = "/images/GradingCriteria.png";
     private static final String STUDENT_IMAGE = "/images/StudentInfo.png";
 
+    private static final String STYLE_BOLD = "-fx-font-weight: bold;";
+    private static final String STYLE_FONT_14 = "-fx-font-size: 14px;";
+    private static final String STYLE_RADIUS_18 = "-fx-background-radius: 18;";
+    private static final String STYLE_PADDING_8_22 = "-fx-padding: 8 22 8 22;";
+    private static final String PILL_SHARED_STYLE =
+            STYLE_BOLD +
+                    STYLE_FONT_14 +
+                    STYLE_RADIUS_18 +
+                    STYLE_PADDING_8_22;
+
+    private static final String PILL_NORMAL =
+            "-fx-background-color: rgba(255,255,255,0.92);" +
+                    "-fx-text-fill: #2E6F62;" +
+                    PILL_SHARED_STYLE +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
+
+    private static final String PILL_HOVER =
+            "-fx-background-color: #9AC4B7;" +
+                    "-fx-text-fill: white;" +
+                    PILL_SHARED_STYLE;
+
     private final StackPane contentArea = new StackPane();
 
     private final String teacherName;
@@ -120,27 +141,10 @@ public class TeacherDashboard extends BorderPane {
         centerWrap.setAlignment(Pos.CENTER);
         layout.setCenter(centerWrap);
 
-        String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
-
-        String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;";
-
         Button btnBack = new Button(messages.getString("common.back"));
-        btnBack.setStyle(pillNormal);
-        btnBack.setOnMouseEntered(event -> btnBack.setStyle(pillHover));
-        btnBack.setOnMouseExited(event -> btnBack.setStyle(pillNormal));
+        btnBack.setStyle(PILL_NORMAL);
+        btnBack.setOnMouseEntered(event -> btnBack.setStyle(PILL_HOVER));
+        btnBack.setOnMouseExited(event -> btnBack.setStyle(PILL_NORMAL));
         btnBack.setOnAction(event -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
@@ -150,9 +154,9 @@ public class TeacherDashboard extends BorderPane {
         });
 
         Button btnLogout = new Button(messages.getString("common.logout"));
-        btnLogout.setStyle(pillNormal);
-        btnLogout.setOnMouseEntered(event -> btnLogout.setStyle(pillHover));
-        btnLogout.setOnMouseExited(event -> btnLogout.setStyle(pillNormal));
+        btnLogout.setStyle(PILL_NORMAL);
+        btnLogout.setOnMouseEntered(event -> btnLogout.setStyle(PILL_HOVER));
+        btnLogout.setOnMouseExited(event -> btnLogout.setStyle(PILL_NORMAL));
         btnLogout.setOnAction(event -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();
@@ -287,33 +291,16 @@ public class TeacherDashboard extends BorderPane {
         wrapper.setNodeOrientation(getCurrentOrientation());
         wrapper.setCenter(pageContent);
 
-        String pillNormal =
-                "-fx-background-color: rgba(255,255,255,0.92);" +
-                        "-fx-text-fill: #2E6F62;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
-
-        String pillHover =
-                "-fx-background-color: #9AC4B7;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 18;" +
-                        "-fx-padding: 8 22 8 22;";
-
         Button btnBack = new Button(messages.getString("common.back"));
-        btnBack.setStyle(pillNormal);
-        btnBack.setOnMouseEntered(event -> btnBack.setStyle(pillHover));
-        btnBack.setOnMouseExited(event -> btnBack.setStyle(pillNormal));
+        btnBack.setStyle(PILL_NORMAL);
+        btnBack.setOnMouseEntered(event -> btnBack.setStyle(PILL_HOVER));
+        btnBack.setOnMouseExited(event -> btnBack.setStyle(PILL_NORMAL));
         btnBack.setOnAction(event -> onBack.run());
 
         Button btnLogout = new Button(messages.getString("common.logout"));
-        btnLogout.setStyle(pillNormal);
-        btnLogout.setOnMouseEntered(event -> btnLogout.setStyle(pillHover));
-        btnLogout.setOnMouseExited(event -> btnLogout.setStyle(pillNormal));
+        btnLogout.setStyle(PILL_NORMAL);
+        btnLogout.setOnMouseEntered(event -> btnLogout.setStyle(PILL_HOVER));
+        btnLogout.setOnMouseExited(event -> btnLogout.setStyle(PILL_NORMAL));
         btnLogout.setOnAction(event -> {
             Locale savedLocale = Session.getCurrentLocale();
             Session.clear();

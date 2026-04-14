@@ -39,39 +39,37 @@ public class StudentDashboard extends BorderPane {
     private static final String GRADING_IMAGE = "/images/MarkSheetS.png";
     private static final String REPORT_IMAGE = "/images/Report CardS.png";
 
+    private static final String STYLE_BOLD = "-fx-font-weight: bold;";
+    private static final String STYLE_FONT_14 = "-fx-font-size: 14px;";
+    private static final String STYLE_RADIUS_18 = "-fx-background-radius: 18;";
+    private static final String STYLE_PADDING_8_22 = "-fx-padding: 8 22 8 22;";
+    private static final String STUDENT_BUTTON_SHARED =
+            STYLE_BOLD +
+                    STYLE_FONT_14 +
+                    STYLE_RADIUS_18 +
+                    STYLE_PADDING_8_22;
+
     private static final String STUDENT_BACK_NORMAL =
             "-fx-background-color: rgba(210,230,255,0.95);" +
                     "-fx-text-fill: #1E4F9A;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-font-size: 14px;" +
-                    "-fx-background-radius: 18;" +
-                    "-fx-padding: 8 22 8 22;" +
+                    STUDENT_BUTTON_SHARED +
                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
     private static final String STUDENT_BACK_HOVER =
             "-fx-background-color: #7FB3FF;" +
                     "-fx-text-fill: white;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-font-size: 14px;" +
-                    "-fx-background-radius: 18;" +
-                    "-fx-padding: 8 22 8 22;";
+                    STUDENT_BUTTON_SHARED;
 
     private static final String LOGOUT_NORMAL =
             "-fx-background-color: rgba(210,230,255,0.95);" +
                     "-fx-text-fill: #1E4F9A;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-font-size: 14px;" +
-                    "-fx-background-radius: 18;" +
-                    "-fx-padding: 8 22 8 22;" +
+                    STUDENT_BUTTON_SHARED +
                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10,0,0,2);";
 
     private static final String LOGOUT_HOVER =
             "-fx-background-color: #7FB3FF;" +
                     "-fx-text-fill: white;" +
-                    "-fx-font-weight: bold;" +
-                    "-fx-font-size: 14px;" +
-                    "-fx-background-radius: 18;" +
-                    "-fx-padding: 8 22 8 22;";
+                    STUDENT_BUTTON_SHARED;
 
     public StudentDashboard(String name, String email, String profileImagePath) {
         this.studentName = name;

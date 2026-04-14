@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 public class StudentMarksDaoImpl {
 
@@ -20,19 +21,31 @@ public class StudentMarksDaoImpl {
     private static final String COL_TOTAL = "total";
     private static final String COL_AVERAGE = "average";
 
+    private static final String IFNULL_PREFIX = "IFNULL(";
+    private static final String ZERO_SUFFIX = ",0)";
+    private static final String PLUS = " + ";
+
+    private static final Set<String> ALLOWED_SUBJECT_COLUMNS = Set.of(
+            COL_MATHEMATICS,
+            COL_ENGLISH,
+            COL_SCIENCE,
+            COL_CRAFT,
+            COL_LANGUAGES
+    );
+
     private static final String SQL_TOTAL_EXPRESSION =
-            "IFNULL(" + COL_MATHEMATICS + ",0) + " +
-                    "IFNULL(" + COL_ENGLISH + ",0) + " +
-                    "IFNULL(" + COL_SCIENCE + ",0) + " +
-                    "IFNULL(" + COL_CRAFT + ",0) + " +
-                    "IFNULL(" + COL_LANGUAGES + ",0)";
+            IFNULL_PREFIX + COL_MATHEMATICS + ZERO_SUFFIX + PLUS +
+                    IFNULL_PREFIX + COL_ENGLISH + ZERO_SUFFIX + PLUS +
+                    IFNULL_PREFIX + COL_SCIENCE + ZERO_SUFFIX + PLUS +
+                    IFNULL_PREFIX + COL_CRAFT + ZERO_SUFFIX + PLUS +
+                    IFNULL_PREFIX + COL_LANGUAGES + ZERO_SUFFIX;
 
     private static final String SQL_AVERAGE_EXPRESSION =
             "ROUND((" + SQL_TOTAL_EXPRESSION + ") / 5, 2)";
 
     // save/update subject total into student_marks (one student)
     public void upsertSubjectTotal(int studentId, String subject, int subjectTotal) throws SQLException {
-        String col = mapSubjectToColumn(subject);
+        String col = validateAllowedColumn(mapSubjectToColumn(subject));
 
         String upsert =
                 "INSERT INTO student_marks (student_id, " + col + ") " +
@@ -86,7 +99,7 @@ public class StudentMarksDaoImpl {
 
     // clear subject for ALL students (when teacher clicks Clear)
     public int clearSubjectForAllStudents(String subject) throws SQLException {
-        String col = mapSubjectToColumn(subject);
+        String col = validateAllowedColumn(mapSubjectToColumn(subject));
 
         String sql = "UPDATE student_marks SET " + col + " = 0";
 
@@ -151,5 +164,12 @@ public class StudentMarksDaoImpl {
         }
 
         return COL_MATHEMATICS;
+    }
+
+    private String validateAllowedColumn(String column) {
+        if (!ALLOWED_SUBJECT_COLUMNS.contains(column)) {
+            throw new IllegalArgumentException("Invalid subject column: " + column);
+        }
+        return column;
     }
 }

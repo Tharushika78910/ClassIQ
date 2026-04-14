@@ -16,19 +16,35 @@ public class StudentDetailsService {
         this.marksDao = marksDao;
     }
 
-    public StudentDetailsDTO getStudentDetails(int studentId, String languageCode) throws Exception {
-        return marksDao.findStudentDetails(studentId, languageCode);
+    public StudentDetailsDTO getStudentDetails(int studentId, String languageCode) throws StudentDetailsServiceException {
+        try {
+            return marksDao.findStudentDetails(studentId, languageCode);
+        } catch (Exception exception) {
+            throw new StudentDetailsServiceException("Failed to load student details.", exception);
+        }
     }
 
-    public void saveFeedback(int studentId, String feedback) throws Exception {
-        marksDao.saveOrUpdateFeedback(studentId, feedback);
+    public void saveFeedback(int studentId, String feedback) throws StudentDetailsServiceException {
+        try {
+            marksDao.saveOrUpdateFeedback(studentId, feedback);
+        } catch (Exception exception) {
+            throw new StudentDetailsServiceException("Failed to save feedback.", exception);
+        }
     }
 
-    public String getFeedback(int studentId) throws Exception {
-        return marksDao.findFeedback(studentId);
+    public String getFeedback(int studentId) throws StudentDetailsServiceException {
+        try {
+            return marksDao.findFeedback(studentId);
+        } catch (Exception exception) {
+            throw new StudentDetailsServiceException("Failed to load feedback.", exception);
+        }
     }
 
-    public void deleteFeedback(int studentId) throws Exception {
-        marksDao.deleteFeedback(studentId);
+    public void deleteFeedback(int studentId) throws StudentDetailsServiceException {
+        try {
+            marksDao.deleteFeedback(studentId);
+        } catch (Exception exception) {
+            throw new StudentDetailsServiceException("Failed to delete feedback.", exception);
+        }
     }
 }
