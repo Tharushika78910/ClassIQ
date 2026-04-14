@@ -11,7 +11,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>Frontend.Main</mainClass>
+          <mainClass>frontend.Main</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -36,8 +36,8 @@
             </goals>
             <configuration>
               <includes>
-                <include>Backend/service/*</include>
-                <include>Backend/controller/*</include>
+                <include>backend/service/*</include>
+                <include>backend/controller/*</include>
               </includes>
             </configuration>
           </execution>
@@ -78,7 +78,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>Frontend.Main</mainClass>
+                  <mainClass>frontend.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>
@@ -110,9 +110,12 @@
     </dependency>
   </dependencies>
   <properties>
+    <sonar.projectName>ClassIQ</sonar.projectName>
     <maven.compiler.source>17</maven.compiler.source>
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
     <junit.jupiter.version>5.8.1</junit.jupiter.version>
     <maven.compiler.target>17</maven.compiler.target>
+    <sonar.projectKey>ClassIQ</sonar.projectKey>
     <javafx.modules>javafx.controls,javafx.graphics,javafx.fxml,javafx.swing,javafx.web</javafx.modules>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javafx.version>21.0.1</javafx.version>

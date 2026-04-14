@@ -4,7 +4,7 @@
 
 The goal of this sprint 2 is to initiate the technical foundation of ClassIQ project by implementing the database using MariaDB,
 starting the user interface
-development with JavaFX , starting Backend programmes  and integrating development tools such as unit testing and code coverage reporting.
+development with JavaFX , starting backend programmes  and integrating development tools such as unit testing and code coverage reporting.
 
 
 ## Completed User Stories / Tasks
