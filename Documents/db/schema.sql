@@ -59,6 +59,16 @@ CREATE TABLE IF NOT EXISTS `grade_scale` (
 
 -- Data exporting was unselected.
 
+-- Dumping structure for table classiq.marksheet_translation
+CREATE TABLE IF NOT EXISTS `marksheet_translation` (
+  `translation_key` varchar(100) NOT NULL,
+  `language_code` varchar(10) NOT NULL,
+  `translated_text` varchar(255) NOT NULL,
+  PRIMARY KEY (`translation_key`,`language_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Data exporting was unselected.
+
 -- Dumping structure for table classiq.role_translation
 CREATE TABLE IF NOT EXISTS `role_translation` (
   `role_code` varchar(20) NOT NULL,
@@ -104,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `student_marks` (
   PRIMARY KEY (`marks_id`),
   UNIQUE KEY `uq_student_marks` (`student_id`),
   CONSTRAINT `fk_student_marks_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -167,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `teacher_marksheet` (
   KEY `fk_tms_teacher` (`teacher_id`),
   CONSTRAINT `fk_teacher_marksheet_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`),
   CONSTRAINT `fk_tms_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
