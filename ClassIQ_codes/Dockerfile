@@ -23,12 +23,19 @@ RUN apt-get update && apt-get install -y \
     mesa-utils \
     wget \
     unzip \
+    fontconfig \
     fonts-noto \
     fonts-noto-core \
     fonts-noto-cjk \
     fonts-noto-color-emoji \
     fonts-noto-extra \
     && rm -rf /var/lib/apt/lists/*
+
+# Add dedicated Sinhala font and refresh font cache
+RUN mkdir -p /usr/share/fonts/truetype/sinhala \
+    && wget -O /usr/share/fonts/truetype/sinhala/NotoSansSinhala-Regular.ttf \
+    https://github.com/notofonts/sinhala/raw/main/fonts/ttf/NotoSansSinhala/NotoSansSinhala-Regular.ttf \
+    && fc-cache -f -v
 
 # Create folders for exported files
 RUN mkdir -p /root/Downloads /app/reports
