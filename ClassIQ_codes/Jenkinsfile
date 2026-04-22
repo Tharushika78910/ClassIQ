@@ -94,6 +94,7 @@ pipeline {
                 '''
                 bat """
                 docker run -d --name classiq-container -p 8080:8080 ^
+                -v C:\\classiq-reports:/app/reports ^
                 -e DB_HOST=host.docker.internal ^
                 -e DB_PORT=3306 ^
                 -e DB_NAME=classiq ^
