@@ -24,7 +24,6 @@
         <sonar.projectKey>ClassIQ</sonar.projectKey>
         <sonar.projectName>ClassIQ</sonar.projectName>
 
-        <!-- ✅ FIXED PATHS -->
         <sonar.coverage.exclusions>
             src/main/java/frontend/**,
             src/main/java/backend/model/dao/**,
@@ -133,6 +132,10 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
+                            <formats>
+                                <format>XML</format>
+                                <format>HTML</format>
+                            </formats>
                             <excludes>
                                 <exclude>frontend/**</exclude>
                                 <exclude>backend/model/dao/**</exclude>

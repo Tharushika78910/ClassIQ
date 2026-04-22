@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK 21'
+        jdk 'JDK 17'
         maven 'Maven_3'
     }
 
@@ -10,8 +10,9 @@ pipeline {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
         DOCKERHUB_REPO = 'poornimj/classiq'
-        DOCKER_IMAGE_TAG = 'latest'
+        DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
         PROJECT_DIR = 'ClassIQ_codes'
+        SONARQUBE_ENV = 'MySonarQube'
     }
 
     stages {
@@ -23,26 +24,10 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build, Test and Coverage') {
             steps {
-                dir('ClassIQ_codes') {
-                    bat 'mvn clean install'
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                dir('ClassIQ_codes') {
-                    bat 'mvn test'
-                }
-            }
-        }
-
-        stage('JaCoCo Report') {
-            steps {
-                dir('ClassIQ_codes') {
-                    bat 'mvn jacoco:report'
+                dir("${PROJECT_DIR}") {
+                    bat 'mvn clean verify'
                 }
             }
         }
@@ -66,6 +51,24 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    dir("${PROJECT_DIR}") {
+                        bat 'mvn sonar:sonar -Dsonar.projectKey=ClassIQ -Dsonar.projectName=ClassIQ'
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -79,9 +82,26 @@ pipeline {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
                         docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push('latest')
                     }
                 }
             }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                bat '''
+                docker rm -f classiq-container
+                exit /b 0
+                '''
+                bat "docker run -d --name classiq-container -p 8080:8080 ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}"
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'ClassIQ_codes/target/*.jar', fingerprint: true
         }
     }
 }
