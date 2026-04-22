@@ -29,13 +29,8 @@ RUN apt-get update && apt-get install -y \
     fonts-noto-cjk \
     fonts-noto-color-emoji \
     fonts-noto-extra \
+    && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
-
-# Add dedicated Sinhala font and refresh font cache
-RUN mkdir -p /usr/share/fonts/truetype/sinhala \
-    && wget -O /usr/share/fonts/truetype/sinhala/NotoSansSinhala-Regular.ttf \
-    https://github.com/notofonts/sinhala/raw/main/fonts/ttf/NotoSansSinhala/NotoSansSinhala-Regular.ttf \
-    && fc-cache -f -v
 
 # Create folders for exported files
 RUN mkdir -p /root/Downloads /app/reports
