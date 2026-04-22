@@ -92,7 +92,15 @@ pipeline {
                 docker rm -f classiq-container
                 exit /b 0
                 '''
-                bat "docker run -d --name classiq-container -p 8080:8080 ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}"
+                bat """
+                docker run -d --name classiq-container -p 8080:8080 ^
+                -e DB_HOST=host.docker.internal ^
+                -e DB_PORT=3306 ^
+                -e DB_NAME=classiq ^
+                -e DB_USER=root ^
+                -e DB_PASS=root123 ^
+                ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}
+                """
             }
         }
     }
