@@ -11,7 +11,7 @@ RUN mvn -B clean package -DskipTests
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# GUI/X11 + JavaFX WebView dependencies
+# GUI/X11 + JavaFX WebView dependencies + Unicode fonts
 RUN apt-get update && apt-get install -y \
     libx11-6 \
     libxext6 \
@@ -23,10 +23,15 @@ RUN apt-get update && apt-get install -y \
     mesa-utils \
     wget \
     unzip \
+    fonts-noto \
+    fonts-noto-core \
+    fonts-noto-cjk \
+    fonts-noto-color-emoji \
+    fonts-noto-extra \
     && rm -rf /var/lib/apt/lists/*
 
-# Create Downloads folder so PDF export has a valid location
-RUN mkdir -p /root/Downloads
+# Create folders for exported files
+RUN mkdir -p /root/Downloads /app/reports
 
 # JavaFX SDK
 RUN mkdir -p /javafx-sdk \
