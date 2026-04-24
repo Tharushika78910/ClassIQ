@@ -12,7 +12,7 @@ The goal of Sprint 7 is to test the ClassIQ system properly and make sure the ap
 
 ---
 
-- Create the Sprint 7 test plan
+- Create the Sprint 7 test plan  
 - Perform final unit testing for completed features
 - Track bugs and issues found during testing
 - Review and refine Trello user stories
