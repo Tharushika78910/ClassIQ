@@ -24,25 +24,34 @@ students.
 ---
 ###  Intended Audience/Users
 
-- The main users are teachers .They can use this application to enter the marks, edit and
-calculate average marks and generate the grades and report cards. They are able to
-give feedback if they need to. 
-- Students can access the system to view their marks, grade ,average and feedback too.
-They are not allowed to edit.
+- Teachers – manage student data, enter marks, calculate grades, generate reports
+- Students – view grades and feedback, download report cards
 
 ---
 
 ### Technologies Used
 
+#### Development
+
 * JavaFX – User Interface
 * IntelliJ IDEA – IDE
 * Maven – Build management
+
+#### Database
+
 * MariaDB / HeidiSQL – Database
+
+#### Testing & Quality
+
 * JUnit – Testing
 * JaCoCo – Code coverage
 * SonarQube – Code quality analysis
+
+#### DevOps
 * Jenkins – Continuous Integration
 * Docker – Containerization
+
+#### Other Tools
 * VcXsrv / Xming – GUI support for Docker
 * GitHub – Version control
 * i18n Framework – Localization support
@@ -99,8 +108,7 @@ The project was organized using an Agile (Scrum) development methodology to allo
 
 ### Sprint-Based Documentation Sections
 
-- Sprint 1: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_1 
-
+- Sprint 1:-[View Project Planning Report](Documents/Project Planning Report.pdf)
 - Sprint 2: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_2
 
 - Sprint 3: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_3
