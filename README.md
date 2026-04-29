@@ -1,4 +1,5 @@
   # ClassIQ – Teacher Grade Book and Report Card System
+  
 
 ## 1. Project Title & Overview
 
@@ -280,19 +281,6 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 
 ---
 
-### Testing & Coverage
-
-* Verified multilingual data storage in the database
-* Tested language-based data retrieval
-* Verified UI updates dynamically
-* Validated report generation in different languages
-* Unit testing done using JUnit
-* JaCoCo used for code coverage
-
-* Coverage report location: target/site/jacoco/index.html
-
----
-
 ### GUI Support (Xming / VcXsrv)
 
 Since this is a JavaFX application, GUI support is required when running in Docker.
@@ -324,6 +312,15 @@ mvn test
 ```
 
 ### Test Coverage Access
+
+### Testing & Coverage
+
+* Verified multilingual data storage in the database
+* Tested language-based data retrieval
+* Verified UI updates dynamically
+* Validated report generation in different languages
+* Unit testing done using JUnit
+* JaCoCo used for code coverage
 
 Test results can be viewed in the terminal after running mvn test. If a coverage tool such as JaCoCo is configured in the pom.xml, the coverage report can be generated using:
 mvn test jacoco:report
