@@ -53,13 +53,14 @@ They are not allowed to edit.
 - 8 Sprints (2 weeks each) = 16 weeks total
 ---
 
-## 2.Product Vision
+## 2. Product Vision
 
 ### Vision Statement
 
-Our vision is to create a simple, reliable, and efficient gradebook system that supports teachers in managing student performance. The goal is to make grading easier, faster, and more accurate while demonstrating how a real-world educational application can be built using Java and modern software engineering practices.
+Our vision is to create a simple, reliable, and efficient grad ebook system that supports teachers in managing student performance. The goal is to make grading easier, faster, and more accurate while demonstrating how a real-world educational application can be built using Java and modern software engineering practices.
 
 Additionally, the system aims to be inclusive and accessible by supporting localization, allowing the application to be used in multiple languages such as Sinhala and Arabic. This ensures that teachers from diverse linguistic backgrounds can interact with the system comfortably and effectively
+
 ---
 ### Main Goals
 
@@ -88,12 +89,12 @@ Additionally, the system aims to be inclusive and accessible by supporting local
 ---
 ### Definition of Success
 
-The project will be considered successful when a fully functional gradebook system is developed within the given timeline, meeting all requirements while enabling teachers to efficiently manage student records, calculate grades accurately, and reduce manual workload. It should provide a user-friendly interface, maintain high accuracy and consistency in grading, and successfully support localization in multiple languages such as Sinhala and Arabic, including proper handling of different language formats. Additionally, the system should demonstrate the use of modern Java development practices and deliver a reliable, maintainable solution with positive user feedback.
+The project will be considered successful when a fully functional grade book system is developed within the given timeline, meeting all requirements while enabling teachers to efficiently manage student records, calculate grades accurately, and reduce manual workload. It should provide a user-friendly interface, maintain high accuracy and consistency in grading, and successfully support localization in multiple languages such as Sinhala and Arabic, including proper handling of different language formats. Additionally, the system should demonstrate the use of modern Java development practices and deliver a reliable, maintainable solution with positive user feedback.
 
 ---
 ## 3. Project Plan & Sprint Structure
 
-The project was organized using an Agile (Scrum) development methodology to allow for iterative progress and continuous improvement. The total development period of 8 weeks was divided into 4 sprints, each lasting 2 weeks. Each sprint focused on specific features such as core gradebook functionality, user interface development, grading logic, and localization support including Sinhala and Arabic. Regular sprint planning, development, and review phases were followed to track progress, identify issues early, and ensure the system met requirements effectively.
+The project was organized using an Agile (Scrum) development methodology to allow for iterative progress and continuous improvement. The total development period of 8 weeks was divided into 4 sprints, each lasting 2 weeks. Each sprint focused on specific features such as core grade book functionality, user interface development, grading logic, and localization support including Sinhala and Arabic. Regular sprint planning, development, and review phases were followed to track progress, identify issues early, and ensure the system met requirements effectively.
 
 ### Sprint-Based Documentation Sections
 
@@ -213,7 +214,7 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
    ```
    git clone <https://github.com/Tharushika78910/ClassIQ.git>
    ```
-2. Setup the database using provided SQL scripts
+2. Set up the database using provided SQL scripts
 3. Configure database connection
 4. Build and run the project
 
@@ -225,7 +226,7 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 
 ---
 
-## Testing & Coverage
+### Testing & Coverage
 
 * Verified multilingual data storage in the database
 * Tested language-based data retrieval
@@ -238,7 +239,7 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 
 ---
 
-## Code Quality (SonarQube)
+### Code Quality (SonarQube)
 
 * SonarQube used for static code analysis
 * JaCoCo used for code coverage
@@ -251,7 +252,7 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 
 ---
 
-## CI/CD Pipeline (Jenkins)
+### CI/CD Pipeline (Jenkins)
 
 Jenkins is used to automate the build and deployment process.
 
@@ -268,13 +269,13 @@ Jenkins is used to automate the build and deployment process.
   
 ___
 
-## Docker Setup
+### Docker Setup
 
-# Docker Hub Repository - poornimj/classiq
+#### Docker Hub Repository - poornimj/classiq
 
-# Build Docker Image - docker build -t poornimj/classiq
+#### Build Docker Image - docker build -t poornimj/classiq
 
-# Run Docker Container (PowerShell) 
+#### Run Docker Container (PowerShell) 
 
 docker rm -f classiq-container
 
@@ -289,11 +290,11 @@ poornimj/classiq:latest
 
 ---
 
-## GUI Support (Xming / VcXsrv)
+### GUI Support (Xming / VcXsrv)
 
 Since this is a JavaFX application, GUI support is required when running in Docker.
 
-# Steps
+### Steps
 
  * Install VcXsrv or Xming
  * Start the server before running Docker
@@ -301,7 +302,7 @@ Since this is a JavaFX application, GUI support is required when running in Dock
 
 ---
 
-# Optional:
+### Optional:
 
 DISPLAY=host.docker.internal:0.0
 
@@ -312,10 +313,10 @@ DISPLAY=host.docker.internal:0.0
 ---
 ## 14. Repository Structure
 
-## Main Directories
+### Main Directories
 
 - **/backend**  
-  Represents the backend logic located in `src/main/java/backend`. It handles business logic, data processing, and core gradebook functionalities.
+  Represents the backend logic located in `src/main/java/backend`. It handles business logic, data processing, and core grade book functionalities.
 
 - **/frontend**  
   Represents the frontend components located in `src/main/java/frontend`. It is responsible for the user interface and user interactions.
@@ -343,13 +344,15 @@ DISPLAY=host.docker.internal:0.0
 
 ---
 ## 15. Authors
+
 Include:
-• Team members: 
+
+Team members: 
 - Poornima Jayamanna
 - Hathadura Chathurika
 - Dilmi Merenchi Kankanamge
 - Roshini Farnando
 - Kumudu Nallaperuma         (names and roles)
 
-• Course name and semester:
+Course name and semester:
 - Software Engineering Project TX00EY30-3011 - Semester 1 & 2, 2026
