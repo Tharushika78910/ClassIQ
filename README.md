@@ -1,6 +1,6 @@
-# ClassIQ – Teacher Grade Book and Report Card System
+  # ClassIQ – Teacher Grade Book and Report Card System
 
-## Project Overview
+## 1. Project Title & Overview
 
 ClassIQ is a Java-based application developed to help teachers manage student academic records efficiently.
 The system allows teachers to view student information, record marks, generate report cards, and provide feedback based on student performance in an organized way.
@@ -12,24 +12,26 @@ The system supports **multilingual functionality**, allowing users to interact w
 This project demonstrates concepts in software development, internationalization (i18n), software quality assurance, and DevOps practices.
 
 ---
+### Problem Summary
 
-## Features
+In some educational systems, some teachers enter students’ performance or marks manually   
+by writing on paper or computers. And they are calculating average and grades are also
+manually. That method is not hundred percent accurate and not very efficient, it will make
+teachers tired and time wasting much and, on the other hand, it is difficult with large numbers of
+students.
 
-* Manage student information
-* Enter student marks
-* Display grading criteria
-* View student grades
-* Generate report cards
-* Teacher and student dashboards
-* Provide performance feedback
-* Multilingual UI support
-* Dynamic language switching
-* RTL (Right-to-Left) layout support
-* Localized database content support
+---
+###  Intended Audience/Users
+
+- The main users are teachers .They can use this application to enter the marks, edit and
+calculate average marks and generate the grades and report cards. They are able to
+give feedback if they need to. 
+- Students can access the system to view their marks, grade ,average and feedback too.
+They are not allowed to edit.
 
 ---
 
-## Technologies Used
+### Technologies Used
 
 * JavaFX – User Interface
 * IntelliJ IDEA – IDE
@@ -46,8 +48,77 @@ This project demonstrates concepts in software development, internationalization
 
 ---
 
-## Localization Support
+### Overall duration
 
+- 8 Sprints (2 weeks each) = 16 weeks total
+---
+
+## 2.Product Vision
+
+### Vision Statement
+
+Our vision is to create a simple, reliable, and efficient gradebook system that supports teachers in managing student performance. The goal is to make grading easier, faster, and more accurate while demonstrating how a real-world educational application can be built using Java and modern software engineering practices.
+
+Additionally, the system aims to be inclusive and accessible by supporting localization, allowing the application to be used in multiple languages such as Sinhala and Arabic. This ensures that teachers from diverse linguistic backgrounds can interact with the system comfortably and effectively
+---
+### Main Goals
+
+- Deliver a fully functional grade book system within the 8-week project timeline
+- Reduce manual grading workload for teachers through automation
+- Maintain grading accuracy, consistency, and standardization
+- Apply modern Java software development practices learned during the course
+- Support localization by enabling the system to operate in multiple languages 
+- Improve accessibility and usability for teachers from diverse linguistic backgrounds
+
+---
+## Features
+
+* Manage student information
+* Enter student marks
+* Display grading criteria
+* View student grades
+* Generate report cards
+* Teacher and student dashboards
+* Provide performance feedback
+* Multilingual UI support
+* Dynamic language switching
+* RTL (Right-to-Left) layout support
+* Localized database content support
+
+---
+### Definition of Success
+
+The project will be considered successful when a fully functional gradebook system is developed within the given timeline, meeting all requirements while enabling teachers to efficiently manage student records, calculate grades accurately, and reduce manual workload. It should provide a user-friendly interface, maintain high accuracy and consistency in grading, and successfully support localization in multiple languages such as Sinhala and Arabic, including proper handling of different language formats. Additionally, the system should demonstrate the use of modern Java development practices and deliver a reliable, maintainable solution with positive user feedback.
+
+---
+## 3. Project Plan & Sprint Structure
+
+The project was organized using an Agile (Scrum) development methodology to allow for iterative progress and continuous improvement. The total development period of 8 weeks was divided into 4 sprints, each lasting 2 weeks. Each sprint focused on specific features such as core gradebook functionality, user interface development, grading logic, and localization support including Sinhala and Arabic. Regular sprint planning, development, and review phases were followed to track progress, identify issues early, and ensure the system met requirements effectively.
+
+### Sprint-Based Documentation Sections
+
+- Sprint 1: 
+- Sprint 2: 
+- Sprint 3: 
+- Sprint 4:
+- Sprint 5:
+- Sprint 6:
+- Sprint 7:
+- Sprint 8:
+
+---
+
+## 4. Sprint 1 – Project Planning & Vision
+
+## 5. Sprint 2 – Requirements & Database
+
+## 6. Sprint 3 – UI Implementation & CI
+
+## 7. Sprint 4 – Docker Containerization
+
+## 8. Sprint 5 – UI Localization & Kubernetes
+
+### Localization Support
 ### Supported Languages
 
 * English (en)
@@ -68,9 +139,9 @@ This project demonstrates concepts in software development, internationalization
 2. Select a language from the dropdown
 3. UI updates instantly
 
----
+## 9. Sprint 6 – Database Localization
 
-## Database Localization
+### Database Localization
 
 The system implements database-level localization using the **Translation Table Approach**.
 
@@ -120,9 +191,13 @@ CREATE TABLE student_translation (
 COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 ```
 
+## 10. Sprint 7 – Quality Assurance
+
+## 11. Sprint 8 – Documentation & Finalization
+
 ---
 
-## How to Run the Project
+## 12. How to Run the Project
 
 ### Prerequisites
 
@@ -231,19 +306,50 @@ Since this is a JavaFX application, GUI support is required when running in Dock
 DISPLAY=host.docker.internal:0.0
 
 ---
-    
-## Documentation
 
-* Sprint Plans
-* Sprint Review Reports
-* UML Diagrams (Sequence Diagram)
-* Localization Excel Sheet
-* Acceptance Criteria
-* Heuristic Evaluation Report
+## 13. Testing Instructions
 
 ---
+## 14. Repository Structure
 
-## Conclusion
+## Main Directories
 
-ClassIQ demonstrates a complete multilingual academic management system with both UI and database localization.
-The project follows Agile practices, integrates modern development tools, and ensures high-quality, scalable software design.
+- **/backend**  
+  Represents the backend logic located in `src/main/java/backend`. It handles business logic, data processing, and core gradebook functionalities.
+
+- **/frontend**  
+  Represents the frontend components located in `src/main/java/frontend`. It is responsible for the user interface and user interactions.
+
+- **/resources**  
+  Located in `src/main/resources`, this directory contains configuration files and localization resources, including support for Sinhala and Arabic languages.
+
+- **/tests**  
+  Located in `src/test/java`, this directory includes test cases for both backend and frontend components to ensure system reliability and correctness.
+
+- **/docs**  
+  Represented by the `Documents` folder, it contains project documentation such as reports and related materials.
+
+- **/diagrams**  
+  Represented by the `Diagrams` folder, it includes system architecture diagrams, UML diagrams, and design illustrations.
+
+- **/docker**  
+  Represented by the `Dockerfile`, used to containerize the application for deployment.
+
+- **/ci-cd**  
+  Represented by the `Jenkinsfile`, which defines the CI/CD pipeline for automated build, testing, and deployment.
+
+- **/build**  
+  Represented by the `target` directory, which stores compiled code and build outputs generated by Maven.
+
+---
+## 15. Authors
+Include:
+• Team members: 
+- Poornima Jayamanna
+- Hathadura Chathurika
+- Dilmi Merenchi Kankanamge
+- Roshini Farnando
+- Kumudu Nallaperuma         (names and roles)
+
+• Course name and semester:
+- Software Engineering Project TX00EY30-3011 - Semester 1 & 2, 2026
