@@ -99,7 +99,7 @@ Additionally, the system aims to be inclusive and accessible by supporting local
 ---
 ### Definition of Success
 
-The project will be considered successful when a fully functional grade book system is developed within the given timeline, meeting all requirements while enabling teachers to efficiently manage student records, calculate grades accurately, and reduce manual workload. It should provide a user-friendly interface, maintain high accuracy and consistency in grading, and successfully support localization in multiple languages such as Sinhala and Arabic, including proper handling of different language formats. Additionally, the system should demonstrate the use of modern Java development practices and deliver a reliable, maintainable solution with positive user feedback.
+The project will be successful if the grade book system is completed on time, meets requirements, supports multiple languages, provides accurate grading, and offers a reliable, user-friendly solution for teachers.
 
 ---
 ## 3. Project Plan & Sprint Structure
@@ -108,30 +108,80 @@ The project was organized using an Agile (Scrum) development methodology to allo
 
 ### Sprint-Based Documentation Sections
 
-- Sprint 1: 📎 [View Project Planning Report](Documents/Project%20Planning%20Report.pdf)
-- 
-- Sprint 2: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_2
+- Sprint  1:  - 📎 [Project Planning Report](Documents/Project%20Planning%20Report.pdf)
 
-- Sprint 3: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_3
+- Sprint 1: - 📎 [Project Vision Report](Documents/Project%20Vision%20Report.pdf)
+  
+- Sprint 2: - 📎 [View Database Schema](Documents/db/schema.sql)
 
-- Sprint 4: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprnt_4
+- Sprint 3: -📎 [View ClassIQ UI Report](Documents/Images/ClassIQ_UI.pdf)
 
-- Sprint 5: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprnt_5
+- Sprint 4:  - Docker Containerization
 
-- Sprint 6: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_6
+- Sprint 5: - UI Localization
 
-- Sprint 7: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprnt_7
+- Sprint 6: - Database Localization
 
-- Sprint 8:
+- Sprint 7: - Quality Assurance
+
+- Sprint 8:- Documentation & Finalization
 
 ---
 
 ## 4. Sprint 1 – Project Planning & Vision
 
+•	Created project plan and timeline
+
+•	Developed product backlog
+
+•	Defined project scope and identified risks
+
+•	Validated project vision
+
+•	Defined acceptance criteria for core system features
+
+- Sprint 1: [View Reports](Documents/Sprint_reports/Sprint_1)
+
+
 ## 5. Sprint 2 – Requirements & Database
+
+•	Identified functional requirements (login, grading, report generation)
+
+•	Created Use Case Diagram
+
+•	Designed ER Diagram
+
+•	Selected MariaDB database
+
+•	Implemented database schema and relationships
+
+•	Planned unit testing strategy using JUnit
+
+- Sprint 2:  [View Reports](Documents/Sprint_reports/Sprint_2)
+
 
 ## 6. Sprint 3 – UI Implementation & CI
 
+•	Developed UI using JavaFX
+
+•	Implemented login page, teacher dashboard, student dashboard, and grading interface
+
+•	Followed MVC design approach
+
+•	Integrated Maven build system
+
+CI/CD Pipeline (Jenkins)
+
+•	Build
+
+•	Test
+
+•	Code Coverage (JaCoCo)
+
+•	SonarQube Analysis
+
+- Sprint 3:  [View Reports](Documents/Sprint_reports/Sprint_3)
+- 
 ### CI/CD Pipeline (Jenkins)
 
 Jenkins is used to automate the build and deployment process.
