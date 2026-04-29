@@ -98,13 +98,20 @@ The project was organized using an Agile (Scrum) development methodology to allo
 
 ### Sprint-Based Documentation Sections
 
-- Sprint 1: 
-- Sprint 2: 
-- Sprint 3: 
-- Sprint 4:
-- Sprint 5:
-- Sprint 6:
-- Sprint 7:
+- Sprint 1: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_1 
+
+- Sprint 2: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_2
+
+- Sprint 3: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_3
+
+- Sprint 4: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprnt_4
+
+- Sprint 5: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprnt_5
+
+- Sprint 6: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_6
+
+- Sprint 7: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprnt_7
+
 - Sprint 8:
 
 ---
