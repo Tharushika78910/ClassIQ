@@ -108,7 +108,8 @@ The project was organized using an Agile (Scrum) development methodology to allo
 
 ### Sprint-Based Documentation Sections
 
-- Sprint 1: 📎 [View Project Planning Report](Documents/Project Planning Report.pdf)
+- Sprint 1: 📎 [View Project Planning Report](Documents/Project%20Planning%20Report.pdf)
+- 
 - Sprint 2: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_2
 
 - Sprint 3: https://github.com/Tharushika78910/ClassIQ/tree/main/Documents/Sprint_reports/Sprint_3
