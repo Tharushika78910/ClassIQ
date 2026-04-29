@@ -122,7 +122,42 @@ The project was organized using an Agile (Scrum) development methodology to allo
 
 ## 6. Sprint 3 – UI Implementation & CI
 
+### CI/CD Pipeline (Jenkins)
+
+Jenkins is used to automate the build and deployment process.
+
+* Pipeline Stages
+* Clean Workspace
+* Checkout Code
+* Build, Test and Coverage
+* Publish Test Results
+* Publish Coverage Report
+* SonarQube Analysis
+* Build Docker Image
+* Push Docker Image to Docker Hub
+* Run Docker Container
+
 ## 7. Sprint 4 – Docker Containerization
+
+### Docker Setup
+
+#### Docker Hub Repository - poornimj/classiq
+
+#### Build Docker Image - docker build -t poornimj/classiq
+
+#### Run Docker Container (PowerShell)
+
+docker rm -f classiq-container
+
+docker run -d --name classiq-container -p 8080:8080 `
+-v C:\classiq-reports:/app/reports `
+-e DB_HOST=host.docker.internal `
+-e DB_PORT=3306 `
+-e DB_NAME=classiq `
+-e DB_USER=root `
+-e DB_PASS=root123 `
+poornimj/classiq:latest
+
 
 ## 8. Sprint 5 – UI Localization & Kubernetes
 
@@ -201,6 +236,18 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 
 ## 10. Sprint 7 – Quality Assurance
 
+### Code Quality (SonarQube)
+
+* SonarQube used for static code analysis
+* JaCoCo used for code coverage
+* Issues and vulnerabilities resolved
+* Quality Gate: Passed
+* Bugs and vulnerabilities identified and resolved
+* Code smells reduced
+* Quality Gate Status: PASSED
+* Dashboard: http://localhost:9000/dashboard?id=ClassIQ
+
+
 ## 11. Sprint 8 – Documentation & Finalization
 
 ---
@@ -243,57 +290,6 @@ COALESCE(tr_req.first_name, tr_en.first_name, s.first_name)
 * JaCoCo used for code coverage
 
 * Coverage report location: target/site/jacoco/index.html
-
----
-
-### Code Quality (SonarQube)
-
-* SonarQube used for static code analysis
-* JaCoCo used for code coverage
-* Issues and vulnerabilities resolved
-* Quality Gate: Passed
-* Bugs and vulnerabilities identified and resolved
-* Code smells reduced
-* Quality Gate Status: PASSED
-* Dashboard: http://localhost:9000/dashboard?id=ClassIQ
-
----
-
-### CI/CD Pipeline (Jenkins)
-
-Jenkins is used to automate the build and deployment process.
-
-  * Pipeline Stages
-  * Clean Workspace
-  * Checkout Code
-  * Build, Test and Coverage
-  * Publish Test Results
-  * Publish Coverage Report
-  * SonarQube Analysis
-  * Build Docker Image
-  * Push Docker Image to Docker Hub
-  * Run Docker Container  
-  
-___
-
-### Docker Setup
-
-#### Docker Hub Repository - poornimj/classiq
-
-#### Build Docker Image - docker build -t poornimj/classiq
-
-#### Run Docker Container (PowerShell) 
-
-docker rm -f classiq-container
-
-docker run -d --name classiq-container -p 8080:8080 `
--v C:\classiq-reports:/app/reports `
--e DB_HOST=host.docker.internal `
--e DB_PORT=3306 `
--e DB_NAME=classiq `
--e DB_USER=root `
--e DB_PASS=root123 `
-poornimj/classiq:latest
 
 ---
 
