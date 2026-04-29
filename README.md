@@ -317,6 +317,28 @@ DISPLAY=host.docker.internal:0.0
 
 ## 13. Testing Instructions
 
+Testing can be executed using Maven from the project root directory. The project includes test files under `src/test/java`, separated into backend and frontend test packages. Backend tests are organized into `controller`, `model`, and `service` folders, while frontend tests include areas such as `student`, `teacher`, and `LoginPageViewTest`.
+
+### Run Unit Tests
+
+To run all unit tests, use the following command:
+
+```bash
+mvn test
+```
+
+### Test Coverage Access
+
+Test results can be viewed in the terminal after running mvn test. If a coverage tool such as JaCoCo is configured in the pom.xml, the coverage report can be generated using:
+mvn test jacoco:report
+
+The generated coverage report can be accessed at:
+target/site/jacoco/index.html
+
+### Performance Testing
+
+Performance testing was not implemented as a separate testing phase in this project. However, basic performance was observed during manual testing by checking application response time, login behavior, grade calculation speed, and navigation between teacher and student interfaces.
+
 ---
 ## 14. Repository Structure
 
