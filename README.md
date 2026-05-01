@@ -134,14 +134,14 @@ The project was organized using an Agile (Scrum) development methodology to allo
 - [View Statistical Code Review Report](Documents/Statistical_Code_Review_Report_Sprint_6.pdf)
 
 - Sprint 7: - Quality Assurance
-- [Open Folder](Documents/Result_after_SonarQube_with_Jenkins_and_Docker)
-- [Open Folder](Documents/Acceptance%20Criteria)
-- [Open Folder](Documents/Heuristic_Evaluation_Reports)
-- [View Bug Report](Documents/ClassIQ_Bug_Issue_Report.pdf)
+- [Open Folder - Result_after_SonarQube_with_Jenkins_and_Docker](Documents/Result_after_SonarQube_with_Jenkins_and_Docker)
+- [Open Folder - Acceptance Criteria](Documents/Acceptance%20Criteria)
+- [Open Folder-Heuristic_Evaluation_Reports](Documents/Heuristic_Evaluation_Reports)
+- [View Bug Issue Report](Documents/ClassIQ_Bug_Issue_Report.pdf)
 
 - Sprint 8:- Documentation & Finalization
-- [Open Diagrams](Diagrams/)
-- [Open Docs](Documents/)
+- [Open Diagrams](Diagrams)
+- [Open Docs](Documents)
 
 ---
 
