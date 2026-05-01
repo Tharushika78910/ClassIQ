@@ -479,9 +479,13 @@ Include:
 
 Team members: 
 - Poornima Jayamanna - Scrum Master, Database Design, SonarQube Analysis, CI/CD (Jenkins) Creation, Backend Development, Documentation Lead  
-- Hathadura Chathurika - Scrum Master, Frontend Development, UI Testing, Documentation Support    
+
+- Hathadura Chathurika - Scrum Master, Frontend Development, UI Testing, Documentation Support   
+
 - Dilmi Merenchi Kankanamge - Scrum Master, System Design (UML Diagrams), Testing, Documentation(Bug Reporting) , Backend Development 
+
 - Roshini Fernando  - Scrum Master, Frontend Development, Documentation (Heuristic Evaluation), presentation preparation
+
 - Kumudu Nallaperuma -   Scrum Master, SonarQube Analysis Support, Quality Assurance, Backend Development, Documentation       
 
 ---
